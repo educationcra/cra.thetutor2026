@@ -3,854 +3,342 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ลงทะเบียน - CRA THE TUTOR 2026</title>
+  <title>Dashboard - CRA THE TUTOR 2026</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
-  <!-- เพิ่ม html2canvas สำหรับเซฟรูประบบ E-Ticket -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
-    body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
+    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
     
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Loader */
+    .loader { border: 4px solid #f1f5f9; border-top: 4px solid #ff6b00; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     /* Animations */
-    .step-section { display: none; opacity: 0; transform: translateX(0); }
-    .step-section.visible { display: block; }
-    @keyframes stepInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes stepInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-    .ani-next { animation: stepInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-    .ani-prev { animation: stepInLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-    
-    /* Inputs */
-    .input-wrapper { margin-bottom: 1.5rem; position: relative; }
-    .input-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 700; color: #334155; margin-bottom: 0.6rem; }
-    .req { color: #ef4444; }
-    .input-field { 
-        width: 100%; padding: 1.125rem 1.25rem; border-radius: 0.85rem; 
-        border: 2px solid #f1f5f9; background: #f8fafc; 
-        outline: none; transition: all 0.25s ease; 
-        font-weight: 600; color: #0f172a; font-size: 0.95rem; 
-    }
-    .input-field:focus { background: #ffffff; border-color: #0f172a; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); }
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Custom Dropdown with SVG Prefix */
-    .c-select-container { position: relative; width: 100%; user-select: none; }
-    .c-select-trigger { 
-        width: 100%; padding: 1.125rem 1.25rem; border-radius: 0.85rem; 
-        border: 2px solid #f1f5f9; background: #f8fafc; 
-        display: flex; justify-content: space-between; align-items: center; 
-        cursor: pointer; transition: all 0.25s ease; 
-        font-weight: 600; color: #64748b; font-size: 0.95rem; 
-    }
-    .c-select-trigger.has-value { color: #0f172a; }
-    .c-select-trigger:focus, .c-select-container.open .c-select-trigger { 
-        background: #ffffff; border-color: #0f172a; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08); 
-    }
-    .trigger-content { display: flex; align-items: center; gap: 0.75rem; }
-    .trigger-icon { color: #94a3b8; font-size: 1.1rem; display: flex; align-items: center; transition: color 0.2s; }
-    .c-select-trigger.has-value .trigger-icon { color: #0f172a; }
-    
-    .c-select-dropdown { 
-        position: absolute; top: calc(100% + 8px); left: 0; width: 100%; 
-        background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; 
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); z-index: 50; 
-        max-height: 250px; overflow-y: auto; opacity: 0; visibility: hidden; 
-        transform: translateY(-10px); transition: all 0.2s; 
-    }
-    .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
-    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; }
-    .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
-    .c-select-option.selected { background: #f1f5f9; color: #0f172a; font-weight: 700; border-left: 4px solid #0f172a; padding-left: 1rem;}
-    
-    /* Autocomplete */
-    .autocomplete-dropdown { 
-        position: absolute; z-index: 50; width: 100%; background: #fff; 
-        border: 1px solid #e2e8f0; border-radius: 0.85rem; max-height: 250px; 
-        overflow-y: auto; display: none; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); margin-top: 8px; 
-    }
-    .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; }
-    .autocomplete-dropdown li:hover { background-color: #f1f5f9; color: #0f172a; padding-left: 1.5rem; }
-
-    /* Custom Checkbox (Like the screenshot) */
-    .check-card { 
-        display: flex; align-items: center; padding: 1.1rem 1.25rem; 
-        background: #f8fafc; border-radius: 1rem; cursor: pointer; 
-        transition: all 0.2s; border: 2px solid transparent; gap: 1rem;
-    }
-    .check-card:hover { background: #f1f5f9; }
-    .check-card.checked { background: #fff7ed; border-color: #ff6b00; }
-    .check-box-ui {
-        width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; 
-        display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-        background: white; flex-shrink: 0;
-    }
-    .check-card.checked .check-box-ui { background: #ff6b00; border-color: #ff6b00; }
-    .check-card.checked .check-box-ui i { opacity: 1; color: white; }
-    .check-box-ui i { opacity: 0; font-size: 0.8rem; margin-top: 2px; }
-
-    /* Course Cards (Step 1) */
-    .course-card { 
-        background: #f8fafc; border: 2px solid transparent; border-radius: 1.25rem; 
-        padding: 1.25rem; cursor: pointer; transition: all 0.2s; position: relative; 
-        display: flex; flex-direction: column; justify-content: space-between;
-    }
-    .course-card:not(.disabled):hover { border-color: #ff6b00; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(255,107,0,0.15); }
-    .course-card.selected { background: #fff7ed; border-color: #ff6b00; }
-    .course-card.disabled { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; }
-    
-    /* Buttons */
-    .btn-dark { background: #0f172a; color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.4); }
-    .btn-dark:hover:not(:disabled) { background: #ff6b00; transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(255, 107, 0, 0.4); }
-    .btn-dark:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; transform: none; background: #64748b; }
-
-    /* Colors for specific courses */
-    .color-MD { background-color: #047857; } .text-MD { color: #047857; }
-    .color-HDS { background-color: #84cc16; } .text-HDS { color: #65a30d; }
-    .color-BNS { background-color: #38bdf8; } .text-BNS { color: #0284c7; }
-    .color-RT { background-color: #a855f7; } .text-RT { color: #9333ea; }
-    .color-HKH { background-color: #f97316; } .text-HKH { color: #ea580c; }
-    .color-PMD { background-color: #1e3a8a; } .text-PMD { color: #1e3a8a; }
-    .color-INMS { background-color: #facc15; } .text-INMS { color: #ca8a04; }
-    .color-BME { background-color: #be123c; } .text-BME { color: #be123c; }
-    .color-MHFT { background-color: #ec4899; } .text-MHFT { color: #db2777; }
+    /* Modal */
+    .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
   </style>
 </head>
-<body class="bg-white min-h-screen text-slate-800">
+<body class="text-slate-800 antialiased pb-10">
 
-  <div class="flex min-h-screen w-full">
+  <!-- Loading Screen -->
+  <div id="loading" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="loader mb-4"></div>
+    <p class="text-[#ff6b00] font-bold animate-pulse text-xl">กำลังดึงข้อมูลลงทะเบียน...</p>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="container mx-auto px-4 py-8 max-w-[85rem] opacity-0 transition-opacity duration-700 hidden">
     
-    <!-- Left Banner (Deep Space Theme) -->
-    <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-[#070B19] text-white flex-col justify-between relative overflow-hidden">
-        <!-- Glowing Effects -->
-        <div class="absolute top-[-20%] left-[-20%] w-[70%] h-[70%] bg-[#0ea5e9] rounded-full mix-blend-screen filter blur-[150px] opacity-30"></div>
-        <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-[#ff6b00] rounded-full mix-blend-screen filter blur-[120px] opacity-30"></div>
-        
-        <div class="relative z-10 p-12 xl:p-20 pt-16 h-full flex flex-col">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-orange-50 rounded-2xl flex justify-center items-center text-[#ff6b00]">
+            <i class="fi fi-sr-dashboard text-3xl mt-1"></i>
+        </div>
+        <div>
+            <span class="inline-block px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold tracking-widest uppercase mb-1">โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2</span>
+            <h1 class="text-2xl md:text-3xl font-black text-[#0f172a] tracking-tight">CRA THE TUTOR <span class="text-[#ff6b00]">DASHBOARD</span></h1>
+        </div>
+      </div>
+      <div class="flex gap-2">
+         <button onclick="fetchData()" class="flex items-center gap-2 px-5 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">
+            <i class="fi fi-sr-refresh"></i> รีเฟรชข้อมูล
+         </button>
+      </div>
+    </header>
+
+    <!-- KPI Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-[#0f172a] rounded-3xl p-6 shadow-lg text-white flex items-center justify-between relative overflow-hidden">
+            <div class="absolute right-[-10%] top-[-10%] w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="relative z-10">
+                <p class="text-slate-400 font-bold text-sm mb-1">ยอดลงทะเบียนรวมทั้งหมด</p>
+                <div class="flex items-baseline gap-2"><span class="text-5xl font-black text-white" id="kpiTotalReg">0</span><span class="text-sm font-bold text-slate-400">คน</span></div>
+            </div>
+            <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white relative z-10"><i class="fi fi-sr-users-alt text-2xl mt-1"></i></div>
+        </div>
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
-                <span class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-bold tracking-widest uppercase mb-6 text-[#ff6b00]">
-                    โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2
-                </span>
-                <h1 class="text-4xl xl:text-6xl font-black leading-[1.1] tracking-tight mb-4">
-                    CRA THE TUTOR <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff6b00] to-[#facc15]">PORTFOLIO LEVEL UP</span>
-                </h1>
-                <p class="text-lg xl:text-xl text-slate-300 font-medium leading-relaxed max-w-md">
-                    เตรียมพบ 10 หลักสูตรคุณภาพ เจาะลึก ทริคปั้นพอร์ต สไตล์ตัวท็อป ราชวิทยาลัยจุฬาภรณ์
-                </p>
+                <p class="text-slate-500 font-bold text-sm mb-1">โควตารวมทั้งโครงการ</p>
+                <div class="flex items-baseline gap-2"><span class="text-5xl font-black text-slate-800" id="kpiTotalQuota">300</span><span class="text-sm font-bold text-slate-400">ที่นั่ง</span></div>
             </div>
-            
-            <div class="mt-auto">
-                <div class="flex items-center gap-4 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 w-fit">
-                    <div class="w-12 h-12 rounded-full bg-[#ff6b00]/20 flex items-center justify-center text-[#ff6b00]">
-                        <i class="fi fi-sr-rocket-lunch text-2xl mt-1"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold text-slate-400">วันงานร่วมกิจกรรม</p>
-                        <p class="text-lg font-bold text-white">12 กันยายน 2569</p>
-                    </div>
-                </div>
+            <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><i class="fi fi-sr-chair text-2xl mt-1"></i></div>
+        </div>
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 font-bold text-sm mb-1">คิดเป็นเปอร์เซ็นต์</p>
+                <div class="flex items-baseline gap-2"><span class="text-5xl font-black text-[#ff6b00]" id="kpiPercent">0</span><span class="text-xl font-bold text-[#ff6b00]">%</span></div>
             </div>
+            <div class="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-[#ff6b00]"><i class="fi fi-sr-chart-pie-alt text-2xl mt-1"></i></div>
         </div>
     </div>
 
-    <!-- Right Form Panel -->
-    <div class="w-full lg:w-7/12 xl:w-1/2 flex flex-col relative bg-white">
-        
-        <!-- Mobile Header Line -->
-        <div class="lg:hidden w-full h-1.5 bg-gradient-to-r from-[#0B1936] via-[#0ea5e9] to-[#ff6b00]"></div>
+    <!-- Course Grid -->
+    <div class="mb-6 flex items-center justify-between px-2">
+        <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+            <i class="fi fi-sr-books text-[#ff6b00]"></i> สรุปยอดแยกตามหลักสูตร
+        </h2>
+        <p class="text-sm text-slate-500 font-medium hidden sm:block">คลิกที่การ์ดเพื่อดูรายชื่อผู้ลงทะเบียน</p>
+    </div>
 
-        <div class="flex-grow flex flex-col px-5 py-8 sm:px-12 md:px-16 lg:px-12 xl:px-20">
-            
-            <!-- Top Nav -->
-            <div class="flex justify-between items-center mb-8">
-               <a href="index.html" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#ff6b00] font-bold transition-colors no-underline">
-                 <i class="fi fi-sr-arrow-small-left mt-0.5 text-xl"></i> กลับหน้าหลัก
-               </a>
-               <img src="https://s.imgz.io/2026/08/17/logo-tutorc7e5a5aaefcfb44f.png" alt="CRA Logo" class="h-10 object-contain">
-            </div>
-
-            <!-- Global Form Loading -->
-            <div id="formLoading" class="flex-grow flex flex-col items-center justify-center text-center py-20">
-                <i class="fi fi-sr-spinner animate-spin text-5xl text-[#ff6b00] mb-4"></i>
-                <p class="font-bold text-slate-700 text-lg">กำลังซิงค์โควตาที่นั่งแบบเรียลไทม์...</p>
-            </div>
-
-            <div class="w-full max-w-[600px] mx-auto hidden" id="formWrapper">
-                
-                <!-- Progress Bar -->
-                <div class="w-full bg-slate-100 h-1.5 rounded-full mb-8 relative overflow-hidden" id="progressContainer">
-                  <div id="progressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#0f172a] to-[#ff6b00] transition-all duration-500 ease-out w-1/4"></div>
-                </div>
-
-                <form id="regForm">
-                  
-                  <!-- STEP 1: เลือกหลักสูตร -->
-                  <div id="step1" class="step-section active visible ani-next">
-                    <div class="mb-8 flex items-center gap-4">
-                       <div class="w-12 h-12 rounded-2xl bg-orange-50 text-[#ff6b00] flex items-center justify-center shrink-0">
-                           <i class="fi fi-sr-books text-2xl mt-1"></i>
-                       </div>
-                       <div>
-                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">1. เลือกหลักสูตรที่ต้องการติว</h2>
-                           <p class="text-slate-500 font-medium text-sm">รับจำนวนจำกัด (1 คน / 1 หลักสูตรเท่านั้น)</p>
-                       </div>
-                    </div>
-                    
-                    <input type="hidden" id="courseVal" value="">
-                    
-                    <!-- Grid การ์ด 9 ใบ (สร้างโดย JS) -->
-                    <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"></div>
-
-                    <div class="mt-8">
-                      <button type="button" onclick="nextStep(2)" class="w-full btn-dark py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
-                    </div>
-                  </div>
-
-                  <!-- STEP 2: ข้อมูลส่วนตัว -->
-                  <div id="step2" class="step-section">
-                    <div class="mb-8 flex items-center gap-4">
-                       <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                           <i class="fi fi-sr-user text-2xl mt-1"></i>
-                       </div>
-                       <div>
-                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">2. ข้อมูลส่วนตัว</h2>
-                       </div>
-                    </div>
-                    
-                    <!-- เลย์เอาต์ แถวเดียวกันสำหรับคอม -->
-                    <div class="grid grid-cols-12 gap-x-4 gap-y-4 mb-5">
-                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
-                        <label class="input-label"><i class="fi fi-sr-venus-mars text-slate-400"></i> คำนำหน้า<span class="req">*</span></label>
-                        <div class="c-select-container" id="c-prefix">
-                           <div class="c-select-trigger" tabindex="0">
-                               <div class="trigger-content">
-                                   <i class="fi fi-sr-user-md trigger-icon mt-0.5"></i>
-                                   <span>เลือก</span>
-                               </div>
-                               <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                           </div>
-                           <div class="c-select-dropdown">
-                              <div class="c-select-option" data-value="นาย">นาย</div>
-                              <div class="c-select-option" data-value="นางสาว"> นางสาว</div>
-                           </div>
-                        </div>
-                        <input type="hidden" id="prefix" value="">
-                      </div>
-
-                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
-                        <label class="input-label"><i class="fi fi-sr-id-badge text-slate-400"></i> ชื่อจริง<span class="req">*</span></label>
-                        <input type="text" id="fname" class="input-field" placeholder="ชื่อ">
-                      </div>
-
-                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
-                        <label class="input-label"><i class="fi fi-sr-users text-slate-400"></i> นามสกุล<span class="req">*</span></label>
-                        <input type="text" id="lname" class="input-field" placeholder="นามสกุล">
-                      </div>
-                    </div>
-                    
-                    <div class="input-wrapper mb-5">
-                      <label class="input-label"><i class="fi fi-sr-envelope text-slate-400"></i> อีเมล<span class="req">*</span></label>
-                      <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="formatEmail(this)">
-                      <ul id="emailDropdown" class="autocomplete-dropdown"></ul>
-                    </div>
-
-                    <div class="input-wrapper">
-                      <label class="input-label"><i class="fi fi-sr-smartphone text-slate-400"></i> เบอร์โทรศัพท์มือถือ<span class="req">*</span></label>
-                      <input type="tel" id="phone" class="input-field tracking-widest text-lg" maxlength="12" placeholder="0XX-XXX-XXXX" oninput="formatPhone(this)">
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                      <button type="button" onclick="prevStep(1)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
-                      <button type="button" onclick="nextStep(3)" class="w-2/3 btn-dark py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
-                    </div>
-                  </div>
-
-                  <!-- STEP 3: ข้อมูลการศึกษา -->
-                  <div id="step3" class="step-section">
-                    <div class="mb-8 flex items-center gap-4">
-                       <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                           <i class="fi fi-sr-graduation-cap text-2xl mt-1"></i>
-                       </div>
-                       <div>
-                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">3. ข้อมูลการศึกษา</h2>
-                       </div>
-                    </div>
-                    
-                    <div class="input-wrapper">
-                      <label class="input-label"><i class="fi fi-sr-school text-slate-400"></i> โรงเรียนที่กำลังศึกษา<span class="req">*</span></label>
-                      <input type="text" id="schoolSearch" class="input-field" placeholder="พิมพ์ชื่อโรงเรียนเพื่อค้นหา..." oninput="searchSchool(this.value)" autocomplete="off">
-                      <ul id="schoolDropdown" class="autocomplete-dropdown"></ul>
-                    </div>
-
-                    <div class="input-wrapper">
-                      <label class="input-label"><i class="fi fi-sr-map-marker text-slate-400"></i> จังหวัดของโรงเรียน<span class="req">*</span></label>
-                      <div class="c-select-container" id="c-province">
-                         <div class="c-select-trigger" tabindex="0">
-                             <div class="trigger-content">
-                                 <i class="fi fi-sr-map trigger-icon mt-0.5"></i>
-                                 <span>เลื่อนเพื่อเลือกจังหวัด</span>
-                             </div>
-                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                         </div>
-                         <div class="c-select-dropdown" id="provinceList"></div>
-                      </div>
-                      <input type="hidden" id="province">
-                    </div>
-
-                    <div class="input-wrapper">
-                      <label class="input-label"><i class="fi fi-sr-book-alt text-slate-400"></i> ระดับชั้น<span class="req">*</span></label>
-                      <div class="c-select-container" id="c-grade">
-                         <div class="c-select-trigger" tabindex="0">
-                             <div class="trigger-content">
-                                 <i class="fi fi-sr-badge trigger-icon mt-0.5"></i>
-                                 <span>เลือกระดับชั้น</span>
-                             </div>
-                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                         </div>
-                         <div class="c-select-dropdown">
-                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 4"> มัธยมศึกษาปีที่ 4</div>
-                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 5"> มัธยมศึกษาปีที่ 5</div>
-                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 6"> มัธยมศึกษาปีที่ 6</div>
-                         </div>
-                      </div>
-                      <input type="hidden" id="grade">
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                      <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
-                      <button type="button" onclick="nextStep(4)" class="w-2/3 btn-dark py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
-                    </div>
-                  </div>
-
-                  <!-- STEP 4: แบบสำรวจ -->
-                  <div id="step4" class="step-section">
-                    <div class="mb-8 flex items-center gap-4">
-                       <div class="w-12 h-12 rounded-2xl bg-orange-50 text-[#ff6b00] flex items-center justify-center shrink-0">
-                           <i class="fi fi-sr-poll-h text-2xl mt-1"></i>
-                       </div>
-                       <div>
-                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">4. แบบสำรวจ</h2>
-                       </div>
-                    </div>
-                    
-                    <div class="input-wrapper mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                      <label class="input-label text-[#ff6b00] mb-4">ท่านรู้จักเราจากช่องทางใด (ตอบได้มากกว่า 1)<span class="req">*</span></label>
-                      <div id="sourceGroup" class="flex flex-col gap-1">
-                        <!-- Checkbox (สร้างโดย JS) -->
-                      </div>
-                    </div>
-
-                    <div class="input-wrapper">
-                      <label class="input-label"><i class="fi fi-sr-social-network text-slate-400"></i> ปัจจุบันติดตามเพจ Education CRA หรือไม่<span class="req">*</span></label>
-                      <div class="c-select-container" id="c-followPage">
-                         <div class="c-select-trigger" tabindex="0">
-                             <div class="trigger-content">
-                                 <i class="fi fi-sr-thumbs-up trigger-icon mt-0.5"></i>
-                                 <span>เลือกสถานะ</span>
-                             </div>
-                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                         </div>
-                         <div class="c-select-dropdown">
-                            <div class="c-select-option" data-value="ติดตาม"> ใช่, ติดตาม</div>
-                            <div class="c-select-option" data-value="ไม่ได้ติดตาม">ไม่ได้ติดตาม</div>
-                         </div>
-                      </div>
-                      <input type="hidden" id="followPage">
-                      
-                      <!-- แพลตฟอร์ม -->
-                      <div id="wrapPlatform" class="hidden bg-orange-50/50 p-5 rounded-2xl border border-orange-100 mt-4">
-                        <label class="input-label text-[#ff6b00]"><i class="fi fi-sr-cursor text-orange-400"></i> แพลตฟอร์มที่ติดตามหลัก<span class="req">*</span></label>
-                        <div class="c-select-container" id="c-followPlatform">
-                           <div class="c-select-trigger bg-white border-white" tabindex="0">
-                               <div class="trigger-content">
-                                   <i class="fi fi-sr-apps trigger-icon mt-0.5"></i>
-                                   <span>เลือกแพลตฟอร์ม</span>
-                               </div>
-                               <i class="fi fi-sr-angle-small-down text-slate-400"></i>
-                           </div>
-                           <div class="c-select-dropdown">
-                              <div class="c-select-option" data-value="Facebook"> Facebook</div>
-                              <div class="c-select-option" data-value="Instagram"> Instagram</div>
-                              <div class="c-select-option" data-value="TikTok">TikTok</div>
-                              <div class="c-select-option" data-value="X (Twitter)"> X (Twitter)</div>
-                           </div>
-                        </div>
-                        <input type="hidden" id="followPlatform">
-                      </div>
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                      <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
-                      <button type="button" id="submitBtn" onclick="submitFinal()" class="w-2/3 btn-dark py-4 rounded-2xl font-black text-[17px] flex items-center justify-center gap-2">
-                         ยืนยันลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>
-                      </button>
-                    </div>
-                  </div>
-                </form>
-
-                <div id="successView" class="step-section text-center py-6">
-                   <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <i class="fi fi-sr-check-circle text-4xl text-green-500 mt-2"></i>
-                   </div>
-                   <h2 class="text-3xl font-black text-[#0f172a] mb-2 tracking-tight">ลงทะเบียนสำเร็จ!</h2>
-                   <p class="text-slate-500 mb-8 font-medium">ระบบได้ยืนยันที่นั่งและออกบัตรให้ท่านแล้ว</p>
-                   
-                   <!-- บัตร E-Ticket ที่จะถูก Capture เซฟเป็นรูปภาพ -->
-                   <div id="ticketCard" class="bg-[#0f172a] p-8 pb-10 rounded-[2rem] text-white shadow-2xl mx-auto mb-6 relative overflow-hidden" style="max-width: 400px;">
-                       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white rounded-full mix-blend-overlay filter blur-[50px] opacity-10"></div>
-                       
-                       <div class="relative z-10">
-                           <p class="text-[11px] text-slate-400 font-bold mb-2 uppercase tracking-widest">หลักสูตรที่ลงทะเบียน</p>
-                           <div id="displayCourseBadge" class="inline-block px-5 py-2 rounded-full text-[15px] font-black mb-6 shadow-md bg-[#ff6b00] text-white">--</div>
-                           
-                           <p class="text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-widest">รหัสประจำตัว</p>
-                           <div class="text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md text-[#ff6b00]" id="displayId">--</div>
-                           
-                           <!-- เพิ่มชื่อนามสกุล -->
-                           <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
-                           
-                           <!-- QR Code Image -->
-                           <div class="bg-white p-3.5 rounded-[1.5rem] inline-block shadow-inner mx-auto">
-                              <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl" crossorigin="anonymous">
-                           </div>
-                       </div>
-                   </div>
-
-                   <!-- คำเตือน -->
-                   <div class="bg-orange-50 text-orange-800 p-4 rounded-2xl border border-orange-200 font-bold text-sm flex items-start gap-3 text-left mb-6 mx-auto max-w-[400px]">
-                      <i class="fi fi-sr-camera text-xl mt-0.5 text-[#ff6b00]"></i>
-                      <span>โปรด <span class="text-[#ff6b00] underline">แคปหน้าจอรูปบัตรด้านบน</span> ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
-                   </div>
-
-                   <!-- ปุ่มฟังก์ชันดาวน์โหลด และส่งอีเมล -->
-                   <div class="flex flex-col sm:flex-row gap-3 mb-8 w-full max-w-[400px] mx-auto">
-                       <button onclick="sendQRToEmail()" class="flex-1 bg-[#ff6b00] text-white py-3.5 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2">
-                           <i class="fi fi-sr-envelope mt-0.5"></i> ส่งเข้าอีเมลฉัน
-                       </button>
-                   </div>
-
-                   <a href="index.html" class="inline-flex w-full max-w-[400px] justify-center items-center gap-2 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-200 transition no-underline text-[17px] mx-auto">
-                      กลับหน้าหลัก
-                   </a>
-                </div>
-
-            </div>
-        </div>
+    <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-8">
+        <!-- JS จะสร้าง Card ตรงนี้ -->
     </div>
   </div>
 
+  <!-- Modal ดูรายชื่อ -->
+  <div id="listModal" class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center hidden opacity-0 transition-opacity duration-300 px-4">
+      <div class="bg-white rounded-[2rem] w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+          
+          <!-- Modal Header -->
+          <div id="modalHeader" class="p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white">
+              <div>
+                  <p class="text-white/80 font-bold text-sm tracking-widest uppercase mb-1">รายชื่อผู้ลงทะเบียน</p>
+                  <h2 class="text-2xl md:text-3xl font-black" id="modalCourseTitle">ชื่อหลักสูตร</h2>
+              </div>
+              <div class="text-right flex items-center gap-4">
+                  <div class="hidden sm:block">
+                      <p class="text-white/80 font-bold text-sm mb-1">ยอดลงทะเบียน</p>
+                      <p class="text-2xl font-black"><span id="modalCourseCount">0</span> <span class="text-sm font-medium">คน</span></p>
+                  </div>
+                  <button onclick="closeModal()" class="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex justify-center items-center transition backdrop-blur-sm text-white">
+                      <i class="fi fi-sr-cross mt-1"></i>
+                  </button>
+              </div>
+          </div>
+
+          <!-- Modal Body (Table) -->
+          <div class="p-0 overflow-hidden flex-1 flex flex-col bg-slate-50">
+              <div class="overflow-x-auto overflow-y-auto flex-1 p-6 md:p-8">
+                  <table class="w-full text-sm text-left border-collapse min-w-[800px] bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                      <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 z-10 shadow-sm">
+                          <tr>
+                              <th class="p-4 w-24 text-center">รหัส</th>
+                              <th class="p-4">ชื่อ-นามสกุล</th>
+                              <th class="p-4">โรงเรียน</th>
+                              <th class="p-4 w-32">จังหวัด</th>
+                              <th class="p-4 w-40 text-center">เบอร์โทรศัพท์</th>
+                          </tr>
+                      </thead>
+                      <tbody id="modalTableBody" class="divide-y divide-slate-100">
+                          <!-- JS จะใส่ข้อมูลรายชื่อตรงนี้ -->
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <script>
-    // ⚠️ ลิงก์ Web App (อัปเดตใหม่เสมอหลังจาก Deploy)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec";
+    // ⚠️ ลิงก์ Web App ของคุณ (อย่าลืมเติม ?action=getDashboardData ลงไปในสคริปต์ GS ก่อน)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec?action=getDashboardData";
 
-    // Config โควตา สี และไอคอน SVG ของ 9 หลักสูตร
+    // ข้อมูลหลักสูตร (อ้างอิงตามฟอร์ม)
     const courseConfig = {
-      "แพทยศาสตร์": { prefix: "MD", color: "bg-emerald-700", text: "text-emerald-700", bgLight: "bg-emerald-50", icon: "fi-sr-stethoscope", max: 30 },
-      "วิทยาศาสตร์ข้อมูลสุขภาพ": { prefix: "HDS", color: "bg-lime-500", text: "text-lime-600", bgLight: "bg-lime-50", icon: "fi-sr-chart-histogram", max: 40 },
-      "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { prefix: "BNS", color: "bg-sky-400", text: "text-sky-500", bgLight: "bg-sky-50", icon: "fi-sr-user-nurse", max: 40 },
-      "รังสีเทคนิค": { prefix: "RT", color: "bg-purple-500", text: "text-purple-600", bgLight: "bg-purple-50", icon: "fi-sr-bone", max: 30 },
-      "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { prefix: "HKH", color: "bg-orange-500", text: "text-orange-600", bgLight: "bg-orange-50", icon: "fi-sr-running", max: 30 },
-      "ฉุกเฉินการแพทย์": { prefix: "PMD", color: "bg-blue-800", text: "text-blue-800", bgLight: "bg-blue-50", icon: "fi-sr-ambulance", max: 30 },
-      "นวัตกรรมวิทยาศาสตร์การแพทย์": { prefix: "INMS", color: "bg-yellow-400", text: "text-yellow-600", bgLight: "bg-yellow-50", icon: "fi-sr-microscope", max: 40 },
-      "วิศวกรรมชีวการแพทย์": { prefix: "BME", color: "bg-rose-800", text: "text-rose-800", bgLight: "bg-rose-50", icon: "fi-sr-microchip", max: 30 },
-      "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { prefix: "MHFT", color: "bg-pink-500", text: "text-pink-600", bgLight: "bg-pink-50", icon: "fi-sr-apple-whole", max: 30 }
+      "แพทยศาสตร์": { max: 30, color: "bg-emerald-600", text: "text-emerald-700", bgLight: "bg-emerald-50", icon: "fi-sr-stethoscope" },
+      "วิทยาศาสตร์ข้อมูลสุขภาพ": { max: 40, color: "bg-lime-500", text: "text-lime-700", bgLight: "bg-lime-50", icon: "fi-sr-chart-histogram" },
+      "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { max: 40, color: "bg-sky-500", text: "text-sky-600", bgLight: "bg-sky-50", icon: "fi-sr-user-nurse" },
+      "รังสีเทคนิค": { max: 30, color: "bg-purple-500", text: "text-purple-600", bgLight: "bg-purple-50", icon: "fi-sr-bone" },
+      "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { max: 30, color: "bg-orange-500", text: "text-orange-600", bgLight: "bg-orange-50", icon: "fi-sr-running" },
+      "ฉุกเฉินการแพทย์": { max: 30, color: "bg-blue-800", text: "text-blue-800", bgLight: "bg-blue-50", icon: "fi-sr-ambulance" },
+      "นวัตกรรมวิทยาศาสตร์การแพทย์": { max: 40, color: "bg-yellow-500", text: "text-yellow-700", bgLight: "bg-yellow-50", icon: "fi-sr-microscope" },
+      "วิศวกรรมชีวการแพทย์": { max: 30, color: "bg-rose-700", text: "text-rose-700", bgLight: "bg-rose-50", icon: "fi-sr-microchip" },
+      "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { max: 30, color: "bg-pink-500", text: "text-pink-600", bgLight: "bg-pink-50", icon: "fi-sr-apple-whole" }
     };
 
-    let schoolData = [];
-    const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
-    const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
-    const sources = ["CRA Roadshow (ที่โรงเรียนของท่าน)", "CRA Open House", "Dek-D's TCAS Fair", "สื่อสังคมออนไลน์ราชวิทยาลัยจุฬาภรณ์ และ Education CRA", "เว็บไซต์ราชวิทยาลัยจุฬาภรณ์", "เพื่อน / คนรู้จัก / ครูแนะนำ", "แบนเนอร์ประชาสัมพันธ์"];
+    let rawData = [];
 
-    window.onload = () => {
-      // 1. ถามเช็คระดับชั้นก่อนเริ่ม
-      Swal.fire({
-        title: 'ยืนยันคุณสมบัติ', text: 'คุณคือนักเรียนระดับมัธยมศึกษาตอนปลาย (ม.4 - ม.6) ใช่หรือไม่?', icon: 'question', 
-        showCancelButton: true, confirmButtonText: 'ใช่, ฉันเป็นนักเรียน ม.ปลาย', cancelButtonText: 'ไม่ใช่',
-        allowOutsideClick: false, customClass: { confirmButton: 'bg-[#ff6b00] rounded-xl px-6 py-3 font-bold text-white border-none', cancelButton: 'bg-slate-200 text-slate-700 rounded-xl px-6 py-3 font-bold border-none' }
-      }).then((res) => {
-        if (res.dismiss === Swal.DismissReason.cancel) {
-          Swal.fire({ title: 'ยกเลิกการลงทะเบียน', text: 'กิจกรรมนี้สงวนสิทธิ์เฉพาะนักเรียนระดับ ม.ปลาย ครับ', icon: 'info', confirmButtonText: 'กลับหน้าหลัก', allowOutsideClick: false, customClass:{ confirmButton: 'bg-[#0f172a] rounded-xl'} })
-          .then(() => window.location.href = 'index.html');
-        } else {
-          // 2. ดึงข้อมูลโควตาแบบ Real-time
-          fetchSeatsAndRender();
-        }
-      });
-      
-      // ดึงข้อมูลโรงเรียน & เตรียม Dropdowns
-      fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => schoolData = data).catch(err => console.log(err));
-      
-      const provListUI = document.getElementById('provinceList');
-      provincesList.forEach(p => { provListUI.innerHTML += `<div class="c-select-option" data-value="${p}"><i class="fi fi-sr-map-pin text-slate-400 mt-0.5"></i> ${p}</div>`; });
+    window.onload = () => { fetchData(); };
 
-      // สร้าง Checkbox ดีไซน์ใหม่
-      const group = document.getElementById('sourceGroup');
-      sources.forEach((s) => {
-        group.innerHTML += `
-          <label class="check-card" onclick="toggleCheckCard(this)">
-            <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
-            <input type="checkbox" name="src" value="${s}" class="hidden">
-            <span class="font-bold text-slate-700 text-[15px]">${s}</span>
-          </label>`;
-      });
-      group.innerHTML += `
-        <label class="check-card" onclick="toggleCheckCard(this); toggleOtherSource();">
-            <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
-            <input type="checkbox" id="chkOtherSource" class="hidden">
-            <span class="font-bold text-slate-700 text-[15px]">อื่นๆ (โปรดระบุ)</span>
-        </label>
-        <div id="wrapOtherSource" class="hidden pl-[3.5rem] pr-2 pb-2 transition-all">
-             <input type="text" id="otherSourceInput" class="input-field !py-2.5 !text-[15px] !bg-white border-2 border-orange-200 focus:border-[#ff6b00]" placeholder="พิมพ์ระบุช่องทาง...">
-        </div>
-      `;
+    function fetchData() {
+        document.getElementById('loading').classList.remove('hidden', 'opacity-0');
+        document.getElementById('mainApp').classList.add('hidden', 'opacity-0');
 
-      setupCustomSelects();
-
-      // Email Suggestion
-      const emailInput = document.getElementById('email');
-      const emailDrop = document.getElementById('emailDropdown');
-      emailInput.addEventListener('input', (e) => {
-        const val = e.target.value.trim();
-        if(val.includes('@') || val.length < 1) { emailDrop.style.display = 'none'; return; }
-        emailDrop.innerHTML = domains.map(d => `<li onclick="applyEmail('${val}${d}')"><i class="fi fi-sr-at text-slate-400 mr-2"></i> ${val}<b class="text-[#ff6b00]">${d}</b></li>`).join('');
-        emailDrop.style.display = 'block';
-      });
-    };
-
-    function fetchSeatsAndRender() {
-        fetch(SCRIPT_URL + "?action=getSeats")
-        .then(r => r.json())
-        .then(data => {
-            renderCourseCards(data);
-            document.getElementById('formLoading').style.display = 'none';
-            document.getElementById('formWrapper').classList.remove('hidden');
-        }).catch(err => {
-            console.log(err);
-            Swal.fire('Error', 'ไม่สามารถเชื่อมต่อระบบโควตาได้', 'error');
+        fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(json => {
+            if(json.status === 'success') {
+                rawData = json.data;
+                // ตัด Header ของ Google Sheet ออก (ถ้ามี)
+                if(rawData.length > 0 && rawData[0][0] === "ID STU") rawData.shift(); 
+                processData();
+            } else {
+                showMockData(); // ถ้า API เออเร่อ (เพราะยังไม่ได้แก้โค้ด GS) ให้โชว์ข้อมูลจำลองไปก่อน
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showMockData(); // โชว์ข้อมูลจำลองถ้า Error
         });
     }
 
-    function renderCourseCards(data) {
+    function processData() {
+        let courseCounts = {};
+        let totalQuotas = 0;
+        let totalRegistered = rawData.length;
+
+        // เริ่มต้นนับ 0 ให้ทุกหลักสูตร และรวมโควตา
+        for (const [course, config] of Object.entries(courseConfig)) {
+            courseCounts[course] = 0;
+            totalQuotas += config.max;
+        }
+
+        // นับจำนวนจริงจากข้อมูล
+        rawData.forEach(row => {
+            let courseName = String(row[1]).trim();
+            if(courseCounts[courseName] !== undefined) {
+                courseCounts[courseName]++;
+            }
+        });
+
+        // อัปเดต KPI
+        document.getElementById('kpiTotalReg').innerText = totalRegistered.toLocaleString();
+        document.getElementById('kpiTotalQuota').innerText = totalQuotas.toLocaleString();
+        let percent = totalQuotas > 0 ? ((totalRegistered / totalQuotas) * 100).toFixed(1) : 0;
+        document.getElementById('kpiPercent').innerText = percent;
+
+        // วาดการ์ดหลักสูตร
+        renderCourseGrid(courseCounts);
+
+        // ปิด Loading
+        document.getElementById('loading').classList.add('opacity-0');
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            setTimeout(()=>document.getElementById('mainApp').classList.remove('opacity-0'), 50);
+        }, 500);
+    }
+
+    function renderCourseGrid(counts) {
         const grid = document.getElementById('courseGrid');
         let html = '';
-        let totalRemaining = 0;
+        let delay = 0;
 
-        data.order.forEach(courseName => {
-            const conf = courseConfig[courseName];
-            const max = conf.max;
-            let remaining = data.remaining[courseName];
-            if(remaining < 0) remaining = 0;
-            totalRemaining += remaining;
-            const isFull = remaining <= 0;
-            const percent = ((max - remaining) / max) * 100;
-            
+        for (const [course, config] of Object.entries(courseConfig)) {
+            let current = counts[course];
+            let max = config.max;
+            let percent = ((current / max) * 100).toFixed(0);
+            let isFull = current >= max;
+
             html += `
-                <div class="course-card group ${isFull ? 'disabled' : ''}" id="card-${conf.prefix}" onclick="${isFull ? '' : `selectCourse('${courseName}', '${conf.prefix}')`}">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-slate-800 text-sm group-hover:${conf.text} transition-colors w-4/5 leading-tight">${courseName}</h3>
-                        <i class="fi ${conf.icon} text-slate-300 group-hover:${conf.text} text-xl transition-colors"></i>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-[11px] font-bold mb-1">
-                            <span class="${isFull ? 'text-slate-500' : conf.text}">${isFull ? 'ที่นั่งเต็มแล้ว' : `ว่าง ${remaining} ที่นั่ง`}</span>
-                            <span class="text-slate-400">เต็ม ${max}</span>
+                <div class="bg-white rounded-3xl p-6 border-2 border-transparent hover:border-slate-200 shadow-sm hover:shadow-xl transition-all cursor-pointer fade-in relative overflow-hidden group" style="animation-delay: ${delay}ms" onclick="openModal('${course}')">
+                    
+                    <!-- แถบสีด้านซ้าย -->
+                    <div class="absolute left-0 top-0 bottom-0 w-2 ${config.color}"></div>
+
+                    <div class="flex justify-between items-start mb-4 pl-2">
+                        <div class="w-12 h-12 rounded-2xl ${config.bgLight} ${config.text} flex justify-center items-center transition-transform group-hover:scale-110">
+                            <i class="fi ${config.icon} text-xl mt-1"></i>
                         </div>
-                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                            <div class="${isFull ? 'bg-slate-400' : conf.color} h-full rounded-full transition-all duration-1000" style="width: ${percent}%;"></div>
+                        ${isFull ? `<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-black">เต็มแล้ว</span>` : `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-black">ว่าง ${max - current}</span>`}
+                    </div>
+                    
+                    <div class="pl-2">
+                        <h3 class="font-black text-slate-800 text-lg leading-tight mb-4 min-h-[2.5rem]">${course}</h3>
+                        
+                        <div class="flex justify-between items-end mb-2">
+                            <div class="text-sm font-bold text-slate-400">ลงทะเบียนแล้ว</div>
+                            <div class="text-2xl font-black ${config.text}">${current}<span class="text-sm text-slate-400 font-medium">/${max}</span></div>
+                        </div>
+                        
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div class="${config.color} h-full rounded-full transition-all duration-1000" style="width: ${percent}%;"></div>
                         </div>
                     </div>
                 </div>
             `;
-        });
-        
+            delay += 50; // ห่างกันการ์ดละ 50ms เวลา Animate
+        }
         grid.innerHTML = html;
-
-        if(totalRemaining <= 0) {
-           document.getElementById('step1').innerHTML = `
-              <div class="text-center py-10 bg-slate-50 rounded-3xl border border-slate-200">
-                 <i class="fi fi-sr-sad-tear text-5xl text-slate-400 mb-4"></i>
-                 <h2 class="text-2xl font-black text-[#0f172a] mb-2">ปิดรับลงทะเบียน</h2>
-                 <p class="text-slate-500 font-medium">เสียใจด้วยคุณลงทะเบียนไม่ทัน ขณะนี้ทุกหลักสูตรเต็มแล้ว<br>ขออภัยและขอบคุณที่ให้ความสนใจกิจกรรมเราครับ</p>
-                 <a href="index.html" class="inline-block mt-6 btn-dark py-3 px-8 rounded-xl font-bold no-underline">กลับหน้าหลัก</a>
-              </div>
-           `;
-        }
     }
 
-    function selectCourse(courseName, prefix) {
-        document.getElementById('courseVal').value = courseName;
-        document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById(`card-${prefix}`).classList.add('selected');
-    }
-
-    function toggleCheckCard(el) {
-        const checkbox = el.querySelector('input[type="checkbox"]');
-        checkbox.checked = !checkbox.checked;
-        if(checkbox.checked) el.classList.add('checked');
-        else el.classList.remove('checked');
-    }
-
-    function toggleOtherSource() {
-      const wrap = document.getElementById('wrapOtherSource');
-      const inp = document.getElementById('otherSourceInput');
-      if(document.getElementById('chkOtherSource').checked) { wrap.classList.remove('hidden'); inp.focus(); } 
-      else { wrap.classList.add('hidden'); inp.value = ''; }
-    }
-
-    function setupCustomSelects() {
-        document.querySelectorAll('.c-select-container').forEach(container => {
-            const trigger = container.querySelector('.c-select-trigger');
-            const options = container.querySelectorAll('.c-select-option');
-            const hiddenInput = document.getElementById(container.id.replace('c-', ''));
-            const triggerSpan = trigger.querySelector('.trigger-content span');
-            const triggerIcon = trigger.querySelector('.trigger-icon');
-
-            trigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.c-select-container').forEach(c => { if(c !== container) c.classList.remove('open'); });
-                container.classList.toggle('open');
-            });
-
-            options.forEach(opt => {
-                opt.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const val = opt.getAttribute('data-value');
-                    hiddenInput.value = val;
-                    triggerSpan.innerHTML = opt.innerHTML; // Copy HTML to keep SVG icon
-                    trigger.classList.add('has-value');
-                    
-                    options.forEach(o => o.classList.remove('selected'));
-                    opt.classList.add('selected');
-                    container.classList.remove('open');
-                    
-                    if(hiddenInput.id === 'followPage') {
-                        const wrapPlatform = document.getElementById('wrapPlatform');
-                        if(val === 'ติดตาม') wrapPlatform.classList.remove('hidden');
-                        else { 
-                           wrapPlatform.classList.add('hidden'); 
-                           document.getElementById('followPlatform').value = ""; 
-                           document.querySelector('#c-followPlatform .trigger-content span').innerText = "เลือกแพลตฟอร์ม"; 
-                           document.querySelector('#c-followPlatform .c-select-trigger').classList.remove('has-value');
-                        }
-                    }
-                });
-            });
-        });
+    /* Modal Functions */
+    function openModal(courseName) {
+        const config = courseConfig[courseName];
         
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('.c-select-container')) document.querySelectorAll('.c-select-container').forEach(c => c.classList.remove('open'));
-            if(e.target.id !== 'schoolSearch') document.getElementById('schoolDropdown').style.display = 'none';
-            if(e.target.id !== 'email') document.getElementById('emailDropdown').style.display = 'none';
-        });
-    }
-
-    function setCustomSelectValue(id, val) {
-        const container = document.getElementById('c-' + id);
-        if(!container) return;
-        const hiddenInput = document.getElementById(id);
-        const triggerSpan = container.querySelector('.trigger-content span');
-        const trigger = container.querySelector('.c-select-trigger');
-        const options = container.querySelectorAll('.c-select-option');
+        // กรองข้อมูลเฉพาะหลักสูตรที่เลือก
+        // โครงสร้าง GS Index: 0=ID, 1=Course, 2=Name, 3=Email, 4=Phone, 5=School, 6=Prov
+        const filteredData = rawData.filter(row => String(row[1]).trim() === courseName);
         
-        hiddenInput.value = val;
-        triggerSpan.innerText = val;
-        trigger.classList.add('has-value');
+        document.getElementById('modalCourseTitle').innerText = courseName;
+        document.getElementById('modalCourseCount').innerText = filteredData.length;
         
-        options.forEach(opt => {
-            if(opt.getAttribute('data-value') === val) { opt.classList.add('selected'); }
-            else { opt.classList.remove('selected'); }
-        });
-    }
+        // ปรับสี Header Modal
+        const header = document.getElementById('modalHeader');
+        header.className = `p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white ${config.color}`;
 
-    function applyEmail(fullEmail) {
-      document.getElementById('email').value = fullEmail;
-      document.getElementById('emailDropdown').style.display = 'none';
-      document.getElementById('email').focus();
-    }
-
-    function formatEmail(el) {
-      el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, '');
-    }
-
-    function formatPhone(el) {
-      let v = el.value.replace(/\D/g,'');
-      if(v.length > 10) v = v.substring(0,10);
-      if(v.length > 6) el.value = v.substring(0,3)+'-'+v.substring(3,6)+'-'+v.substring(6);
-      else if(v.length > 3) el.value = v.substring(0,3)+'-'+v.substring(3);
-      else el.value = v;
-    }
-
-    function searchSchool(query) {
-      const drop = document.getElementById('schoolDropdown');
-      if(query.trim().length < 2) { drop.style.display = 'none'; return; }
-      const res = schoolData.filter(s => s[0].toLowerCase().includes(query.toLowerCase())).slice(0, 8);
-      if(res.length > 0) {
-          drop.innerHTML = res.map(s => `<li class="flex justify-between items-center" onclick="selectSchool('${s[0]}','${s[1]}')"><span class="font-bold text-[#0f172a]"><i class="fi fi-sr-school text-slate-400 mr-1 mt-0.5"></i> ${s[0]}</span> <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">จ.${s[1]}</span></li>`).join('');
-      } else {
-          drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-2">พิมพ์ชื่อโรงเรียนเต็มได้เลยครับ</li>`;
-      }
-      drop.style.display = 'block';
-    }
-
-    function selectSchool(name, prov) {
-      document.getElementById('schoolSearch').value = name;
-      setCustomSelectValue('province', prov);
-      document.getElementById('schoolDropdown').style.display = 'none';
-    }
-
-    function updateProgress(step) {
-        const bar = document.getElementById('progressBar');
-        if(step === 1) bar.style.width = '25%';
-        else if(step === 2) bar.style.width = '50%';
-        else if(step === 3) bar.style.width = '75%';
-        else if(step === 4) bar.style.width = '100%';
-        else document.getElementById('progressContainer').style.display = 'none';
-    }
-
-    function animateStepChange(targetStepNum, animationClass) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        updateProgress(targetStepNum);
-        document.querySelectorAll('.step-section').forEach(sec => { sec.classList.remove('visible', 'ani-next', 'ani-prev'); });
-        document.getElementById('step' + targetStepNum).classList.add('visible', animationClass);
-    }
-
-    function nextStep(s) { 
-      if(s === 2) {
-          if(!document.getElementById('courseVal').value) return Swal.fire({icon: 'warning', title: 'ยังไม่ได้เลือกหลักสูตร', text: 'กรุณาคลิกเลือกการ์ดหลักสูตร 1 อันเพื่อดำเนินการต่อครับ', confirmButtonColor: '#0f172a'});
-      }
-      if(s === 3) {
-          if(!document.getElementById('prefix').value || !document.getElementById('fname').value || !document.getElementById('lname').value || !document.getElementById('email').value || !document.getElementById('phone').value) {
-              return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลส่วนตัวให้ครบถ้วน รวมถึงคำนำหน้า', confirmButtonColor: '#0f172a'});
-          }
-          if(document.getElementById('phone').value.length !== 12) {
-              return Swal.fire({icon: 'warning', title: 'เบอร์โทรไม่ถูกต้อง', text: 'กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก', confirmButtonColor: '#0f172a'});
-          }
-      }
-      if(s === 4) {
-          if(!document.getElementById('schoolSearch').value || !document.getElementById('province').value || !document.getElementById('grade').value) {
-              return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลการศึกษาให้ครบถ้วน (อย่าลืมเลือกจังหวัด)', confirmButtonColor: '#0f172a'});
-          }
-      }
-      animateStepChange(s, 'ani-next');
-    }
-
-    function prevStep(s) { animateStepChange(s, 'ani-prev'); }
-
-    function submitFinal() {
-      const srcNodes = document.querySelectorAll('input[name="src"]:checked');
-      let selectedSources = Array.from(srcNodes).map(n => n.value);
-      
-      const chkOther = document.getElementById('chkOtherSource');
-      const otherInput = document.getElementById('otherSourceInput').value.trim();
-      if(chkOther && chkOther.checked) {
-         if(!otherInput) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาระบุช่องทางอื่นๆ ที่ท่านรู้จักเรา', confirmButtonColor: '#0f172a'}); 
-         selectedSources.push("อื่นๆ: " + otherInput);
-      }
-
-      const followPage = document.getElementById('followPage').value;
-      const followPlatform = document.getElementById('followPlatform').value;
-
-      if(selectedSources.length === 0) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกช่องทางที่ท่านทราบข่าวอย่างน้อย 1 ข้อ', confirmButtonColor: '#0f172a'});
-      if(!followPage) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกว่าท่านติดตามเพจ Education CRA หรือไม่', confirmButtonColor: '#0f172a'});
-      
-      // เพิ่มตัวแปร btn เพื่อจัดการปุ่มตอนกำลังโหลด
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true; 
-      btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
-
-      // เพิ่มตัวแปร payload เพื่อรวบรวมข้อมูลทั้งหมดส่งไปให้ Google Apps Script
-      const payload = {
-        course: document.getElementById('courseVal').value,
-        prefix: document.getElementById('prefix').value,
-        fname: document.getElementById('fname').value.trim(),
-        lname: document.getElementById('lname').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone').value,
-        school: document.getElementById('schoolSearch').value.trim(),
-        province: document.getElementById('province').value,
-        grade: document.getElementById('grade').value,
-        source: selectedSources.join(', '),
-        followPage: followPage,
-        followPlatform: followPage === 'ไม่ได้ติดตาม' ? '-' : followPlatform
-      };
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      })
-      .then(response => response.json())
-      .then(res => {
-        if(res.status === 'success') {
-          document.getElementById('regForm').style.display = 'none';
-          document.getElementById('progressContainer').style.display = 'none';
-          const successView = document.getElementById('successView');
-          successView.classList.add('visible', 'ani-next');
-          
-          document.getElementById('displayId').innerText = res.id;
-          
-          // รวมชื่อและนามสกุลมาแสดงบนการ์ด
-          const prefixName = document.getElementById('prefix').value;
-          const fName = document.getElementById('fname').value;
-          const lName = document.getElementById('lname').value;
-          document.getElementById('displayName').innerText = `${prefixName}${fName} ${lName}`;
-          
-          // กำหนดสีและข้อความตามหลักสูตร
-          const courseConfigColor = {
-            "แพทยศาสตร์": { bg: "bg-[#065f46]", text: "text-[#065f46]" },
-            "วิทยาศาสตร์ข้อมูลสุขภาพ": { bg: "bg-[#a3e635]", text: "text-[#4d7c0f]" },
-            "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { bg: "bg-[#38bdf8]", text: "text-[#0369a1]" },
-            "รังสีเทคนิค": { bg: "bg-[#a855f7]", text: "text-[#7e22ce]" },
-            "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { bg: "bg-[#f97316]", text: "text-[#c2410c]" },
-            "ฉุกเฉินการแพทย์": { bg: "bg-[#1e3a8a]", text: "text-[#1e3a8a]" },
-            "นวัตกรรมวิทยาศาสตร์การแพทย์": { bg: "bg-[#eab308]", text: "text-[#a16207]" },
-            "วิศวกรรมชีวการแพทย์": { bg: "bg-[#9f1239]", text: "text-[#881337]" },
-            "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { bg: "bg-[#ec4899]", text: "text-[#be185d]" }
-          };
-          const colors = courseConfigColor[res.course] || { bg: "bg-[#ff6b00]", text: "text-[#ff6b00]" };
-          
-          const badge = document.getElementById('displayCourseBadge');
-          badge.innerText = res.course;
-          badge.className = `inline-block px-5 py-2 rounded-full text-[15px] font-black mb-6 shadow-md text-white ${colors.bg}`;
-          
-          document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md ${colors.text}`;
-          
-          // โหลด QR Code ทันทีโดยไม่ต้องรอโหลดจาก Drive
-          document.getElementById('qrImage').src = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
-          
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else if (res.status === 'full') {
-          // กรณีเต็มระหว่างกำลังกด
-          fetchSeatsAndRender(); // รีเฟรชยอดใหม่
-          animateStepChange(1, 'ani-prev'); // เด้งกลับหน้า 1
-          Swal.fire({icon: 'warning', title: 'หลักสูตรเต็มพอดี', text: 'ขออภัยครับ หลักสูตรที่คุณเลือกเพิ่งถูกจองเต็มไป กรุณาเลือกหลักสูตรอื่นที่ยังว่างอยู่ครับ', confirmButtonColor: '#ff6b00'});
-          btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+        const tbody = document.getElementById('modalTableBody');
+        if(filteredData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold"><i class="fi fi-sr-box-open text-4xl mb-3 block"></i>ยังไม่มีผู้ลงทะเบียนในหลักสูตรนี้</td></tr>`;
         } else {
-          Swal.fire({icon: 'error', title: 'ไม่สามารถลงทะเบียนได้', text: res.message, confirmButtonColor: '#0f172a'});
-          btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+            tbody.innerHTML = filteredData.map((row, index) => {
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-4 text-center font-black ${config.text}">${row[0] || '-'}</td>
+                        <td class="p-4 font-bold text-slate-800">${row[2] || '-'}</td>
+                        <td class="p-4 text-slate-500">${row[5] || '-'}</td>
+                        <td class="p-4 font-medium text-slate-600"><span class="bg-slate-100 px-2 py-1 rounded text-xs">จ.${row[6] || '-'}</span></td>
+                        <td class="p-4 text-center text-slate-500 font-mono text-sm">${row[4] || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
-      })
-      .catch(err => {
-          Swal.fire({icon: 'error', title: 'ระบบขัดข้อง', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', confirmButtonColor: '#0f172a'});
-          btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-check-circle mt-0.5"></i>';
-      });
+
+        const modal = document.getElementById('listModal');
+        const content = document.getElementById('modalContent');
+        
+        modal.classList.remove('hidden');
+        // trigger animation
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
     }
 
-    // ฟังก์ชัน ส่งอีเมลเข้าตัวเองด้วย mailto:
-    function sendQRToEmail() {
-        const email = document.getElementById('email').value;
-        const id = document.getElementById('displayId').innerText;
-        const course = document.getElementById('displayCourseBadge').innerText;
+    function closeModal() {
+        const modal = document.getElementById('listModal');
+        const content = document.getElementById('modalContent');
         
-        // --- FIX: ดึงลิงก์จาก data-url ---
-        // ไม่ดึงจาก src ตรงๆ แล้ว เพราะตอนนี้ src จะเป็นรหัส Base64 ที่ยาวมากๆ ส่งเข้าอีเมลไม่ได้
-        const qrUrl = document.getElementById('qrImage').getAttribute('data-url') || document.getElementById('qrImage').src;
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
         
-        const subject = encodeURIComponent(`บัตร QR Code ยืนยันการลงทะเบียน - ${id}`);
-        const body = encodeURIComponent(`สวัสดีครับ\n\nนี่คือลิงก์สำหรับดูและดาวน์โหลด QR Code ประจำตัวของคุณในการเข้าร่วมกิจกรรม CRA THE TUTOR 2026\n\nรหัสประจำตัว: ${id}\nหลักสูตร: ${course}\n\nลิงก์รูปภาพ QR Code:\n${qrUrl}\n\n*โปรดบันทึกภาพและเตรียมไว้สำหรับสแกนรายงานตัวหน้างาน*\n\nขอบคุณครับ`);
-        
-        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // ปิด Modal เมื่อคลิกพื้นที่ว่าง
+    document.getElementById('listModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    /* ----------------------------------------------------
+       Mock Data สำหรับ Preview หากเชื่อม API ไม่ผ่าน
+       ---------------------------------------------------- */
+    function showMockData() {
+        console.log("Using Mock Data for preview.");
+        rawData = [
+            ["MD-01", "แพทยศาสตร์", "นายชานนท์ ใจดี", "test@gmail.com", "081-234-5678", "สวนกุหลาบวิทยาลัย", "กรุงเทพมหานคร"],
+            ["MD-02", "แพทยศาสตร์", "นางสาวสมหญิง น่ารัก", "test2@gmail.com", "089-999-8888", "เตรียมอุดมศึกษา", "กรุงเทพมหานคร"],
+            ["HDS-01", "วิทยาศาสตร์ข้อมูลสุขภาพ", "นายสมชาย สายโค้ด", "test3@gmail.com", "082-333-4444", "มหิดลวิทยานุสรณ์", "นครปฐม"],
+            ["RT-01", "รังสีเทคนิค", "นางสาววิภาวี สว่าง", "test4@gmail.com", "084-555-6666", "สตรีวิทยา", "กรุงเทพมหานคร"],
+            ["RT-02", "รังสีเทคนิค", "นายภพ พิภพ", "test5@gmail.com", "085-666-7777", "บดินทรเดชา", "กรุงเทพมหานคร"],
+            ["RT-03", "รังสีเทคนิค", "นางสาวมาลี ดวงดี", "test6@gmail.com", "086-777-8888", "สามเสนวิทยาลัย", "กรุงเทพมหานคร"],
+            ["INMS-01", "นวัตกรรมวิทยาศาสตร์การแพทย์", "นายวิทย์ ล้ำยุค", "test7@gmail.com", "087-888-9999", "ขอนแก่นวิทยายน", "ขอนแก่น"],
+            ["BNS-01", "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)", "นางสาวใจดี มีเมตตา", "test8@gmail.com", "088-999-0000", "หาดใหญ่วิทยาลัย", "สงขลา"]
+        ];
+        processData();
     }
   </script>
 </body>
