@@ -411,9 +411,9 @@
                            <!-- เพิ่มชื่อนามสกุล -->
                            <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
                            
-                           <!-- QR Code Image - แก้ไขโดยเอา crossorigin="anonymous" ออก เพื่อหลีกเลี่ยงบัคของเบราว์เซอร์ -->
+                           <!-- QR Code Image -->
                            <div class="bg-white p-3.5 rounded-[1.5rem] inline-block shadow-inner mx-auto">
-                              <img id="qrImage" src="" data-url="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl">
+                              <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl" crossorigin="anonymous">
                            </div>
                        </div>
                    </div>
@@ -421,14 +421,11 @@
                    <!-- คำเตือน -->
                    <div class="bg-orange-50 text-orange-800 p-4 rounded-2xl border border-orange-200 font-bold text-sm flex items-start gap-3 text-left mb-6 mx-auto max-w-[400px]">
                       <i class="fi fi-sr-camera text-xl mt-0.5 text-[#ff6b00]"></i>
-                      <span>โปรด <span class="text-[#ff6b00] underline">เซฟรูปบัตรด้านบน</span> ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
+                      <span>โปรด <span class="text-[#ff6b00] underline">แคปหน้าจอรูปบัตรด้านบน</span> ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
                    </div>
 
                    <!-- ปุ่มฟังก์ชันดาวน์โหลด และส่งอีเมล -->
                    <div class="flex flex-col sm:flex-row gap-3 mb-8 w-full max-w-[400px] mx-auto">
-                       <button id="btnDownload" onclick="downloadQR()" class="flex-1 bg-slate-800 text-white py-3.5 rounded-xl font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2">
-                           <i class="fi fi-sr-download mt-0.5"></i> เซฟการ์ดลงเครื่อง
-                       </button>
                        <button onclick="sendQRToEmail()" class="flex-1 bg-[#ff6b00] text-white py-3.5 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2">
                            <i class="fi fi-sr-envelope mt-0.5"></i> ส่งเข้าอีเมลฉัน
                        </button>
@@ -819,28 +816,8 @@
           
           document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md ${colors.text}`;
           
-          // --- FIX: การแก้ปัญหา html2canvas มองไม่เห็นรูปภาพ QR Code (CORS Issue) ---
-          const qrOriginalUrl = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
-          const qrImgEl = document.getElementById('qrImage');
-          
-          // 1. เก็บ URL ต้นฉบับไว้ใน attribute data-url ไว้สำหรับดึงไปใช้ส่งเข้าอีเมล
-          qrImgEl.setAttribute('data-url', qrOriginalUrl);
-          
-          // 2. Fetch ดึงข้อมูลรูปมาแปลงเป็นรหัส Base64 (Data URI)
-          // วิธีนี้จะทำให้รูปฝังอยู่ในหน้าเว็บเลย และ html2canvas จะสามารถแคปภาพได้ 100% โดยไม่ติด CORS
-          fetch(qrOriginalUrl)
-            .then(response => response.blob())
-            .then(blob => {
-               const reader = new FileReader();
-               reader.onloadend = function() {
-                   qrImgEl.src = reader.result; // ใส่รูปด้วยรหัส Base64
-               }
-               reader.readAsDataURL(blob);
-            })
-            .catch(err => {
-               // หาก fetch ล้มเหลว ให้กลับไปใช้ URL ปกติ
-               qrImgEl.src = qrOriginalUrl;
-            });
+          // โหลด QR Code ทันทีโดยไม่ต้องรอโหลดจาก Drive
+          document.getElementById('qrImage').src = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
           
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (res.status === 'full') {
@@ -858,36 +835,6 @@
           Swal.fire({icon: 'error', title: 'ระบบขัดข้อง', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', confirmButtonColor: '#0f172a'});
           btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-check-circle mt-0.5"></i>';
       });
-    }
-
-    // ฟังก์ชัน ดาวน์โหลดรูปภาพ ทั้งบัตร E-Ticket
-    function downloadQR() {
-        const card = document.getElementById('ticketCard');
-        const id = document.getElementById('displayId').innerText;
-        const btn = document.getElementById('btnDownload');
-        const originalText = btn.innerHTML;
-        
-        btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
-        btn.disabled = true;
-
-        html2canvas(card, {
-            scale: 2, 
-            useCORS: true, // รองรับภาพข้ามโดเมน
-            allowTaint: false,
-            backgroundColor: '#0f172a' 
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Ticket_CRA_${id}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }).catch(err => {
-            console.error(err);
-            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้ กรุณาแคปหน้าจอด้วยตนเองครับ', 'error');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        });
     }
 
     // ฟังก์ชัน ส่งอีเมลเข้าตัวเองด้วย mailto:
