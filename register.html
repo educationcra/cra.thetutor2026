@@ -8,9 +8,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- UIcons สำหรับไอคอนสวยๆ -->
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
-  
+  <!-- เพิ่ม html2canvas สำหรับเซฟรูประบบ E-Ticket -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
     
@@ -389,48 +389,51 @@
                   </div>
                 </form>
 
-                <!-- SUCCESS VIEW (QR Code) -->
                 <div id="successView" class="step-section text-center py-6">
-                   <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <i class="fi fi-sr-check-circle text-4xl text-emerald-500 mt-2"></i>
+                   <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <i class="fi fi-sr-check-circle text-4xl text-green-500 mt-2"></i>
                    </div>
                    <h2 class="text-3xl font-black text-[#0f172a] mb-2 tracking-tight">ลงทะเบียนสำเร็จ!</h2>
                    <p class="text-slate-500 mb-8 font-medium">ระบบได้ยืนยันที่นั่งและออกบัตรให้ท่านแล้ว</p>
                    
-                   <div class="bg-[#0f172a] p-8 rounded-[2rem] text-white shadow-2xl mx-auto mb-6 relative overflow-hidden">
-                       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white rounded-full mix-blend-overlay filter blur-[50px] opacity-20"></div>
+                   <!-- บัตร E-Ticket ที่จะถูก Capture เซฟเป็นรูปภาพ -->
+                   <div id="ticketCard" class="bg-[#0f172a] p-8 pb-10 rounded-[2rem] text-white shadow-2xl mx-auto mb-6 relative overflow-hidden" style="max-width: 400px;">
+                       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white rounded-full mix-blend-overlay filter blur-[50px] opacity-10"></div>
                        
                        <div class="relative z-10">
                            <p class="text-[11px] text-slate-400 font-bold mb-2 uppercase tracking-widest">หลักสูตรที่ลงทะเบียน</p>
-                           <div id="displayCourseBadge" class="inline-block px-4 py-1.5 rounded-full text-sm font-black mb-6 shadow-md">--</div>
+                           <div id="displayCourseBadge" class="inline-block px-5 py-2 rounded-full text-[15px] font-black mb-6 shadow-md bg-[#ff6b00] text-white">--</div>
                            
                            <p class="text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-widest">รหัสประจำตัว</p>
-                           <div class="text-5xl sm:text-6xl font-black tracking-widest mb-6 drop-shadow-md" id="displayId">--</div>
+                           <div class="text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md text-[#ff6b00]" id="displayId">--</div>
+                           
+                           <!-- เพิ่มชื่อนามสกุล -->
+                           <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
                            
                            <!-- QR Code Image -->
-                           <div class="bg-white p-3 rounded-[1.5rem] inline-block shadow-inner mx-auto">
+                           <div class="bg-white p-3.5 rounded-[1.5rem] inline-block shadow-inner mx-auto">
                               <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl" crossorigin="anonymous">
                            </div>
                        </div>
                    </div>
 
                    <!-- คำเตือน -->
-                   <div class="bg-orange-50 text-orange-800 p-4 rounded-2xl border border-orange-200 font-bold text-sm flex items-start gap-3 text-left mb-6 mx-auto">
+                   <div class="bg-orange-50 text-orange-800 p-4 rounded-2xl border border-orange-200 font-bold text-sm flex items-start gap-3 text-left mb-6 mx-auto max-w-[400px]">
                       <i class="fi fi-sr-camera text-xl mt-0.5 text-[#ff6b00]"></i>
-                      <span>โปรด <span class="text-[#ff6b00] underline">บันทึกรูปภาพ QR Code</span> ด้านบนนี้ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
+                      <span>โปรด <span class="text-[#ff6b00] underline">เซฟรูปบัตรด้านบน</span> ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
                    </div>
 
                    <!-- ปุ่มฟังก์ชันดาวน์โหลด และส่งอีเมล -->
-                   <div class="flex flex-col sm:flex-row gap-3 mb-8 w-full">
-                       <button onclick="downloadQR()" class="flex-1 bg-slate-800 text-white py-3.5 rounded-xl font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2">
-                           <i class="fi fi-sr-download mt-0.5"></i> เซฟรูปลงเครื่อง
+                   <div class="flex flex-col sm:flex-row gap-3 mb-8 w-full max-w-[400px] mx-auto">
+                       <button id="btnDownload" onclick="downloadQR()" class="flex-1 bg-slate-800 text-white py-3.5 rounded-xl font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2">
+                           <i class="fi fi-sr-download mt-0.5"></i> เซฟการ์ดลงเครื่อง
                        </button>
                        <button onclick="sendQRToEmail()" class="flex-1 bg-[#ff6b00] text-white py-3.5 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2">
                            <i class="fi fi-sr-envelope mt-0.5"></i> ส่งเข้าอีเมลฉัน
                        </button>
                    </div>
 
-                   <a href="index.html" class="inline-flex w-full justify-center items-center gap-2 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-200 transition no-underline text-[17px] mx-auto">
+                   <a href="index.html" class="inline-flex w-full max-w-[400px] justify-center items-center gap-2 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-200 transition no-underline text-[17px] mx-auto">
                       กลับหน้าหลัก
                    </a>
                 </div>
@@ -754,12 +757,13 @@
 
       if(selectedSources.length === 0) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกช่องทางที่ท่านทราบข่าวอย่างน้อย 1 ข้อ', confirmButtonColor: '#0f172a'});
       if(!followPage) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกว่าท่านติดตามเพจ Education CRA หรือไม่', confirmButtonColor: '#0f172a'});
-      if(followPage === 'ติดตาม' && !followPlatform) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกแพลตฟอร์มที่ติดตามเพจ', confirmButtonColor: '#0f172a'});
-
+      
+      // เพิ่มตัวแปร btn เพื่อจัดการปุ่มตอนกำลังโหลด
       const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin"></i> กำลังบันทึกข้อมูล...';
+      btn.disabled = true; 
+      btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
 
+      // เพิ่มตัวแปร payload เพื่อรวบรวมข้อมูลทั้งหมดส่งไปให้ Google Apps Script
       const payload = {
         course: document.getElementById('courseVal').value,
         prefix: document.getElementById('prefix').value,
@@ -770,32 +774,53 @@
         school: document.getElementById('schoolSearch').value.trim(),
         province: document.getElementById('province').value,
         grade: document.getElementById('grade').value,
-        source: selectedSources.join(', '), 
+        source: selectedSources.join(', '),
         followPage: followPage,
         followPlatform: followPage === 'ไม่ได้ติดตาม' ? '-' : followPlatform
       };
 
-      fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
       .then(response => response.json())
       .then(res => {
         if(res.status === 'success') {
-          // โชว์หน้า Success
           document.getElementById('regForm').style.display = 'none';
           document.getElementById('progressContainer').style.display = 'none';
           const successView = document.getElementById('successView');
           successView.classList.add('visible', 'ani-next');
           
-          // เปลี่ยนสี ป้ายรหัส ตามหลักสูตร
-          const cConf = courseConfig[res.course];
+          document.getElementById('displayId').innerText = res.id;
+          
+          // รวมชื่อและนามสกุลมาแสดงบนการ์ด
+          const prefixName = document.getElementById('prefix').value;
+          const fName = document.getElementById('fname').value;
+          const lName = document.getElementById('lname').value;
+          document.getElementById('displayName').innerText = `${prefixName}${fName} ${lName}`;
+          
+          // กำหนดสีและข้อความตามหลักสูตร
+          const courseConfigColor = {
+            "แพทยศาสตร์": { bg: "bg-[#065f46]", text: "text-[#065f46]" },
+            "วิทยาศาสตร์ข้อมูลสุขภาพ": { bg: "bg-[#a3e635]", text: "text-[#4d7c0f]" },
+            "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { bg: "bg-[#38bdf8]", text: "text-[#0369a1]" },
+            "รังสีเทคนิค": { bg: "bg-[#a855f7]", text: "text-[#7e22ce]" },
+            "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { bg: "bg-[#f97316]", text: "text-[#c2410c]" },
+            "ฉุกเฉินการแพทย์": { bg: "bg-[#1e3a8a]", text: "text-[#1e3a8a]" },
+            "นวัตกรรมวิทยาศาสตร์การแพทย์": { bg: "bg-[#eab308]", text: "text-[#a16207]" },
+            "วิศวกรรมชีวการแพทย์": { bg: "bg-[#9f1239]", text: "text-[#881337]" },
+            "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { bg: "bg-[#ec4899]", text: "text-[#be185d]" }
+          };
+          const colors = courseConfigColor[res.course] || { bg: "bg-[#ff6b00]", text: "text-[#ff6b00]" };
+          
           const badge = document.getElementById('displayCourseBadge');
           badge.innerText = res.course;
-          badge.className = `inline-block px-4 py-1.5 rounded-full text-sm font-black mb-6 shadow-md ${cConf.color} text-white`;
+          badge.className = `inline-block px-5 py-2 rounded-full text-[15px] font-black mb-6 shadow-md text-white ${colors.bg}`;
           
-          document.getElementById('displayId').innerText = res.id;
-          document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-6 drop-shadow-md ${cConf.text}`;
+          document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md ${colors.text}`;
           
-          // โหลดรูป QR Code จาก Drive URL
-          document.getElementById('qrImage').src = res.qrUrl;
+          // โหลด QR Code ทันทีโดยไม่ต้องรอโหลดจาก Drive เพื่อป้องกันภาพบัคตอนแคปหน้าจอ
+          document.getElementById('qrImage').src = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
           
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (res.status === 'full') {
@@ -811,34 +836,44 @@
       })
       .catch(err => {
           Swal.fire({icon: 'error', title: 'ระบบขัดข้อง', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', confirmButtonColor: '#0f172a'});
-          btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+          btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-check-circle mt-0.5"></i>';
       });
     }
 
-    // ฟังก์ชัน ดาวน์โหลดรูปภาพ QR Code
+    // ฟังก์ชัน ดาวน์โหลดรูปภาพ ทั้งบัตร E-Ticket
     function downloadQR() {
-        const qrUrl = document.getElementById('qrImage').src;
+        const card = document.getElementById('ticketCard');
         const id = document.getElementById('displayId').innerText;
-        fetch(qrUrl)
-          .then(response => response.blob())
-          .then(blob => {
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.style.display = 'none';
-              a.href = url;
-              a.download = `QR_CRA_TUTOR_${id}.png`;
-              document.body.appendChild(a);
-              a.click();
-              window.URL.revokeObjectURL(url);
-          })
-          .catch(() => window.open(qrUrl, '_blank')); // Fallback ถ้าโหลด Blob ไม่ได้ให้เปิดแท็บใหม่
+        const btn = document.getElementById('btnDownload');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
+        btn.disabled = true;
+
+        html2canvas(card, {
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#0f172a' 
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Ticket_CRA_${id}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error(err);
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้ กรุณาแคปหน้าจอด้วยตนเองครับ', 'error');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
     }
 
     // ฟังก์ชัน ส่งอีเมลเข้าตัวเองด้วย mailto:
     function sendQRToEmail() {
         const email = document.getElementById('email').value;
         const id = document.getElementById('displayId').innerText;
-        const course = document.getElementById('courseVal').value;
+        const course = document.getElementById('displayCourseBadge').innerText;
         const qrUrl = document.getElementById('qrImage').src;
         
         const subject = encodeURIComponent(`บัตร QR Code ยืนยันการลงทะเบียน - ${id}`);
