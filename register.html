@@ -11,6 +11,7 @@
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   <!-- เพิ่ม html2canvas สำหรับเซฟรูประบบ E-Ticket -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
     
@@ -136,7 +137,7 @@
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff6b00] to-[#facc15]">PORTFOLIO LEVEL UP</span>
                 </h1>
                 <p class="text-lg xl:text-xl text-slate-300 font-medium leading-relaxed max-w-md">
-                    เตรียมพบอ10 หลักสูตรคุณภาพ เจาะลึก ทริคปั้นพอร์ต สไตล์ตัวท็อป ราชวิทยาลัยจุฬาภรณ์
+                    เตรียมพบ 10 หลักสูตรคุณภาพ เจาะลึก ทริคปั้นพอร์ต สไตล์ตัวท็อป ราชวิทยาลัยจุฬาภรณ์
                 </p>
             </div>
             
@@ -410,9 +411,9 @@
                            <!-- เพิ่มชื่อนามสกุล -->
                            <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
                            
-                           <!-- QR Code Image -->
+                           <!-- QR Code Image - แก้ไขโดยเอา crossorigin="anonymous" ออก เพื่อหลีกเลี่ยงบัคของเบราว์เซอร์ -->
                            <div class="bg-white p-3.5 rounded-[1.5rem] inline-block shadow-inner mx-auto">
-                              <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl" crossorigin="anonymous">
+                              <img id="qrImage" src="" data-url="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl">
                            </div>
                        </div>
                    </div>
@@ -672,7 +673,6 @@
       document.getElementById('email').focus();
     }
 
-    // ฟังก์ชันบังคับให้พิมพ์อีเมลได้เฉพาะภาษาอังกฤษ ตัวเลข และสัญลักษณ์ที่เกี่ยวข้อง
     function formatEmail(el) {
       el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, '');
     }
@@ -819,8 +819,28 @@
           
           document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md ${colors.text}`;
           
-          // โหลด QR Code ทันทีโดยไม่ต้องรอโหลดจาก Drive เพื่อป้องกันภาพบัคตอนแคปหน้าจอ
-          document.getElementById('qrImage').src = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
+          // --- FIX: การแก้ปัญหา html2canvas มองไม่เห็นรูปภาพ QR Code (CORS Issue) ---
+          const qrOriginalUrl = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
+          const qrImgEl = document.getElementById('qrImage');
+          
+          // 1. เก็บ URL ต้นฉบับไว้ใน attribute data-url ไว้สำหรับดึงไปใช้ส่งเข้าอีเมล
+          qrImgEl.setAttribute('data-url', qrOriginalUrl);
+          
+          // 2. Fetch ดึงข้อมูลรูปมาแปลงเป็นรหัส Base64 (Data URI)
+          // วิธีนี้จะทำให้รูปฝังอยู่ในหน้าเว็บเลย และ html2canvas จะสามารถแคปภาพได้ 100% โดยไม่ติด CORS
+          fetch(qrOriginalUrl)
+            .then(response => response.blob())
+            .then(blob => {
+               const reader = new FileReader();
+               reader.onloadend = function() {
+                   qrImgEl.src = reader.result; // ใส่รูปด้วยรหัส Base64
+               }
+               reader.readAsDataURL(blob);
+            })
+            .catch(err => {
+               // หาก fetch ล้มเหลว ให้กลับไปใช้ URL ปกติ
+               qrImgEl.src = qrOriginalUrl;
+            });
           
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (res.status === 'full') {
@@ -852,7 +872,8 @@
 
         html2canvas(card, {
             scale: 2, 
-            useCORS: true, 
+            useCORS: true, // รองรับภาพข้ามโดเมน
+            allowTaint: false,
             backgroundColor: '#0f172a' 
         }).then(canvas => {
             const link = document.createElement('a');
@@ -874,7 +895,10 @@
         const email = document.getElementById('email').value;
         const id = document.getElementById('displayId').innerText;
         const course = document.getElementById('displayCourseBadge').innerText;
-        const qrUrl = document.getElementById('qrImage').src;
+        
+        // --- FIX: ดึงลิงก์จาก data-url ---
+        // ไม่ดึงจาก src ตรงๆ แล้ว เพราะตอนนี้ src จะเป็นรหัส Base64 ที่ยาวมากๆ ส่งเข้าอีเมลไม่ได้
+        const qrUrl = document.getElementById('qrImage').getAttribute('data-url') || document.getElementById('qrImage').src;
         
         const subject = encodeURIComponent(`บัตร QR Code ยืนยันการลงทะเบียน - ${id}`);
         const body = encodeURIComponent(`สวัสดีครับ\n\nนี่คือลิงก์สำหรับดูและดาวน์โหลด QR Code ประจำตัวของคุณในการเข้าร่วมกิจกรรม CRA THE TUTOR 2026\n\nรหัสประจำตัว: ${id}\nหลักสูตร: ${course}\n\nลิงก์รูปภาพ QR Code:\n${qrUrl}\n\n*โปรดบันทึกภาพและเตรียมไว้สำหรับสแกนรายงานตัวหน้างาน*\n\nขอบคุณครับ`);
