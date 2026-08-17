@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CRA THE TUTOR 2026: PORTFOLIO LEVEL UP</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons@3.3.1/css/all/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body {
+      margin: 0; font-family: 'Noto Sans Thai', sans-serif;
+      background: #0f172a;
+      background-image: radial-gradient(circle at 15% 50%, rgba(30, 58, 138, 0.4), transparent 50%), radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.3), transparent 50%);
+      color: #f8fafc; min-height: 100vh; overflow-x: hidden;
+    }
+    .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
+    .course-card {
+      background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+      border-radius: 20px; padding: 1.25rem; color: #0f172a;
+      transition: all 0.3s ease; border: 2px solid transparent; display: flex; flex-direction: column; height: 100%;
+    }
+    .course-card:hover { transform: translateY(-3px); border-color: #f97316; box-shadow: 0 15px 30px -10px rgba(249, 115, 22, 0.3); }
+    .course-card.disabled { opacity: 0.7; filter: grayscale(80%); pointer-events: none; }
+    .progress-bg { width: 100%; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width 1s ease-out; }
+    
+    /* Course badges color mapping */
+    .color-MD { background: #065f46; color: white; }
+    .color-HDS { background: #a3e635; color: #1a2e05; }
+    .color-BNS { background: #38bdf8; color: #082f49; }
+    .color-RT { background: #a855f7; color: white; }
+    .color-HKH { background: #f97316; color: white; }
+    .color-PMD { background: #1e3a8a; color: white; }
+    .color-INMS { background: #eab308; color: #422006; }
+    .color-BME { background: #9f1239; color: white; }
+    .color-MHFT { background: #ec4899; color: white; }
+
+    .bottom-nav { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(16px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite alternate; }
+    @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 0.8; transform: scale(1.2); } }
+  </style>
+</head>
+<body class="relative pb-safe">
+  
+  <div class="star w-1 h-1 top-20 left-10 delay-100"></div>
+  <div class="star w-2 h-2 top-40 right-20 delay-300"></div>
+
+  <div class="max-w-6xl mx-auto px-5 py-6 relative z-10 flex justify-end">
+     <a href="login.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-5 py-2.5 rounded-full font-bold shadow-lg transition-transform hover:scale-105 no-underline">
+       <i class="fi fi-sr-sign-in-alt mt-0.5"></i> เข้าสู่ระบบ
+     </a>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-5 pb-10 relative z-10">
+    <div class="text-center mb-10 flex flex-col items-center">
+      <img src="https://s.imgz.io/2026/08/17/logo-tutorc7e5a5aaefcfb44f.png" alt="CRA Tutor Logo" class="h-28 md:h-36 object-contain mb-4 drop-shadow-xl">
+      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-blue-200 text-sm font-bold tracking-widest uppercase mb-4">
+        โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black text-white leading-tight tracking-tight mb-2 drop-shadow-lg">
+        CRA THE TUTOR 2026<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">PORTFOLIO LEVEL UP</span>
+      </h1>
+      <p class="text-slate-300 font-medium text-lg max-w-2xl mx-auto">เลือกดูโควตาที่นั่งคงเหลือของแต่ละหลักสูตร</p>
+    </div>
+
+    <div id="loading" class="flex flex-col items-center justify-center py-10">
+      <i class="fi fi-sr-spinner animate-spin text-5xl text-orange-500 mb-4"></i>
+      <p class="text-xl font-bold text-slate-300">กำลังตรวจสอบที่นั่ง...</p>
+    </div>
+
+    <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 hidden"></div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 w-full z-40 flex bottom-nav py-3 px-2 pb-5 md:hidden">
+    <a href="index.html" class="flex-1 flex flex-col items-center gap-1 text-orange-400 no-underline">
+      <i class="fi fi-sr-home text-2xl"></i>
+      <span class="text-[10px] font-black">หน้าหลัก</span>
+    </a>
+    <a href="register.html" class="flex-1 flex flex-col items-center gap-1 text-slate-400 hover:text-white no-underline transition-colors">
+      <i class="fi fi-sr-edit text-2xl"></i>
+      <span class="text-[10px] font-black">ลงทะเบียน</span>
+    </a>
+    <a href="check.html" class="flex-1 flex flex-col items-center gap-1 text-slate-400 hover:text-white no-underline transition-colors">
+      <i class="fi fi-sr-search-alt text-2xl"></i>
+      <span class="text-[10px] font-black">เช็ครายชื่อ</span>
+    </a>
+    <a href="login.html" class="flex-1 flex flex-col items-center gap-1 text-slate-400 hover:text-white no-underline transition-colors">
+      <i class="fi fi-sr-sign-in-alt text-2xl"></i>
+      <span class="text-[10px] font-black">เข้าสู่ระบบ</span>
+    </a>
+  </nav>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec"; // ⚠️ ใส่ URL ของ Web App
+
+    const courseDataMap = {
+      "แพทยศาสตร์": { key: "MD", icon: "fi-sr-stethoscope" },
+      "วิทยาศาสตร์ข้อมูลสุขภาพ": { key: "HDS", icon: "fi-sr-chart-histogram" },
+      "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { key: "BNS", icon: "fi-sr-user-nurse" },
+      "รังสีเทคนิค": { key: "RT", icon: "fi-sr-bone" },
+      "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { key: "HKH", icon: "fi-sr-running" },
+      "ฉุกเฉินการแพทย์": { key: "PMD", icon: "fi-sr-ambulance" },
+      "นวัตกรรมวิทยาศาสตร์การแพทย์": { key: "INMS", icon: "fi-sr-flask" },
+      "วิศวกรรมชีวการแพทย์": { key: "BME", icon: "fi-sr-microchip" },
+      "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { key: "MHFT", icon: "fi-sr-apple-whole" }
+    };
+
+    window.onload = () => {
+      // PDPA Popup
+      if(!sessionStorage.getItem('pdpa_accepted')) {
+        Swal.fire({
+          title: 'นโยบายความเป็นส่วนตัว (PDPA)',
+          text: 'ราชวิทยาลัยจุฬาภรณ์ ขอความยินยอมในการเก็บรวบรวมข้อมูลส่วนบุคคลของท่าน เพื่อใช้สำหรับการลงทะเบียน เข้าร่วมกิจกรรม และการประชาสัมพันธ์โครงการ',
+          icon: 'info', confirmButtonText: 'รับทราบและยินยอม',
+          confirmButtonColor: '#f97316', allowOutsideClick: false,
+          customClass: { popup: 'rounded-3xl', title: 'font-black' }
+        }).then(() => { sessionStorage.setItem('pdpa_accepted', 'true'); });
+      }
+
+      fetch(SCRIPT_URL + "?action=getSeats")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('courseGrid').classList.remove('hidden');
+          renderCards(data);
+        }).catch(err => {
+          document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold">ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบ SCRIPT_URL</p>`;
+        });
+    };
+
+    function renderCards(data) {
+      if(data.status !== 'success') return;
+      let html = '';
+      data.order.forEach(courseName => {
+        const total = data.total[courseName];
+        const remaining = data.remaining[courseName];
+        const used = total - remaining;
+        const percent = (used / total) * 100;
+        const isFull = remaining <= 0;
+        const mapped = courseDataMap[courseName];
+
+        html += `
+          <div class="course-card ${isFull ? 'disabled' : ''}">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xl color-${mapped.key} shadow-md">
+                <i class="fi ${mapped.icon} mt-1"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-black text-slate-800 text-[1rem] leading-snug">${courseName}</h3>
+              </div>
+            </div>
+            <div class="mt-auto bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div class="flex justify-between items-end mb-2">
+                <span class="text-sm font-bold text-slate-500">รับ ${total} คน</span>
+                <span class="text-xl font-black ${isFull ? 'text-red-500' : 'text-blue-600'}">${remaining > 0 ? `ว่าง ${remaining}` : 'เต็มแล้ว'}</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill color-${mapped.key}" style="width: ${percent}%;"></div></div>
+            </div>
+            ${!isFull ? `
+            <a href="register.html?course=${encodeURIComponent(courseName)}" class="mt-4 block w-full bg-slate-900 text-white text-center py-2.5 rounded-xl font-bold hover:bg-orange-500 transition-colors no-underline">
+              สมัครหลักสูตรนี้
+            </a>` : `
+            <button disabled class="mt-4 block w-full bg-slate-200 text-slate-400 text-center py-2.5 rounded-xl font-bold">
+              ที่นั่งเต็มแล้ว
+            </button>`}
+          </div>
+        `;
+      });
+      document.getElementById('courseGrid').innerHTML = html;
+    }
+  </script>
+</body>
+</html>
