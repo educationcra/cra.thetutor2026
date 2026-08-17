@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตรวจสอบรายชื่อ - CRA THE TUTOR 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons@3.3.1/css/all/all.min.css" rel="stylesheet">
+  <!-- นำเข้า SweetAlert2 สำหรับ Popup แจ้งปัญหา -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
+    
+    /* สีประจำแต่ละหลักสูตร */
+    .color-MD { background-color: #064e3b; color: white; } /* เขียวเข้ม */
+    .color-HDS { background-color: #bef264; color: #1a2e05; } /* เขียวเหลืองอ่อน */
+    .color-BNS { background-color: #38bdf8; color: #082f49; } /* ฟ้า */
+    .color-RT { background-color: #a855f7; color: white; } /* ม่วง */
+    .color-HKH { background-color: #f97316; color: white; } /* ส้ม */
+    .color-PMD { background-color: #1e3a8a; color: white; } /* น้ำเงินเข้ม */
+    .color-INMS { background-color: #facc15; color: #422006; } /* เหลือง */
+    .color-BME { background-color: #9f1239; color: white; } /* แดงเลือดหมู */
+    .color-MHFT { background-color: #ec4899; color: white; } /* ชมพู */
+
+    .course-panel { background: white; border-radius: 1.5rem; overflow: hidden; margin-bottom: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+    .course-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .student-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #f8fafc; transition: background 0.2s; }
+    .student-item:hover { background-color: #f1f5f9; }
+    .student-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 pb-20">
+
+  <!-- แถบสีด้านบน -->
+  <div class="fixed top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#0a2240] via-[#0ea5e9] to-[#ff6b00] z-50"></div>
+
+  <div class="w-full max-w-5xl mx-auto px-5 md:px-10 pt-8 mt-4">
+    
+    <!-- เมนู Navigation ด้านบน -->
+    <div class="flex justify-between items-center mb-8">
+       <a href="index.html" class="inline-flex items-center gap-2 text-sm text-slate-600 bg-white px-5 py-2.5 rounded-full shadow-sm font-bold no-underline border border-slate-200 hover:bg-slate-50 transition-colors">
+          <i class="fi fi-sr-arrow-small-left mt-0.5 text-lg"></i> กลับหน้าหลัก
+       </a>
+       
+       <!-- ปุ่มแจ้งปัญหา -->
+       <button onclick="reportIssue()" class="inline-flex items-center gap-2 text-sm text-white bg-red-500 px-5 py-2.5 rounded-full shadow-md shadow-red-500/30 font-bold hover:bg-red-600 hover:-translate-y-0.5 transition-all">
+          <i class="fi fi-sr-engine-warning mt-0.5"></i> แจ้งปัญหา
+       </button>
+    </div>
+
+    <!-- ส่วนหัวข้อและค้นหา -->
+    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+           <h1 class="text-3xl font-black text-[#0f172a] mb-2 tracking-tight">ตรวจสอบรายชื่อผู้ลงทะเบียน</h1>
+           <p class="text-slate-500 font-medium text-sm">ข้อมูลอัปเดตเรียลไทม์ แบ่งกลุ่มรายชื่อตามหลักสูตรที่สมัคร</p>
+        </div>
+        
+        <div class="w-full md:w-72 relative">
+            <i class="fi fi-sr-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" onkeyup="filterStudents()" placeholder="ค้นหาด้วยชื่อ หรือ ID..." class="w-full bg-slate-100 text-slate-800 font-bold px-12 py-3.5 rounded-xl outline-none border-2 border-transparent focus:border-[#0ea5e9] focus:bg-white transition-all placeholder:font-medium placeholder:text-slate-400">
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-16 bg-white rounded-[2rem] border border-slate-200 shadow-sm">
+      <i class="fi fi-sr-spinner animate-spin text-5xl text-[#0ea5e9]"></i>
+      <p class="font-bold mt-4 text-slate-500 text-lg">กำลังดึงข้อมูลจากระบบ...</p>
+    </div>
+
+    <!-- คอนเทนเนอร์แสดงรายชื่อ (แดชบอร์ด) -->
+    <div id="dashboard" class="w-full hidden"></div>
+  </div>
+
+  <script>
+    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุดของคุณ)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec"; 
+    
+    // ตั้งค่ารหัสสีและตัวย่อให้ตรงกับที่ระบุ
+    const coursePrefixMap = {
+      "แพทยศาสตร์": "MD", 
+      "วิทยาศาสตร์ข้อมูลสุขภาพ": "HDS", 
+      "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": "BNS",
+      "รังสีเทคนิค": "RT", 
+      "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": "HKH", 
+      "ฉุกเฉินการแพทย์": "PMD",
+      "นวัตกรรมวิทยาศาสตร์การแพทย์": "INMS", 
+      "วิศวกรรมชีวการแพทย์": "BME", 
+      "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": "MHFT"
+    };
+
+    window.onload = () => {
+      // ใช้ action getRegisteredList ที่ดึงเฉพาะ ID และ ชื่อ เพื่อความปลอดภัยของข้อมูลส่วนตัว
+      fetch(SCRIPT_URL + "?action=getRegisteredList")
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('dashboard').classList.remove('hidden');
+          renderDashboard(data);
+        }).catch(err => {
+          document.getElementById('loading').innerHTML = `
+            <i class="fi fi-sr-exclamation text-5xl text-red-500 mb-4"></i>
+            <h2 class="text-2xl font-black text-slate-800">เกิดข้อผิดพลาด</h2>
+            <p class="text-slate-500 mt-2 font-medium">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่ภายหลัง</p>
+          `;
+        });
+    };
+
+    function renderDashboard(data) {
+      let grouped = {};
+      Object.keys(coursePrefixMap).forEach(c => grouped[c] = []);
+      
+      // จัดกลุ่มนักเรียนตามหลักสูตร
+      if(data && data.length > 0) {
+          data.forEach(p => { if(grouped[p.course]) grouped[p.course].push(p); });
+      }
+
+      let html = '';
+      Object.keys(grouped).forEach(course => {
+        const students = grouped[course].sort((a,b) => a.id.localeCompare(b.id)); // เรียงตามรหัส
+        const prefix = coursePrefixMap[course];
+        const count = students.length;
+        
+        html += `
+          <div class="course-panel" data-course="${course}">
+            <div class="course-header color-${prefix}">
+              <h2 class="text-lg md:text-xl font-black flex items-center gap-3">
+                 <i class="fi fi-sr-users-alt mt-1"></i> ${course}
+              </h2>
+              <div class="bg-white/20 px-4 py-1.5 rounded-full text-sm font-black backdrop-blur-sm shadow-inner tracking-widest">${count} คน</div>
+            </div>
+            <div class="bg-white student-list">
+        `;
+        
+        if(count === 0) {
+            html += `<div class="p-8 text-center text-slate-400 font-medium bg-slate-50"><i class="fi fi-sr-box-open text-3xl mb-2 text-slate-300"></i><br>ยังไม่มีผู้ลงทะเบียนในหลักสูตรนี้</div>`;
+        } else {
+          students.forEach(s => {
+            html += `
+              <div class="student-item" data-name="${s.name}" data-id="${s.id}">
+                <div class="font-bold text-slate-700 flex items-center gap-3">
+                   <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs"><i class="fi fi-sr-user"></i></div>
+                   ${s.name}
+                </div>
+                <div class="px-3.5 py-1.5 rounded-lg text-sm font-black color-${prefix} shadow-sm tracking-widest border border-black/5">${s.id}</div>
+              </div>
+            `;
+          });
+        }
+        html += `</div></div>`;
+      });
+      document.getElementById('dashboard').innerHTML = html;
+    }
+
+    // ฟังก์ชันค้นหารายชื่อ
+    function filterStudents() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const courses = document.querySelectorAll('.course-panel');
+        
+        courses.forEach(course => {
+            let hasVisibleStudent = false;
+            const students = course.querySelectorAll('.student-item');
+            
+            students.forEach(student => {
+                const name = student.getAttribute('data-name').toLowerCase();
+                const id = student.getAttribute('data-id').toLowerCase();
+                
+                if (name.includes(input) || id.includes(input)) {
+                    student.style.display = 'flex';
+                    hasVisibleStudent = true;
+                } else {
+                    student.style.display = 'none';
+                }
+            });
+            
+            // ซ่อนหลักสูตรที่ไม่มีรายชื่อตรงกับการค้นหา
+            if (hasVisibleStudent || input === '') {
+                course.style.display = 'block';
+            } else {
+                course.style.display = 'none';
+            }
+        });
+    }
+
+    // ฟังก์ชันแจ้งปัญหา (ตรวจสอบเบอร์โทรก่อนส่งอีเมล)
+    function reportIssue() {
+        Swal.fire({
+            title: 'ยืนยันสิทธิ์ก่อนแจ้งปัญหา',
+            html: '<p class="text-sm text-slate-500 mb-4 font-medium">เพื่อป้องกันผู้ไม่เกี่ยวข้อง<br>กรุณากรอกเบอร์โทรศัพท์ที่ใช้ลงทะเบียน</p>',
+            input: 'tel',
+            inputPlaceholder: '0XX-XXX-XXXX',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'ตรวจสอบข้อมูล <i class="fi fi-sr-search mt-1 ml-1"></i>',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#0ea5e9',
+            cancelButtonColor: '#94a3b8',
+            customClass: {
+                popup: 'rounded-3xl p-6',
+                title: 'font-black text-[#0f172a]',
+                input: 'border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-center text-lg focus:border-[#0ea5e9] focus:outline-none transition-all',
+                confirmButton: 'rounded-xl font-bold px-6 py-3 shadow-md',
+                cancelButton: 'rounded-xl font-bold px-6 py-3'
+            },
+            inputValidator: (value) => {
+                if (!value) return 'กรุณากรอกเบอร์โทรศัพท์มือถือ';
+                const phoneStr = value.replace(/\D/g, '');
+                if (phoneStr.length !== 10) return 'กรุณากรอกเบอร์ให้ครบ 10 หลัก';
+            },
+            didOpen: () => {
+                // จัดรูปแบบเบอร์โทรศัพท์อัตโนมัติขณะพิมพ์
+                const input = Swal.getInput();
+                input.addEventListener('input', () => {
+                    let v = input.value.replace(/\D/g,'');
+                    if(v.length > 10) v = v.substring(0,10);
+                    if(v.length > 6) input.value = v.substring(0,3)+'-'+v.substring(3,6)+'-'+v.substring(6);
+                    else if(v.length > 3) input.value = v.substring(0,3)+'-'+v.substring(3);
+                    else input.value = v;
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const phone = result.value.replace(/\D/g, ''); // ดึงเฉพาะตัวเลข 10 หลัก
+                verifyAndReport(phone);
+            }
+        });
+    }
+
+    // ฟังก์ชันเชื่อม API เช็คเบอร์โทร
+    function verifyAndReport(phone) {
+        Swal.fire({
+            title: 'กำลังตรวจสอบ...',
+            text: 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        // ใช้ API Login เดิมในการเช็คฐานข้อมูล
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'login', phone: phone })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.status === 'success') {
+                Swal.close();
+                
+                // ดึง ID และ ชื่อ มาใส่ในอีเมลอัตโนมัติ
+                const email = 'craopenhouse@gmail.com';
+                const subject = encodeURIComponent(`แจ้งปัญหาการลงทะเบียน - ID: ${res.id}`);
+                const body = encodeURIComponent(`สวัสดีครับ/ค่ะ,\n\nฉันต้องการแจ้งปัญหาเกี่ยวกับกิจกรรม CRA THE TUTOR\nรหัสประจำตัว (ID): ${res.id}\nชื่อผู้แจ้ง: ${res.name}\n\nรายละเอียดปัญหาที่พบ:\n(กรุณาลบข้อความนี้และพิมพ์ปัญหาของท่าน...)\n\n\n\n-----------------------------\nขอบคุณครับ/ค่ะ`);
+                
+                // เปิดแอปอีเมลในเครื่องพร้อมเนื้อหา
+                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ปฏิเสธการเข้าถึง',
+                    text: 'เบอร์โทรศัพท์นี้ไม่มีในระบบ หรือท่านยังไม่ได้ลงทะเบียนครับ',
+                    confirmButtonColor: '#0f172a',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-3' }
+                });
+            }
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'ระบบขัดข้อง',
+                text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่ภายหลัง',
+                confirmButtonColor: '#0f172a',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-3' }
+            });
+        });
+    }
+  </script>
+</body>
+</html>
