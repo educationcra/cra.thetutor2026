@@ -9,8 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
-  <!-- เพิ่ม html2canvas สำหรับเซฟรูประบบ E-Ticket -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
@@ -73,7 +71,7 @@
     .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; }
     .autocomplete-dropdown li:hover { background-color: #f1f5f9; color: #0f172a; padding-left: 1.5rem; }
 
-    /* Custom Checkbox (Like the screenshot) */
+    /* Custom Checkbox */
     .check-card { 
         display: flex; align-items: center; padding: 1.1rem 1.25rem; 
         background: #f8fafc; border-radius: 1rem; cursor: pointer; 
@@ -123,7 +121,6 @@
     
     <!-- Left Banner (Deep Space Theme) -->
     <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-[#070B19] text-white flex-col justify-between relative overflow-hidden">
-        <!-- Glowing Effects -->
         <div class="absolute top-[-20%] left-[-20%] w-[70%] h-[70%] bg-[#0ea5e9] rounded-full mix-blend-screen filter blur-[150px] opacity-30"></div>
         <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-[#ff6b00] rounded-full mix-blend-screen filter blur-[120px] opacity-30"></div>
         
@@ -158,12 +155,10 @@
     <!-- Right Form Panel -->
     <div class="w-full lg:w-7/12 xl:w-1/2 flex flex-col relative bg-white">
         
-        <!-- Mobile Header Line -->
         <div class="lg:hidden w-full h-1.5 bg-gradient-to-r from-[#0B1936] via-[#0ea5e9] to-[#ff6b00]"></div>
 
         <div class="flex-grow flex flex-col px-5 py-8 sm:px-12 md:px-16 lg:px-12 xl:px-20">
             
-            <!-- Top Nav -->
             <div class="flex justify-between items-center mb-8">
                <a href="index.html" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#ff6b00] font-bold transition-colors no-underline">
                  <i class="fi fi-sr-arrow-small-left mt-0.5 text-xl"></i> กลับหน้าหลัก
@@ -179,7 +174,6 @@
 
             <div class="w-full max-w-[600px] mx-auto hidden" id="formWrapper">
                 
-                <!-- Progress Bar -->
                 <div class="w-full bg-slate-100 h-1.5 rounded-full mb-8 relative overflow-hidden" id="progressContainer">
                   <div id="progressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#0f172a] to-[#ff6b00] transition-all duration-500 ease-out w-1/4"></div>
                 </div>
@@ -219,7 +213,6 @@
                        </div>
                     </div>
                     
-                    <!-- เลย์เอาต์ แถวเดียวกันสำหรับคอม -->
                     <div class="grid grid-cols-12 gap-x-4 gap-y-4 mb-5">
                       <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
                         <label class="input-label"><i class="fi fi-sr-venus-mars text-slate-400"></i> คำนำหน้า<span class="req">*</span></label>
@@ -359,7 +352,6 @@
                       </div>
                       <input type="hidden" id="followPage">
                       
-                      <!-- แพลตฟอร์ม -->
                       <div id="wrapPlatform" class="hidden bg-orange-50/50 p-5 rounded-2xl border border-orange-100 mt-4">
                         <label class="input-label text-[#ff6b00]"><i class="fi fi-sr-cursor text-orange-400"></i> แพลตฟอร์มที่ติดตามหลัก<span class="req">*</span></label>
                         <div class="c-select-container" id="c-followPlatform">
@@ -397,7 +389,6 @@
                    <h2 class="text-3xl font-black text-[#0f172a] mb-2 tracking-tight">ลงทะเบียนสำเร็จ!</h2>
                    <p class="text-slate-500 mb-8 font-medium">ระบบได้ยืนยันที่นั่งและออกบัตรให้ท่านแล้ว</p>
                    
-                   <!-- บัตร E-Ticket ที่จะถูก Capture เซฟเป็นรูปภาพ -->
                    <div id="ticketCard" class="bg-[#0f172a] p-8 pb-10 rounded-[2rem] text-white shadow-2xl mx-auto mb-6 relative overflow-hidden" style="max-width: 400px;">
                        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white rounded-full mix-blend-overlay filter blur-[50px] opacity-10"></div>
                        
@@ -408,23 +399,20 @@
                            <p class="text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-widest">รหัสประจำตัว</p>
                            <div class="text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md text-[#ff6b00]" id="displayId">--</div>
                            
-                           <!-- เพิ่มชื่อนามสกุล -->
                            <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
                            
-                           <!-- QR Code Image -->
                            <div class="bg-white p-3.5 rounded-[1.5rem] inline-block shadow-inner mx-auto">
                               <img id="qrImage" src="" alt="QR Code" class="w-48 h-48 object-contain rounded-xl" crossorigin="anonymous">
                            </div>
                        </div>
                    </div>
 
-                   <!-- คำเตือน -->
+                   <!-- คำเตือนฉบับใหม่ -->
                    <div class="bg-orange-50 text-orange-800 p-4 rounded-2xl border border-orange-200 font-bold text-sm flex items-start gap-3 text-left mb-6 mx-auto max-w-[400px]">
                       <i class="fi fi-sr-camera text-xl mt-0.5 text-[#ff6b00]"></i>
                       <span>โปรด <span class="text-[#ff6b00] underline">แคปหน้าจอรูปบัตรด้านบน</span> ไว้ในเครื่อง เพื่อใช้สแกนยืนยันตัวตนหน้างาน</span>
                    </div>
 
-                   <!-- ปุ่มฟังก์ชันดาวน์โหลด และส่งอีเมล -->
                    <div class="flex flex-col sm:flex-row gap-3 mb-8 w-full max-w-[400px] mx-auto">
                        <button onclick="sendQRToEmail()" class="flex-1 bg-[#ff6b00] text-white py-3.5 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2">
                            <i class="fi fi-sr-envelope mt-0.5"></i> ส่งเข้าอีเมลฉัน
@@ -442,10 +430,9 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ Web App (อัปเดตใหม่เสมอหลังจาก Deploy)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec";
+    // ⚠️ ลิงก์ Web App (อัปเดตใหม่เสมอหลังจาก Deploy -> New Deployment)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyU9D2U0R7mXjVzBw22xT0jF3VqW57lQ3g6-k74R0x6R5UuH95PqA8YgWc8M/exec";
 
-    // Config โควตา สี และไอคอน SVG ของ 9 หลักสูตร
     const courseConfig = {
       "แพทยศาสตร์": { prefix: "MD", color: "bg-emerald-700", text: "text-emerald-700", bgLight: "bg-emerald-50", icon: "fi-sr-stethoscope", max: 30 },
       "วิทยาศาสตร์ข้อมูลสุขภาพ": { prefix: "HDS", color: "bg-lime-500", text: "text-lime-600", bgLight: "bg-lime-50", icon: "fi-sr-chart-histogram", max: 40 },
@@ -464,7 +451,6 @@
     const sources = ["CRA Roadshow (ที่โรงเรียนของท่าน)", "CRA Open House", "Dek-D's TCAS Fair", "สื่อสังคมออนไลน์ราชวิทยาลัยจุฬาภรณ์ และ Education CRA", "เว็บไซต์ราชวิทยาลัยจุฬาภรณ์", "เพื่อน / คนรู้จัก / ครูแนะนำ", "แบนเนอร์ประชาสัมพันธ์"];
 
     window.onload = () => {
-      // 1. ถามเช็คระดับชั้นก่อนเริ่ม
       Swal.fire({
         title: 'ยืนยันคุณสมบัติ', text: 'คุณคือนักเรียนระดับมัธยมศึกษาตอนปลาย (ม.4 - ม.6) ใช่หรือไม่?', icon: 'question', 
         showCancelButton: true, confirmButtonText: 'ใช่, ฉันเป็นนักเรียน ม.ปลาย', cancelButtonText: 'ไม่ใช่',
@@ -474,18 +460,15 @@
           Swal.fire({ title: 'ยกเลิกการลงทะเบียน', text: 'กิจกรรมนี้สงวนสิทธิ์เฉพาะนักเรียนระดับ ม.ปลาย ครับ', icon: 'info', confirmButtonText: 'กลับหน้าหลัก', allowOutsideClick: false, customClass:{ confirmButton: 'bg-[#0f172a] rounded-xl'} })
           .then(() => window.location.href = 'index.html');
         } else {
-          // 2. ดึงข้อมูลโควตาแบบ Real-time
           fetchSeatsAndRender();
         }
       });
       
-      // ดึงข้อมูลโรงเรียน & เตรียม Dropdowns
       fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => schoolData = data).catch(err => console.log(err));
       
       const provListUI = document.getElementById('provinceList');
       provincesList.forEach(p => { provListUI.innerHTML += `<div class="c-select-option" data-value="${p}"><i class="fi fi-sr-map-pin text-slate-400 mt-0.5"></i> ${p}</div>`; });
 
-      // สร้าง Checkbox ดีไซน์ใหม่
       const group = document.getElementById('sourceGroup');
       sources.forEach((s) => {
         group.innerHTML += `
@@ -508,7 +491,6 @@
 
       setupCustomSelects();
 
-      // Email Suggestion
       const emailInput = document.getElementById('email');
       const emailDrop = document.getElementById('emailDropdown');
       emailInput.addEventListener('input', (e) => {
@@ -605,7 +587,6 @@
             const options = container.querySelectorAll('.c-select-option');
             const hiddenInput = document.getElementById(container.id.replace('c-', ''));
             const triggerSpan = trigger.querySelector('.trigger-content span');
-            const triggerIcon = trigger.querySelector('.trigger-icon');
 
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -618,7 +599,7 @@
                     e.stopPropagation();
                     const val = opt.getAttribute('data-value');
                     hiddenInput.value = val;
-                    triggerSpan.innerHTML = opt.innerHTML; // Copy HTML to keep SVG icon
+                    triggerSpan.innerHTML = opt.innerHTML; 
                     trigger.classList.add('has-value');
                     
                     options.forEach(o => o.classList.remove('selected'));
@@ -755,12 +736,10 @@
       if(selectedSources.length === 0) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกช่องทางที่ท่านทราบข่าวอย่างน้อย 1 ข้อ', confirmButtonColor: '#0f172a'});
       if(!followPage) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกว่าท่านติดตามเพจ Education CRA หรือไม่', confirmButtonColor: '#0f172a'});
       
-      // เพิ่มตัวแปร btn เพื่อจัดการปุ่มตอนกำลังโหลด
       const btn = document.getElementById('submitBtn');
       btn.disabled = true; 
       btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
 
-      // เพิ่มตัวแปร payload เพื่อรวบรวมข้อมูลทั้งหมดส่งไปให้ Google Apps Script
       const payload = {
         course: document.getElementById('courseVal').value,
         prefix: document.getElementById('prefix').value,
@@ -776,6 +755,7 @@
         followPlatform: followPage === 'ไม่ได้ติดตาม' ? '-' : followPlatform
       };
 
+      // ใช้ POST method ในการส่งข้อมูล จะไปเข้าฟังชันก์ doPost ใน GS 
       fetch(SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify(payload)
@@ -790,13 +770,11 @@
           
           document.getElementById('displayId').innerText = res.id;
           
-          // รวมชื่อและนามสกุลมาแสดงบนการ์ด
           const prefixName = document.getElementById('prefix').value;
           const fName = document.getElementById('fname').value;
           const lName = document.getElementById('lname').value;
           document.getElementById('displayName').innerText = `${prefixName}${fName} ${lName}`;
           
-          // กำหนดสีและข้อความตามหลักสูตร
           const courseConfigColor = {
             "แพทยศาสตร์": { bg: "bg-[#065f46]", text: "text-[#065f46]" },
             "วิทยาศาสตร์ข้อมูลสุขภาพ": { bg: "bg-[#a3e635]", text: "text-[#4d7c0f]" },
@@ -816,14 +794,12 @@
           
           document.getElementById('displayId').className = `text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md ${colors.text}`;
           
-          // โหลด QR Code ทันทีโดยไม่ต้องรอโหลดจาก Drive
           document.getElementById('qrImage').src = `https://quickchart.io/qr?size=400x400&margin=2&text=${res.id}`;
           
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (res.status === 'full') {
-          // กรณีเต็มระหว่างกำลังกด
-          fetchSeatsAndRender(); // รีเฟรชยอดใหม่
-          animateStepChange(1, 'ani-prev'); // เด้งกลับหน้า 1
+          fetchSeatsAndRender(); 
+          animateStepChange(1, 'ani-prev'); 
           Swal.fire({icon: 'warning', title: 'หลักสูตรเต็มพอดี', text: 'ขออภัยครับ หลักสูตรที่คุณเลือกเพิ่งถูกจองเต็มไป กรุณาเลือกหลักสูตรอื่นที่ยังว่างอยู่ครับ', confirmButtonColor: '#ff6b00'});
           btn.disabled = false; btn.innerHTML = 'ยืนยันลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
         } else {
@@ -837,18 +813,16 @@
       });
     }
 
-    // ฟังก์ชัน ส่งอีเมลเข้าตัวเองด้วย mailto:
     function sendQRToEmail() {
         const email = document.getElementById('email').value;
         const id = document.getElementById('displayId').innerText;
         const course = document.getElementById('displayCourseBadge').innerText;
-        
-        // --- FIX: ดึงลิงก์จาก data-url ---
-        // ไม่ดึงจาก src ตรงๆ แล้ว เพราะตอนนี้ src จะเป็นรหัส Base64 ที่ยาวมากๆ ส่งเข้าอีเมลไม่ได้
-        const qrUrl = document.getElementById('qrImage').getAttribute('data-url') || document.getElementById('qrImage').src;
+        const qrUrl = document.getElementById('qrImage').src;
+        const name = document.getElementById('displayName').innerText;
+        const school = document.getElementById('schoolSearch').value;
         
         const subject = encodeURIComponent(`บัตร QR Code ยืนยันการลงทะเบียน - ${id}`);
-        const body = encodeURIComponent(`สวัสดีครับ\n\nนี่คือลิงก์สำหรับดูและดาวน์โหลด QR Code ประจำตัวของคุณในการเข้าร่วมกิจกรรม CRA THE TUTOR 2026\n\nรหัสประจำตัว: ${id}\nหลักสูตร: ${course}\n\nลิงก์รูปภาพ QR Code:\n${qrUrl}\n\n*โปรดบันทึกภาพและเตรียมไว้สำหรับสแกนรายงานตัวหน้างาน*\n\nขอบคุณครับ`);
+        const body = encodeURIComponent(`สวัสดีครับคุณ ${name}\nจากโรงเรียน: ${school}\n\nนี่คือลิงก์สำหรับดูและดาวน์โหลด QR Code ประจำตัวของคุณในการเข้าร่วมกิจกรรม CRA THE TUTOR 2026\n\nรหัสประจำตัว: ${id}\nหลักสูตร: ${course}\n\nลิงก์รูปภาพ QR Code:\n${qrUrl}\n\n*โปรดบันทึกภาพและเตรียมไว้สำหรับสแกนรายงานตัวหน้างาน*\n\nขอบคุณครับ`);
         
         window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
     }
