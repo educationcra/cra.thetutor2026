@@ -83,7 +83,7 @@
 
     .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
 
-    /* Custom Scrollbar for Course List */
+    /* Custom Scrollbar for Course List (ยังคงไว้สำหรับ Modal) */
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
@@ -137,7 +137,7 @@
       <!-- CTA Buttons (Gen Z Style, Clear Hierarchy) -->
       <div class="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4 w-full">
         <!-- ปุ่มลงทะเบียน ใหญ่สุด เด่นสุด -->
-        <a href="register.html" class="w-full sm:w-auto bg-gradient-to-r from-[#ff6b00] to-[#f97316] text-white px-8 py-4 rounded-[1.25rem] font-black shadow-lg shadow-orange-500/30 btn-glow no-underline flex justify-center items-center gap-3 text-lg border border-orange-400/50">
+        <a id="mainRegBtn" href="register.html" class="w-full sm:w-auto bg-gradient-to-r from-[#ff6b00] to-[#f97316] text-white px-8 py-4 rounded-[1.25rem] font-black shadow-lg shadow-orange-500/30 btn-glow no-underline flex justify-center items-center gap-3 text-lg border border-orange-400/50">
           ลงทะเบียนตอนนี้ <i class="fi fi-sr-rocket-lunch mt-0.5"></i>
         </a>
         
@@ -189,8 +189,8 @@
           </div>
         </div>
 
-        <!-- List of Courses (With Scrollbar) -->
-        <div class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2" id="courseList">
+        <!-- List of Courses (ยืดการ์ดให้ยาวลงมา นำ Scrollbar ออก) -->
+        <div class="space-y-4" id="courseList">
           <!-- Injected via JS -->
         </div>
 
@@ -208,7 +208,7 @@
       <i class="fi fi-sr-calendar-clock text-2xl"></i>
       <span class="text-[10px] font-black">กำหนดการ</span>
     </button>
-    <a href="register.html" class="flex-1 flex flex-col items-center gap-1.5 text-slate-400 hover:text-white transition-colors no-underline">
+    <a id="mobileRegBtn" href="register.html" class="flex-1 flex flex-col items-center gap-1.5 text-slate-400 hover:text-white transition-colors no-underline">
       <i class="fi fi-sr-edit text-2xl"></i>
       <span class="text-[10px] font-black">ลงทะเบียน</span>
     </a>
@@ -317,6 +317,7 @@
   <script>
     // ⚠️ ใส่ URL ของ Web App ตรงนี้
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
+    
     // Config: สีและไอคอนตามหลักสูตร
     const courseConfig = {
       "แพทยศาสตร์": { color: "bg-[#065f46]", text: "text-[#065f46]", icon: "fi-sr-stethoscope", max: 30 },
@@ -418,6 +419,23 @@
       const globalPercent = (globalUsed / globalMax) * 100;
       document.getElementById('globalText').innerText = `${globalUsed} / ${globalMax}`;
       document.getElementById('globalProgress').style.width = `${globalPercent}%`;
+
+      // ฟังก์ชันปิดปุ่มลงทะเบียนอัตโนมัติหากโควตารวมเต็ม
+      if (globalUsed >= globalMax) {
+          const mainRegBtn = document.getElementById('mainRegBtn');
+          const mobileRegBtn = document.getElementById('mobileRegBtn');
+          
+          if (mainRegBtn) {
+              mainRegBtn.removeAttribute('href'); // นำลิงก์ออก
+              mainRegBtn.className = "w-full sm:w-auto bg-slate-800/80 text-slate-400 px-8 py-4 rounded-[1.25rem] font-black shadow-none no-underline flex justify-center items-center gap-3 text-lg border border-slate-700 cursor-not-allowed";
+              mainRegBtn.innerHTML = 'ที่นั่งเต็มโควตาแล้ว <i class="fi fi-sr-lock mt-0.5"></i>';
+          }
+          if (mobileRegBtn) {
+              mobileRegBtn.removeAttribute('href'); // นำลิงก์ออก
+              mobileRegBtn.className = "flex-1 flex flex-col items-center gap-1.5 text-slate-600 cursor-not-allowed no-underline";
+              mobileRegBtn.innerHTML = '<i class="fi fi-sr-lock text-2xl"></i><span class="text-[10px] font-black">เต็มแล้ว</span>';
+          }
+      }
     }
 
     // Modal Control Functions
