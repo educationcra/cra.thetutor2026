@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
@@ -34,7 +35,7 @@
   <!-- Loading Screen -->
   <div id="loading" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center transition-opacity duration-500">
     <div class="loader mb-4"></div>
-    <p class="text-[#ff6b00] font-bold animate-pulse text-xl">กำลังดึงข้อมูลลงทะเบียน...</p>
+    <p class="text-[#ff6b00] font-bold animate-pulse text-xl">กำลังดึงข้อมูลเรียลไทม์...</p>
   </div>
 
   <!-- Main App -->
@@ -53,7 +54,7 @@
       </div>
       <div class="flex gap-2">
          <button onclick="fetchData()" class="flex items-center gap-2 px-5 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">
-            <i class="fi fi-sr-refresh"></i> รีเฟรชข้อมูล
+            <i class="fi fi-sr-refresh"></i> อัปเดตข้อมูล
          </button>
       </div>
     </header>
@@ -84,32 +85,57 @@
         </div>
     </div>
 
-    <!-- Course Grid -->
-    <div class="mb-6 flex items-center justify-between px-2">
+    <!-- 1. สรุปยอดแยกตามระดับชั้น -->
+    <div class="mb-4 flex items-center justify-between px-2 pt-2 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+            <i class="fi fi-sr-graduation-cap text-[#facc15]"></i> สรุปยอดแยกตามระดับชั้น
+        </h2>
+        <p class="text-sm text-slate-500 font-medium hidden sm:block">คลิกที่การ์ดเพื่อดูรายชื่อ</p>
+    </div>
+
+    <div id="gradeGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <!-- JS จะสร้าง Grade Card ตรงนี้ -->
+    </div>
+
+    <!-- 2. สรุปยอดแยกตามหลักสูตร -->
+    <div class="mb-6 flex items-center justify-between px-2 pt-6 border-t border-slate-200">
         <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
             <i class="fi fi-sr-books text-[#ff6b00]"></i> สรุปยอดแยกตามหลักสูตร
         </h2>
         <p class="text-sm text-slate-500 font-medium hidden sm:block">คลิกที่การ์ดเพื่อดูรายชื่อผู้ลงทะเบียน</p>
     </div>
 
-    <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-8">
-        <!-- JS จะสร้าง Card ตรงนี้ -->
+    <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-12">
+        <!-- JS จะสร้าง Course Card ตรงนี้ -->
     </div>
+
+    <!-- 3. จัดอันดับโรงเรียน -->
+    <div class="mb-6 flex items-center justify-between px-2 pt-6 border-t border-slate-200">
+        <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+            <i class="fi fi-sr-school text-[#0ea5e9]"></i> จัดอันดับโรงเรียนยอดฮิต
+        </h2>
+        <p class="text-sm text-slate-500 font-medium hidden sm:block">คลิกเพื่อดูรายชื่อนักเรียนจากโรงเรียนนั้น</p>
+    </div>
+
+    <div id="schoolGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+        <!-- JS จะสร้าง School Card ตรงนี้ -->
+    </div>
+
   </div>
 
-  <!-- Modal ดูรายชื่อ -->
+  <!-- Modal ดูรายชื่อแบบ All-in-One (ปรับ Header อัตโนมัติ) -->
   <div id="listModal" class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center hidden opacity-0 transition-opacity duration-300 px-4">
       <div class="bg-white rounded-[2rem] w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
           
           <!-- Modal Header -->
           <div id="modalHeader" class="p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white">
               <div>
-                  <p class="text-white/80 font-bold text-sm tracking-widest uppercase mb-1">รายชื่อผู้ลงทะเบียน</p>
-                  <h2 class="text-2xl md:text-3xl font-black" id="modalCourseTitle">ชื่อหลักสูตร</h2>
+                  <p class="text-white/80 font-bold text-sm tracking-widest uppercase mb-1" id="modalTitleLabel">รายชื่อผู้ลงทะเบียน</p>
+                  <h2 class="text-2xl md:text-3xl font-black" id="modalCourseTitle">ชื่อ...</h2>
               </div>
               <div class="text-right flex items-center gap-4">
                   <div class="hidden sm:block">
-                      <p class="text-white/80 font-bold text-sm mb-1">ยอดลงทะเบียน</p>
+                      <p class="text-white/80 font-bold text-sm mb-1">ยอดรวม</p>
                       <p class="text-2xl font-black"><span id="modalCourseCount">0</span> <span class="text-sm font-medium">คน</span></p>
                   </div>
                   <button onclick="closeModal()" class="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex justify-center items-center transition backdrop-blur-sm text-white">
@@ -122,13 +148,13 @@
           <div class="p-0 overflow-hidden flex-1 flex flex-col bg-slate-50">
               <div class="overflow-x-auto overflow-y-auto flex-1 p-6 md:p-8">
                   <table class="w-full text-sm text-left border-collapse min-w-[800px] bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                      <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 z-10 shadow-sm">
+                      <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 z-10 shadow-sm text-[13px]">
                           <tr>
-                              <th class="p-4 w-24 text-center">รหัส</th>
+                              <th class="p-4 w-20 text-center">รหัส</th>
                               <th class="p-4">ชื่อ-นามสกุล</th>
-                              <th class="p-4">โรงเรียน</th>
-                              <th class="p-4 w-32">จังหวัด</th>
-                              <th class="p-4 w-40 text-center">เบอร์โทรศัพท์</th>
+                              <th class="p-4 w-48" id="thCol1">ข้อมูลอ้างอิง 1</th>
+                              <th class="p-4 w-48" id="thCol2">ข้อมูลอ้างอิง 2</th>
+                              <th class="p-4 w-28">จังหวัด</th>
                           </tr>
                       </thead>
                       <tbody id="modalTableBody" class="divide-y divide-slate-100">
@@ -165,40 +191,63 @@
         document.getElementById('loading').classList.remove('hidden', 'opacity-0');
         document.getElementById('mainApp').classList.add('hidden', 'opacity-0');
 
-        fetch(SCRIPT_URL)
+        fetch(SCRIPT_URL + "?action=getDashboardData")
         .then(res => res.json())
         .then(json => {
             if(json.status === 'success') {
-                rawData = json.data;
-                // ตัด Header ของ Google Sheet ออก (ถ้ามี)
+                rawData = json.data || [];
+                // ตัด Header ของ Google Sheet ออกถ้ามี
                 if(rawData.length > 0 && rawData[0][0] === "ID STU") rawData.shift(); 
                 processData();
             } else {
-                showMockData(); // ถ้า API เออเร่อ (เพราะยังไม่ได้แก้โค้ด GS) ให้โชว์ข้อมูลจำลองไปก่อน
+                Swal.fire('ข้อผิดพลาด', 'ดึงข้อมูลจากฐานข้อมูลไม่สำเร็จ กรุณาลองใหม่', 'error');
+                document.getElementById('loading').classList.add('hidden');
             }
         })
         .catch(err => {
             console.error(err);
-            showMockData(); // โชว์ข้อมูลจำลองถ้า Error
+            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            document.getElementById('loading').classList.add('hidden');
         });
     }
 
     function processData() {
         let courseCounts = {};
+        let schoolCounts = {};
+        let gradeCounts = {};
         let totalQuotas = 0;
-        let totalRegistered = rawData.length;
+        let totalRegistered = 0;
 
-        // เริ่มต้นนับ 0 ให้ทุกหลักสูตร และรวมโควตา
         for (const [course, config] of Object.entries(courseConfig)) {
             courseCounts[course] = 0;
             totalQuotas += config.max;
         }
 
-        // นับจำนวนจริงจากข้อมูล
+        // โครงสร้าง GS Index: 0=ID, 1=Course, 2=Name, 3=Email, 4=Phone, 5=School, 6=Prov, 7=Grade
         rawData.forEach(row => {
-            let courseName = String(row[1]).trim();
-            if(courseCounts[courseName] !== undefined) {
-                courseCounts[courseName]++;
+            if (row[0] && row[1]) { 
+                let courseName = String(row[1]).trim();
+                let schoolName = row[5] ? String(row[5]).trim() : "ไม่ได้ระบุ";
+                let provName = row[6] ? String(row[6]).trim() : "-";
+                let gradeName = row[7] ? String(row[7]).replace('มัธยมศึกษาปีที่', 'ม.').replace(/\s+/g, '') : "ไม่ได้ระบุ";
+                
+                // นับยอดหลักสูตร
+                if(courseCounts[courseName] !== undefined) {
+                    courseCounts[courseName]++;
+                    totalRegistered++;
+                }
+
+                // นับยอดโรงเรียน
+                if(!schoolCounts[schoolName]) {
+                    schoolCounts[schoolName] = { count: 0, prov: provName };
+                }
+                schoolCounts[schoolName].count++;
+
+                // นับยอดระดับชั้น
+                if(!gradeCounts[gradeName] && gradeName.startsWith('ม.')) {
+                    gradeCounts[gradeName] = 0;
+                }
+                if(gradeName.startsWith('ม.')) gradeCounts[gradeName]++;
             }
         });
 
@@ -208,10 +257,19 @@
         let percent = totalQuotas > 0 ? ((totalRegistered / totalQuotas) * 100).toFixed(1) : 0;
         document.getElementById('kpiPercent').innerText = percent;
 
-        // วาดการ์ดหลักสูตร
+        // วาดส่วนต่างๆ
+        renderGradeGrid(gradeCounts);
         renderCourseGrid(courseCounts);
 
-        // ปิด Loading
+        let sortedSchools = Object.keys(schoolCounts).map(name => ({
+            name: name,
+            prov: schoolCounts[name].prov,
+            count: schoolCounts[name].count
+        })).sort((a, b) => b.count - a.count);
+
+        renderSchoolGrid(sortedSchools);
+
+        // โชว์แอป
         document.getElementById('loading').classList.add('opacity-0');
         setTimeout(() => {
             document.getElementById('loading').classList.add('hidden');
@@ -232,74 +290,182 @@
             let isFull = current >= max;
 
             html += `
-                <div class="bg-white rounded-3xl p-6 border-2 border-transparent hover:border-slate-200 shadow-sm hover:shadow-xl transition-all cursor-pointer fade-in relative overflow-hidden group" style="animation-delay: ${delay}ms" onclick="openModal('${course}')">
-                    
-                    <!-- แถบสีด้านซ้าย -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-transparent hover:border-slate-200 shadow-sm hover:shadow-xl transition-all cursor-pointer fade-in relative overflow-hidden group" style="animation-delay: ${delay}ms" onclick="openCourseModal('${course}')">
                     <div class="absolute left-0 top-0 bottom-0 w-2 ${config.color}"></div>
-
                     <div class="flex justify-between items-start mb-4 pl-2">
                         <div class="w-12 h-12 rounded-2xl ${config.bgLight} ${config.text} flex justify-center items-center transition-transform group-hover:scale-110">
                             <i class="fi ${config.icon} text-xl mt-1"></i>
                         </div>
                         ${isFull ? `<span class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-xs font-black">เต็มแล้ว</span>` : `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-black">ว่าง ${max - current}</span>`}
                     </div>
-                    
                     <div class="pl-2">
                         <h3 class="font-black text-slate-800 text-lg leading-tight mb-4 min-h-[2.5rem]">${course}</h3>
-                        
                         <div class="flex justify-between items-end mb-2">
                             <div class="text-sm font-bold text-slate-400">ลงทะเบียนแล้ว</div>
                             <div class="text-2xl font-black ${config.text}">${current}<span class="text-sm text-slate-400 font-medium">/${max}</span></div>
                         </div>
-                        
                         <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                             <div class="${config.color} h-full rounded-full transition-all duration-1000" style="width: ${percent}%;"></div>
                         </div>
                     </div>
                 </div>
             `;
-            delay += 50; // ห่างกันการ์ดละ 50ms เวลา Animate
+            delay += 50;
         }
         grid.innerHTML = html;
     }
 
-    /* Modal Functions */
-    function openModal(courseName) {
+    function renderGradeGrid(counts) {
+        const grid = document.getElementById('gradeGrid');
+        let html = '';
+        const grades = ['ม.4', 'ม.5', 'ม.6']; 
+        
+        grades.forEach((g, idx) => {
+            let current = counts[g] || 0;
+            let delay = idx * 50;
+            html += `
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-[#facc15] hover:shadow-md transition cursor-pointer fade-in flex items-center gap-4 group" style="animation-delay: ${delay}ms" onclick="openGradeModal('${g}')">
+                    <div class="w-14 h-14 rounded-full bg-yellow-50 text-yellow-500 flex justify-center items-center text-xl font-black group-hover:scale-110 transition-transform shrink-0">
+                        <i class="fi fi-sr-badge mt-1"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-black text-slate-800 text-lg">${g}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold">ยอดลงทะเบียน</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-3xl font-black text-yellow-500">${current}</span>
+                        <span class="text-xs font-bold text-slate-400">คน</span>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    function renderSchoolGrid(schools) {
+        const grid = document.getElementById('schoolGrid');
+        let html = '';
+        
+        if(schools.length === 0) {
+           grid.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400 font-bold">ยังไม่มีข้อมูล</div>';
+           return;
+        }
+        
+        schools.forEach((s, idx) => {
+            let delay = (idx % 10) * 50;
+            html += `
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 hover:border-[#0ea5e9] hover:shadow-md transition cursor-pointer fade-in flex items-center gap-4 group" style="animation-delay: ${delay}ms" onclick="openSchoolModal('${s.name}')">
+                    <div class="w-12 h-12 rounded-full bg-sky-50 text-sky-500 flex justify-center items-center font-black text-lg group-hover:scale-110 transition-transform shrink-0">
+                        ${idx + 1}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-slate-800 text-sm truncate" title="${s.name}">${s.name}</h3>
+                        <p class="text-[11px] text-slate-400 font-bold">จ.${s.prov}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-2xl font-black text-sky-500">${s.count}</span>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    function openCourseModal(courseName) {
         const config = courseConfig[courseName];
+        const filteredData = rawData.filter(row => row[1] && String(row[1]).trim() === courseName);
         
-        // กรองข้อมูลเฉพาะหลักสูตรที่เลือก
-        // โครงสร้าง GS Index: 0=ID, 1=Course, 2=Name, 3=Email, 4=Phone, 5=School, 6=Prov
-        const filteredData = rawData.filter(row => String(row[1]).trim() === courseName);
-        
+        document.getElementById('modalTitleLabel').innerText = "รายชื่อผู้ลงทะเบียน (แบ่งตามหลักสูตร)";
         document.getElementById('modalCourseTitle').innerText = courseName;
         document.getElementById('modalCourseCount').innerText = filteredData.length;
         
-        // ปรับสี Header Modal
-        const header = document.getElementById('modalHeader');
-        header.className = `p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white ${config.color}`;
+        document.getElementById('modalHeader').className = `p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white ${config.color}`;
 
+        renderModalTable(filteredData, config.text, 'course');
+        showModal();
+    }
+
+    function openSchoolModal(schoolName) {
+        const filteredData = rawData.filter(row => row[5] && String(row[5]).trim() === schoolName);
+        
+        document.getElementById('modalTitleLabel').innerText = "รายชื่อผู้ลงทะเบียน (แบ่งตามโรงเรียน)";
+        document.getElementById('modalCourseTitle').innerText = schoolName;
+        document.getElementById('modalCourseCount').innerText = filteredData.length;
+        
+        document.getElementById('modalHeader').className = `p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white bg-[#0ea5e9]`;
+
+        renderModalTable(filteredData, 'text-[#0ea5e9]', 'school');
+        showModal();
+    }
+
+    function openGradeModal(gradeName) {
+        const filteredData = rawData.filter(row => {
+            let g = row[7] ? String(row[7]).replace('มัธยมศึกษาปีที่', 'ม.').replace(/\s+/g, '') : "";
+            return g === gradeName;
+        });
+        
+        document.getElementById('modalTitleLabel').innerText = "รายชื่อผู้ลงทะเบียน (แบ่งตามระดับชั้น)";
+        document.getElementById('modalCourseTitle').innerText = gradeName;
+        document.getElementById('modalCourseCount').innerText = filteredData.length;
+        
+        document.getElementById('modalHeader').className = `p-6 md:p-8 flex items-center justify-between rounded-t-[2rem] text-white bg-yellow-500`;
+
+        renderModalTable(filteredData, 'text-yellow-600', 'grade');
+        showModal();
+    }
+
+    function renderModalTable(data, colorClass, viewMode) {
         const tbody = document.getElementById('modalTableBody');
-        if(filteredData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold"><i class="fi fi-sr-box-open text-4xl mb-3 block"></i>ยังไม่มีผู้ลงทะเบียนในหลักสูตรนี้</td></tr>`;
-        } else {
-            tbody.innerHTML = filteredData.map((row, index) => {
-                return `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-4 text-center font-black ${config.text}">${row[0] || '-'}</td>
-                        <td class="p-4 font-bold text-slate-800">${row[2] || '-'}</td>
-                        <td class="p-4 text-slate-500">${row[5] || '-'}</td>
-                        <td class="p-4 font-medium text-slate-600"><span class="bg-slate-100 px-2 py-1 rounded text-xs">จ.${row[6] || '-'}</span></td>
-                        <td class="p-4 text-center text-slate-500 font-mono text-sm">${row[4] || '-'}</td>
-                    </tr>
-                `;
-            }).join('');
+        const thCol1 = document.getElementById('thCol1'); 
+        const thCol2 = document.getElementById('thCol2'); 
+        
+        let label1 = "", label2 = "";
+        if (viewMode === 'course') {
+            label1 = "โรงเรียน"; label2 = "ระดับชั้น";
+        } else if (viewMode === 'school') {
+            label1 = "หลักสูตร"; label2 = "ระดับชั้น";
+        } else if (viewMode === 'grade') {
+            label1 = "หลักสูตร"; label2 = "โรงเรียน";
+        }
+        
+        thCol1.innerText = label1;
+        thCol2.innerText = label2;
+
+        if(data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-400 font-bold"><i class="fi fi-sr-box-open text-4xl mb-3 block"></i>ไม่พบข้อมูล</td></tr>`;
+            return;
         }
 
+        tbody.innerHTML = data.map((row) => {
+            let course = row[1] || '-';
+            let school = row[5] || '-';
+            let grade = row[7] ? String(row[7]).replace('มัธยมศึกษาปีที่', 'ม.').replace(/\s+/g, '') : '-';
+            
+            let val1 = "", val2 = "";
+            if (viewMode === 'course') {
+                val1 = school; val2 = grade;
+            } else if (viewMode === 'school') {
+                val1 = course; val2 = grade;
+            } else if (viewMode === 'grade') {
+                val1 = course; val2 = school;
+            }
+            
+            return `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="p-4 text-center font-black text-[13px] ${colorClass}">${row[0] || '-'}</td>
+                    <td class="p-4 font-bold text-slate-800 text-[13px]">${row[2] || '-'}</td>
+                    <td class="p-4 text-slate-600 font-medium text-[13px] truncate max-w-[200px]">${val1}</td>
+                    <td class="p-4 text-slate-600 font-medium text-[13px] truncate max-w-[200px]">${val2}</td>
+                    <td class="p-4 font-medium text-slate-500 text-[13px]">จ.${row[6] || '-'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function showModal() {
         const modal = document.getElementById('listModal');
         const content = document.getElementById('modalContent');
-        
         modal.classList.remove('hidden');
-        // trigger animation
         setTimeout(() => {
             modal.classList.remove('opacity-0');
             content.classList.remove('scale-95');
@@ -309,37 +475,15 @@
     function closeModal() {
         const modal = document.getElementById('listModal');
         const content = document.getElementById('modalContent');
-        
         modal.classList.add('opacity-0');
         content.classList.add('scale-95');
-        
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
-    // ปิด Modal เมื่อคลิกพื้นที่ว่าง
     document.getElementById('listModal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
     });
 
-    /* ----------------------------------------------------
-       Mock Data สำหรับ Preview หากเชื่อม API ไม่ผ่าน
-       ---------------------------------------------------- */
-    function showMockData() {
-        console.log("Using Mock Data for preview.");
-        rawData = [
-            ["MD-01", "แพทยศาสตร์", "นายชานนท์ ใจดี", "test@gmail.com", "081-234-5678", "สวนกุหลาบวิทยาลัย", "กรุงเทพมหานคร"],
-            ["MD-02", "แพทยศาสตร์", "นางสาวสมหญิง น่ารัก", "test2@gmail.com", "089-999-8888", "เตรียมอุดมศึกษา", "กรุงเทพมหานคร"],
-            ["HDS-01", "วิทยาศาสตร์ข้อมูลสุขภาพ", "นายสมชาย สายโค้ด", "test3@gmail.com", "082-333-4444", "มหิดลวิทยานุสรณ์", "นครปฐม"],
-            ["RT-01", "รังสีเทคนิค", "นางสาววิภาวี สว่าง", "test4@gmail.com", "084-555-6666", "สตรีวิทยา", "กรุงเทพมหานคร"],
-            ["RT-02", "รังสีเทคนิค", "นายภพ พิภพ", "test5@gmail.com", "085-666-7777", "บดินทรเดชา", "กรุงเทพมหานคร"],
-            ["RT-03", "รังสีเทคนิค", "นางสาวมาลี ดวงดี", "test6@gmail.com", "086-777-8888", "สามเสนวิทยาลัย", "กรุงเทพมหานคร"],
-            ["INMS-01", "นวัตกรรมวิทยาศาสตร์การแพทย์", "นายวิทย์ ล้ำยุค", "test7@gmail.com", "087-888-9999", "ขอนแก่นวิทยายน", "ขอนแก่น"],
-            ["BNS-01", "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)", "นางสาวใจดี มีเมตตา", "test8@gmail.com", "088-999-0000", "หาดใหญ่วิทยาลัย", "สงขลา"]
-        ];
-        processData();
-    }
   </script>
 </body>
 </html>
