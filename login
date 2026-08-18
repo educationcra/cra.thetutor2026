@@ -70,7 +70,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec"; // ⚠️ ใส่ URL ของ Web App
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec"; 
 
     const prefixMap = {
       "แพทยศาสตร์": "MD", "วิทยาศาสตร์ข้อมูลสุขภาพ": "HDS", "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": "BNS",
