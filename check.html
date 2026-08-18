@@ -7,7 +7,7 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons@3.3.1/css/all/all.min.css" rel="stylesheet">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   <!-- นำเข้า SweetAlert2 สำหรับ Popup แจ้งปัญหา -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
@@ -15,14 +15,14 @@
     body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
     
     /* สีประจำแต่ละหลักสูตร */
-    .color-MD { background-color: #064e3b; color: white; } /* เขียวเข้ม */
-    .color-HDS { background-color: #bef264; color: #1a2e05; } /* เขียวเหลืองอ่อน */
+    .color-MD { background-color: #047857; color: white; } /* เขียวเข้ม */
+    .color-HDS { background-color: #84cc16; color: #1a2e05; } /* เขียวเหลืองอ่อน */
     .color-BNS { background-color: #38bdf8; color: #082f49; } /* ฟ้า */
     .color-RT { background-color: #a855f7; color: white; } /* ม่วง */
     .color-HKH { background-color: #f97316; color: white; } /* ส้ม */
     .color-PMD { background-color: #1e3a8a; color: white; } /* น้ำเงินเข้ม */
     .color-INMS { background-color: #facc15; color: #422006; } /* เหลือง */
-    .color-BME { background-color: #9f1239; color: white; } /* แดงเลือดหมู */
+    .color-BME { background-color: #be123c; color: white; } /* แดงเลือดหมู */
     .color-MHFT { background-color: #ec4899; color: white; } /* ชมพู */
 
     .course-panel { background: white; border-radius: 1.5rem; overflow: hidden; margin-bottom: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
@@ -46,7 +46,7 @@
        </a>
        
        <!-- ปุ่มแจ้งปัญหา -->
-       <button onclick="reportIssue()" class="inline-flex items-center gap-2 text-sm text-white bg-red-500 px-5 py-2.5 rounded-full shadow-md shadow-red-500/30 font-bold hover:bg-red-600 hover:-translate-y-0.5 transition-all">
+       <button onclick="reportIssue()" class="inline-flex items-center gap-2 text-sm text-white bg-rose-500 px-5 py-2.5 rounded-full shadow-md shadow-rose-500/30 font-bold hover:bg-rose-600 hover:-translate-y-0.5 transition-all">
           <i class="fi fi-sr-engine-warning mt-0.5"></i> แจ้งปัญหา
        </button>
     </div>
@@ -58,15 +58,15 @@
            <p class="text-slate-500 font-medium text-sm">ข้อมูลอัปเดตเรียลไทม์ แบ่งกลุ่มรายชื่อตามหลักสูตรที่สมัคร</p>
         </div>
         
-        <div class="w-full md:w-72 relative">
+        <div class="w-full md:w-80 relative">
             <i class="fi fi-sr-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-            <input type="text" id="searchInput" onkeyup="filterStudents()" placeholder="ค้นหาด้วยชื่อ หรือ ID..." class="w-full bg-slate-100 text-slate-800 font-bold px-12 py-3.5 rounded-xl outline-none border-2 border-transparent focus:border-[#0ea5e9] focus:bg-white transition-all placeholder:font-medium placeholder:text-slate-400">
+            <input type="text" id="searchInput" onkeyup="filterStudents()" placeholder="ค้นหาด้วยชื่อ หรือ ID..." class="w-full bg-slate-100 text-slate-800 font-bold px-12 py-3.5 rounded-xl outline-none border-2 border-transparent focus:border-[#ff6b00] focus:bg-white transition-all placeholder:font-medium placeholder:text-slate-400">
         </div>
     </div>
 
     <!-- Loading State -->
     <div id="loading" class="text-center py-16 bg-white rounded-[2rem] border border-slate-200 shadow-sm">
-      <i class="fi fi-sr-spinner animate-spin text-5xl text-[#0ea5e9]"></i>
+      <i class="fi fi-sr-spinner animate-spin text-5xl text-[#ff6b00]"></i>
       <p class="font-bold mt-4 text-slate-500 text-lg">กำลังดึงข้อมูลจากระบบ...</p>
     </div>
 
@@ -75,8 +75,8 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุดของคุณ)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzn5Jkj1XfL4aIJ71xdc0bs8pi8iwTo3XSGErhlHkqsgaWP61qkqF9KaJQ4QMaAWsf/exec"; 
+    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุดที่ Deploy จาก Code.gs)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec"; 
     
     // ตั้งค่ารหัสสีและตัวย่อให้ตรงกับที่ระบุ
     const coursePrefixMap = {
@@ -92,7 +92,7 @@
     };
 
     window.onload = () => {
-      // ใช้ action getRegisteredList ที่ดึงเฉพาะ ID และ ชื่อ เพื่อความปลอดภัยของข้อมูลส่วนตัว
+      // เรียกใช้ API getRegisteredList เพื่อดึงข้อมูลรายชื่อมาแสดง
       fetch(SCRIPT_URL + "?action=getRegisteredList")
         .then(r => r.json())
         .then(data => {
@@ -101,23 +101,33 @@
           renderDashboard(data);
         }).catch(err => {
           document.getElementById('loading').innerHTML = `
-            <i class="fi fi-sr-exclamation text-5xl text-red-500 mb-4"></i>
+            <i class="fi fi-sr-exclamation text-5xl text-rose-500 mb-4"></i>
             <h2 class="text-2xl font-black text-slate-800">เกิดข้อผิดพลาด</h2>
             <p class="text-slate-500 mt-2 font-medium">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาลองใหม่ภายหลัง</p>
           `;
+          console.error("Error fetching data:", err);
         });
     };
 
     function renderDashboard(data) {
       let grouped = {};
+      
+      // สร้างคีย์ตั้งต้นสำหรับทุกหลักสูตร เพื่อให้แสดงครบทุกอันแม้ยังไม่มีคนลงทะเบียน
       Object.keys(coursePrefixMap).forEach(c => grouped[c] = []);
       
       // จัดกลุ่มนักเรียนตามหลักสูตร
       if(data && data.length > 0) {
-          data.forEach(p => { if(grouped[p.course]) grouped[p.course].push(p); });
+          data.forEach(p => { 
+              // เช็คว่าหลักสูตรของเด็กคนนี้มีใน Map ที่เราตั้งไว้หรือไม่
+              if(grouped[p.course]) {
+                  grouped[p.course].push(p); 
+              }
+          });
       }
 
       let html = '';
+      
+      // วนลูปสร้าง HTML สำหรับแต่ละหลักสูตร
       Object.keys(grouped).forEach(course => {
         const students = grouped[course].sort((a,b) => a.id.localeCompare(b.id)); // เรียงตามรหัส
         const prefix = coursePrefixMap[course];
@@ -137,6 +147,7 @@
         if(count === 0) {
             html += `<div class="p-8 text-center text-slate-400 font-medium bg-slate-50"><i class="fi fi-sr-box-open text-3xl mb-2 text-slate-300"></i><br>ยังไม่มีผู้ลงทะเบียนในหลักสูตรนี้</div>`;
         } else {
+          // วนลูปสร้างรายชื่อนักเรียนในหลักสูตรนั้นๆ
           students.forEach(s => {
             html += `
               <div class="student-item" data-name="${s.name}" data-id="${s.id}">
@@ -151,12 +162,14 @@
         }
         html += `</div></div>`;
       });
+      
+      // นำ HTML ที่สร้างเสร็จไปแสดงใน Dashboard
       document.getElementById('dashboard').innerHTML = html;
     }
 
     // ฟังก์ชันค้นหารายชื่อ
     function filterStudents() {
-        const input = document.getElementById('searchInput').value.toLowerCase();
+        const input = document.getElementById('searchInput').value.toLowerCase().trim();
         const courses = document.querySelectorAll('.course-panel');
         
         courses.forEach(course => {
@@ -175,9 +188,12 @@
                 }
             });
             
-            // ซ่อนหลักสูตรที่ไม่มีรายชื่อตรงกับการค้นหา
+            // ซ่อนหลักสูตรที่ไม่มีรายชื่อตรงกับการค้นหา หรือถ้าช่องค้นหาว่างให้แสดงทั้งหมด
             if (hasVisibleStudent || input === '') {
                 course.style.display = 'block';
+                // หากกำลังค้นหา และหลักสูตรนี้มีคนถูกค้นเจอ ให้ลบข้อความ "ยังไม่มีผู้ลงทะเบียน" ชั่วคราว (ถ้ามี)
+                const emptyMsg = course.querySelector('.p-8.text-center');
+                if (emptyMsg) emptyMsg.style.display = (input === '') ? 'block' : 'none';
             } else {
                 course.style.display = 'none';
             }
@@ -195,12 +211,12 @@
             showCancelButton: true,
             confirmButtonText: 'ตรวจสอบข้อมูล <i class="fi fi-sr-search mt-1 ml-1"></i>',
             cancelButtonText: 'ยกเลิก',
-            confirmButtonColor: '#0ea5e9',
+            confirmButtonColor: '#0f172a',
             cancelButtonColor: '#94a3b8',
             customClass: {
                 popup: 'rounded-3xl p-6',
                 title: 'font-black text-[#0f172a]',
-                input: 'border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-center text-lg focus:border-[#0ea5e9] focus:outline-none transition-all',
+                input: 'border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-center text-lg focus:border-[#ff6b00] focus:outline-none transition-all',
                 confirmButton: 'rounded-xl font-bold px-6 py-3 shadow-md',
                 cancelButton: 'rounded-xl font-bold px-6 py-3'
             },
@@ -228,7 +244,7 @@
         });
     }
 
-    // ฟังก์ชันเชื่อม API เช็คเบอร์โทร
+    // ฟังก์ชันเชื่อม API เช็คเบอร์โทรเพื่อยืนยันตัวตน
     function verifyAndReport(phone) {
         Swal.fire({
             title: 'กำลังตรวจสอบ...',
@@ -237,7 +253,7 @@
             didOpen: () => { Swal.showLoading(); }
         });
 
-        // ใช้ API Login เดิมในการเช็คฐานข้อมูล
+        // ใช้ API 'login' ที่เพิ่มไปใน Google Apps Script เพื่อเช็คเบอร์โทร
         fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify({ action: 'login', phone: phone })
@@ -272,6 +288,7 @@
                 confirmButtonColor: '#0f172a',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-3' }
             });
+            console.error("Verification error:", err);
         });
     }
   </script>
