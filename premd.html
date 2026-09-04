@@ -11,7 +11,6 @@
   <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   
   <style>
-    /* ใช้ Style เดิมจากหน้า register.html ทั้งหมด */
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
     .step-section { display: none; opacity: 0; transform: translateX(0); }
     .step-section.visible { display: block; opacity: 1; }
@@ -314,7 +313,7 @@
   </div>
 
   <script>
-    // ใช้ Web App URL เดียวกับไฟล์เดิม
+    // ⚠️ ใช้ Web App URL ที่เพิ่ง Deploy ใหม่อีกครั้ง
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec"; 
     
     let schoolData = [];
@@ -360,7 +359,6 @@
       });
     };
 
-    /* [ฟังก์ชันพื้นฐานเหมือนหน้าหลัก] */
     function toggleCheckCard(el) { const checkbox = el.querySelector('input[type="checkbox"]'); checkbox.checked = !checkbox.checked; if(checkbox.checked) el.classList.add('checked'); else el.classList.remove('checked'); }
     function toggleOtherSource() { const wrap = document.getElementById('wrapOtherSource'); const inp = document.getElementById('otherSourceInput'); if(document.getElementById('chkOtherSource').checked) { wrap.classList.remove('hidden'); inp.focus(); } else { wrap.classList.add('hidden'); inp.value = ''; } }
     
@@ -489,11 +487,16 @@
       if(selectedSources.length === 0) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกช่องทางที่ท่านทราบข่าวอย่างน้อย 1 ข้อ', confirmButtonColor: '#0f172a'});
       if(!followPage) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกว่าท่านติดตามเพจ Education CRA หรือไม่', confirmButtonColor: '#0f172a'});
       
+      // บังคับเลือกแพลตฟอร์มเมื่อกด "ติดตาม"
+      if(followPage === 'ติดตาม' && !followPlatform) {
+          return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกแพลตฟอร์มที่ท่านติดตามหลักด้วยครับ', confirmButtonColor: '#0f172a'});
+      }
+      
       const btn = document.getElementById('submitBtn');
       btn.disabled = true; 
       btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
 
-      // เพิ่ม Secret Key ส่งกลับไปหาหลังบ้าน
+      // Payload ส่งไปพร้อมรหัสลับรอบพิเศษ
       const payload = {
         secretKey: "CRA_SECRET_MD_VIP", 
         course: "แพทยศาสตร์",
