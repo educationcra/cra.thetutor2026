@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Real-time Check-in | CRA THE TUTOR 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  
+  <!-- เพิ่มไลบรารีสำหรับสแกน QR Code -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  
+  <style>
+    body { 
+      font-family: 'Noto Sans Thai', sans-serif; 
+      background-color: #0f172a; 
+      color: white;
+    }
+    /* ซ่อนลูกศรขึ้นลงใน input type number */
+    input[type="number"]::-webkit-inner-spin-button, 
+    input[type="number"]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; margin: 0; 
+    }
+    .modern-popup { border-radius: 24px !important; font-family: 'Noto Sans Thai', sans-serif !important; }
+    
+    /* Animation สำหรับรายชื่อที่เพิ่งเช็คอิน */
+    .highlight-row {
+      animation: pulseHighlight 2.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    }
+    
+    @keyframes pulseHighlight {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); border-color: #34d399; background-color: rgba(16, 185, 129, 0.4); }
+      20% { transform: scale(1.02); box-shadow: 0 0 20px 5px rgba(52, 211, 153, 0.5); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+
+    /* ตกแต่ง Select ให้กลืนกับตีมมืด */
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+      background-repeat: no-repeat;
+      background-position-x: 90%;
+      background-position-y: 50%;
+    }
+    
+    #reader { width: 100%; border-radius: 1rem; overflow: hidden; border: 2px solid #38bdf8; }
+    #reader video { object-fit: cover; }
+  </style>
+</head>
+<body class="min-h-screen pb-10">
+
+  <!-- แถบตกแต่งบนสุด -->
+  <div class="w-full h-2 bg-gradient-to-r from-emerald-500 via-sky-500 to-blue-600 fixed top-0 z-50"></div>
+
+  <!-- Header -->
+  <header class="pt-8 pb-4 px-4 md:px-6 max-w-6xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-sky-500/10 rounded-xl flex items-center justify-center border border-sky-500/20">
+        <i class="fi fi-sr-id-badge text-2xl text-sky-400 mt-1"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">ระบบเช็คอิน (Hybrid)</h1>
+        <p class="text-slate-400 text-sm font-medium mt-1">CRA THE TUTOR 2026</p>
+      </div>
+    </div>
+    <a href="index.html" class="hidden md:flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl transition border border-slate-700 text-sm font-bold no-underline">
+      <i class="fi fi-sr-home mt-0.5"></i> หน้าหลัก
+    </a>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 lg:px-6 lg:flex lg:gap-8 lg:items-start mt-4">
+    
+    <!-- LEFT PANEL: Sticky Dashboard & Form -->
+    <div class="w-full lg:w-4/12 lg:sticky lg:top-8 flex flex-col gap-6 shrink-0">
+      
+      <!-- Real-time Stats -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-800 rounded-2xl p-4 text-center border border-slate-700 shadow-lg transition-all duration-300">
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">ทั้งหมด (คน)</div>
+          <div class="text-3xl font-black text-white" id="stat-total">0</div>
+        </div>
+        <div class="bg-emerald-500/10 rounded-2xl p-4 text-center border border-emerald-500/20 shadow-lg relative overflow-hidden transition-all duration-300">
+          <div class="absolute -right-2 -top-2 opacity-20"><i class="fi fi-sr-check-circle text-4xl text-emerald-400"></i></div>
+          <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-1 relative z-10">มาแล้ว</div>
+          <div class="text-3xl font-black text-emerald-400 relative z-10" id="stat-arrived">0</div>
+        </div>
+        <div class="bg-orange-500/10 rounded-2xl p-4 text-center border border-orange-500/20 shadow-lg relative overflow-hidden transition-all duration-300">
+          <div class="absolute -right-2 -top-2 opacity-20"><i class="fi fi-sr-time-fast text-4xl text-orange-400"></i></div>
+          <div class="text-[10px] text-orange-400 font-bold uppercase tracking-widest mb-1 relative z-10">รอเช็คอิน</div>
+          <div class="text-3xl font-black text-orange-400 relative z-10" id="stat-waiting">0</div>
+        </div>
+      </div>
+
+      <!-- Action Area: Scanner & Form -->
+      <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+        
+        <!-- Toggle Buttons -->
+        <div class="flex bg-slate-900 rounded-xl p-1 mb-6 border border-slate-700">
+          <button onclick="switchMode('scan')" id="tab-scan" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-sky-500 text-white shadow transition-all flex items-center justify-center gap-2">
+            <i class="fi fi-sr-scan"></i> สแกน QR
+          </button>
+          <button onclick="switchMode('manual')" id="tab-manual" class="flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
+            <i class="fi fi-sr-keyboard"></i> พิมพ์รหัส
+          </button>
+        </div>
+
+        <!-- Mode: Scanner -->
+        <div id="mode-scan" class="flex flex-col gap-4">
+           <div id="reader-container" class="bg-slate-900 rounded-2xl p-2 border border-slate-700 flex flex-col items-center justify-center min-h-[250px]">
+              <button id="startScanBtn" onclick="startScanner()" class="bg-sky-500 hover:bg-sky-400 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-colors">
+                 <i class="fi fi-sr-camera mt-0.5"></i> เปิดกล้องสแกน
+              </button>
+              <div id="reader" class="hidden"></div>
+           </div>
+           <button id="stopScanBtn" onclick="stopScanner()" class="hidden w-full bg-slate-700 text-white font-bold py-3 rounded-xl hover:bg-slate-600 transition-colors">
+              ปิดกล้อง
+           </button>
+        </div>
+        
+        <!-- Mode: Manual Entry -->
+        <div id="mode-manual" class="hidden flex-col gap-4">
+          <form id="checkinForm" onsubmit="handleManualCheckin(event)" class="flex flex-col gap-4">
+            
+            <div class="flex gap-2 w-full">
+              <!-- Dropdown เลือกรหัสวิชา (เพิ่ม onchange) -->
+              <div class="w-2/5">
+                <select id="coursePrefix" onchange="renderUI()" class="w-full bg-slate-900 border-2 border-slate-600 rounded-2xl py-4 pl-4 pr-8 text-xl font-black text-sky-400 outline-none focus:border-sky-500 transition-all text-center">
+                  <option value="MD">MD</option>
+                  <option value="HDS">HDS</option>
+                  <option value="BNS">BNS</option>
+                  <option value="RT">RT</option>
+                  <option value="HKH">HKH</option>
+                  <option value="PMD">PMD</option>
+                  <option value="INMS">INMS</option>
+                  <option value="BME">BME</option>
+                  <option value="MHFT">MHFT</option>
+                </select>
+              </div>
+              
+              <!-- Input กรอกตัวเลข -->
+              <div class="w-3/5 relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-black text-2xl">-</span>
+                <input type="number" id="idCode" class="w-full bg-slate-900 border-2 border-slate-600 rounded-2xl py-4 pl-10 pr-4 text-2xl font-black text-white placeholder-slate-700 outline-none focus:border-sky-500 transition-all text-center tracking-widest" placeholder="1" autocomplete="off" required>
+              </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white font-black text-lg py-4 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all flex items-center justify-center gap-2">
+              ยืนยันการเช็คอิน <i class="fi fi-sr-arrow-right mt-1"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- RIGHT PANEL: Live Attendee List -->
+    <div class="w-full lg:w-8/12 mt-8 lg:mt-0">
+      <div class="bg-slate-800 border border-slate-700 rounded-3xl p-4 md:p-6 shadow-xl min-h-[500px]">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h2 class="text-lg md:text-xl font-black text-white flex items-center gap-2">
+            <i class="fi fi-sr-users-alt text-slate-400"></i> รายชื่อผู้ลงทะเบียน
+          </h2>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <!-- Dropdown Filter ใหม่ -->
+            <select id="listFilter" onchange="renderUI()" class="bg-slate-900 border border-slate-700 text-sky-400 px-3 py-2 rounded-xl text-sm font-bold outline-none focus:border-sky-500 transition-all flex-1 md:flex-none">
+              <option value="all">ดูภาพรวมทั้งหมด</option>
+              <option value="current">ดูเฉพาะหลักสูตรที่เลือก</option>
+            </select>
+            <button onclick="fetchAttendees()" class="text-sm text-slate-300 hover:text-white transition bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 font-bold shrink-0">
+              <i class="fi fi-sr-refresh"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div id="loadingList" class="flex flex-col items-center justify-center py-20 text-slate-500">
+          <i class="fi fi-sr-spinner animate-spin text-4xl mb-4 text-sky-500"></i>
+          <p class="font-bold">กำลังโหลดข้อมูลรายชื่อ...</p>
+        </div>
+
+        <div id="attendee-list" class="space-y-3 hidden">
+          <!-- ข้อมูลจะถูก Render ลงที่นี่ผ่าน JavaScript -->
+        </div>
+        
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ⚠️ นำ URL Google Apps Script ที่ Deploy ใหม่ล่าสุด มาใส่ที่นี่
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
+
+    let attendees = [];
+    let highlightId = null;
+    let html5QrCode = null;
+
+    // โหลดข้อมูลรายชื่อครั้งแรกเมื่อเปิดหน้าเว็บ
+    window.onload = () => {
+      fetchAttendees();
+    };
+
+    // ==========================================
+    // UI ควบคุมแท็บ สแกน/พิมพ์
+    // ==========================================
+    function switchMode(mode) {
+       const tabScan = document.getElementById('tab-scan');
+       const tabManual = document.getElementById('tab-manual');
+       const modeScan = document.getElementById('mode-scan');
+       const modeManual = document.getElementById('mode-manual');
+       
+       if (mode === 'scan') {
+           tabScan.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-sky-500 text-white shadow transition-all flex items-center justify-center gap-2";
+           tabManual.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+           modeScan.classList.remove('hidden');
+           modeScan.classList.add('flex');
+           modeManual.classList.add('hidden');
+           modeManual.classList.remove('flex');
+       } else {
+           tabManual.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-sky-500 text-white shadow transition-all flex items-center justify-center gap-2";
+           tabScan.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2";
+           modeManual.classList.remove('hidden');
+           modeManual.classList.add('flex');
+           modeScan.classList.add('hidden');
+           modeScan.classList.remove('flex');
+           
+           stopScanner(); // ถ้าเปิดกล้องอยู่ให้ปิด
+           setTimeout(() => document.getElementById('idCode').focus(), 100);
+       }
+    }
+
+    // ==========================================
+    // ระบบ QR Code Scanner
+    // ==========================================
+    function startScanner() {
+        document.getElementById('startScanBtn').classList.add('hidden');
+        document.getElementById('reader').classList.remove('hidden');
+        document.getElementById('stopScanBtn').classList.remove('hidden');
+        
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        html5QrCode.start({ facingMode: "environment" }, config, 
+           (decodedText) => {
+               stopScanner();
+               processCheckin(decodedText.trim()); // ส่งรหัสที่ได้ไป API
+           },
+           (errorMessage) => { /* ignore */ }
+        ).catch(err => {
+           Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเปิดกล้องได้ โปรดตรวจสอบสิทธิ์การใช้งานกล้อง', 'error');
+           stopScanner();
+        });
+    }
+
+    function stopScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                html5QrCode = null;
+            }).catch(err => console.log(err));
+        }
+        document.getElementById('startScanBtn').classList.remove('hidden');
+        document.getElementById('reader').classList.add('hidden');
+        document.getElementById('stopScanBtn').classList.add('hidden');
+    }
+
+    // ==========================================
+    // ระบบประมวลผล (API)
+    // ==========================================
+    function handleManualCheckin(e) {
+      e.preventDefault();
+      const prefix = document.getElementById('coursePrefix').value;
+      let numVal = document.getElementById('idCode').value.trim();
+      if (!numVal) return;
+      
+      // จัดรูปแบบตัวเลขให้เป็น 2 หลัก (เช่น พิมพ์ 1 -> 01)
+      numVal = ("0" + numVal).slice(-2);
+      const fullId = prefix + "-" + numVal;
+      
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin text-xl"></i> กำลังตรวจสอบ...';
+      
+      processCheckin(fullId, () => {
+          btn.disabled = false;
+          btn.innerHTML = 'ยืนยันการเช็คอิน <i class="fi fi-sr-arrow-right mt-1"></i>';
+          // ล้างเฉพาะตัวเลข แต่จำ Prefix ไว้ตามที่คุณขอ
+          document.getElementById('idCode').value = '';
+          document.getElementById('idCode').focus(); 
+      });
+    }
+
+    function processCheckin(fullId, callback = null) {
+      Swal.fire({ title: 'กำลังบันทึก...', text: `รหัส: ${fullId}`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'checkin', id: fullId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (callback) callback();
+        
+        if (data.status === 'success') {
+          Swal.fire({
+            toast: true, position: 'top', icon: 'success', 
+            title: `เช็คอินสำเร็จ!<br>${data.name}`,
+            showConfirmButton: false, timer: 2500,
+            customClass: { popup: 'modern-popup border border-emerald-200' }
+          });
+
+          let targetItem = attendees.find(a => a.id === fullId);
+          if(targetItem) {
+              targetItem.status = 'มาแล้ว'; 
+              highlightId = targetItem.id;
+              
+              // ตรวจสอบว่าโหมดการดูปัจจุบันรองรับ ID นี้หรือไม่
+              const filterMode = document.getElementById('listFilter').value;
+              const currentPrefix = document.getElementById('coursePrefix').value;
+              
+              if(filterMode === 'current' && !fullId.startsWith(currentPrefix)) {
+                 // ถ้ากำลังดูหลักสูตรอื่นอยู่ ให้เปลี่ยน Dropdown กลับมาที่หลักสูตรที่เพิ่งเช็คอิน
+                 document.getElementById('coursePrefix').value = fullId.split('-')[0];
+              }
+              renderUI(); 
+          } else {
+              fetchAttendees(); 
+          }
+
+        } 
+        else if (data.status === 'already') {
+          Swal.fire({
+            icon: 'warning', title: 'เช็คอินไปแล้ว',
+            html: `<strong class="text-orange-500">${data.name}</strong><br>ได้ทำการเช็คอินเข้าระบบไปก่อนหน้านี้แล้ว`,
+            confirmButtonColor: '#0f172a', customClass: { popup: 'modern-popup' }
+          });
+        } 
+        else {
+          Swal.fire({
+            icon: 'error', title: 'ไม่พบข้อมูล',
+            text: `ไม่มีรหัส ${fullId} ในระบบ`,
+            confirmButtonColor: '#ef4444', customClass: { popup: 'modern-popup' }
+          });
+        }
+      })
+      .catch(err => {
+        if (callback) callback();
+        Swal.fire({ icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'กรุณาลองใหม่อีกครั้ง', confirmButtonColor: '#0f172a' });
+      });
+    }
+
+    // ==========================================
+    // จัดการรายชื่อบน Dashboard (พร้อม Filter)
+    // ==========================================
+    function fetchAttendees() {
+      const listContainer = document.getElementById('attendee-list');
+      const loading = document.getElementById('loadingList');
+      
+      listContainer.classList.add('hidden');
+      loading.classList.remove('hidden');
+
+      fetch(SCRIPT_URL + "?action=getRegisteredList")
+        .then(res => res.json())
+        .then(data => {
+          attendees = data;
+          attendees.forEach(a => { if(!a.status || a.status === 'undefined') a.status = 'รอเช็คอิน'; });
+          renderUI();
+          loading.classList.add('hidden');
+          listContainer.classList.remove('hidden');
+        })
+        .catch(err => {
+          loading.innerHTML = `<i class="fi fi-sr-exclamation text-4xl mb-4 text-red-500"></i><p class="font-bold text-red-400">โหลดข้อมูลล้มเหลว กรุณารีเฟรช</p>`;
+        });
+    }
+
+    function renderUI() {
+      const filterMode = document.getElementById('listFilter').value;
+      const currentPrefix = document.getElementById('coursePrefix').value;
+      
+      // การกรองข้อมูล
+      let filteredAttendees = attendees;
+      if (filterMode === 'current') {
+         // กรองเอาเฉพาะคนที่ ID ขึ้นต้นด้วยตัวย่อที่เลือกไว้ (เช่น "MD-")
+         filteredAttendees = attendees.filter(a => a.id.startsWith(currentPrefix + '-'));
+      }
+      
+      let arrived = filteredAttendees.filter(a => a.status === 'มาแล้ว');
+      let waiting = filteredAttendees.filter(a => a.status !== 'มาแล้ว');
+      
+      // เรียงลำดับตาม Prefix หลักสูตรก่อน แล้วตามด้วยตัวเลข ID
+      const sortById = (a, b) => {
+          let prefixA = a.id.split('-')[0];
+          let prefixB = b.id.split('-')[0];
+          if(prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+          
+          let numA = parseInt(a.id.split('-')[1]);
+          let numB = parseInt(b.id.split('-')[1]);
+          return numA - numB;
+      };
+      arrived.sort(sortById);
+      waiting.sort(sortById);
+
+      // อัปเดตสถิติด้านบน (เปลี่ยนตาม Filter)
+      document.getElementById('stat-total').textContent = filteredAttendees.length;
+      document.getElementById('stat-arrived').textContent = arrived.length;
+      document.getElementById('stat-waiting').textContent = waiting.length;
+
+      const listContainer = document.getElementById('attendee-list');
+      let html = '';
+      
+      if(filteredAttendees.length === 0) {
+          html = `<div class="text-center py-10 text-slate-500 font-bold bg-slate-900 rounded-2xl border border-slate-700">ไม่มีรายชื่อในหมวดหมู่นี้</div>`;
+      } else {
+          [...arrived, ...waiting].forEach(item => {
+              const isArrived = item.status === 'มาแล้ว';
+              const isHighlight = item.id === highlightId; 
+              
+              const baseClass = "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ";
+              let stateClass = isArrived 
+                  ? "bg-emerald-500/10 border-emerald-500/30" 
+                  : "bg-slate-800 border-slate-700 opacity-60 hover:opacity-100";
+                  
+              if (isHighlight) stateClass += " highlight-row";
+
+              const icon = isArrived 
+                ? '<i class="fi fi-sr-check-circle text-emerald-400 text-3xl"></i>' 
+                : '<i class="fi fi-sr-time-fast text-slate-500 text-2xl"></i>';
+
+              html += `
+                  <div id="row-${item.id}" class="${baseClass} ${stateClass}">
+                      <div class="flex items-center gap-4">
+                          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isArrived ? 'bg-emerald-500/20' : 'bg-slate-700'}">
+                              <span class="font-black text-sm ${isArrived ? 'text-emerald-400' : 'text-slate-400'}">${item.id}</span>
+                          </div>
+                          <div>
+                              <h3 class="font-bold text-lg md:text-xl ${isArrived ? 'text-emerald-50' : 'text-slate-300'} leading-tight">${item.name}</h3>
+                              <p class="text-sm ${isArrived ? 'text-emerald-400/80' : 'text-slate-500'} font-bold mt-0.5">${item.course}</p>
+                          </div>
+                      </div>
+                      <div class="pr-2">${icon}</div>
+                  </div>
+              `;
+          });
+      }
+      
+      listContainer.innerHTML = html;
+      
+      if(highlightId) {
+          const el = document.getElementById('row-' + highlightId);
+          if(el) {
+              setTimeout(() => { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+              setTimeout(() => { highlightId = null; }, 3000);
+          }
+      }
+    }
+  </script>
+</body>
+</html>
