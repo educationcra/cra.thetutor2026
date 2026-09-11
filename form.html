@@ -35,18 +35,18 @@
     /* SVG Icons for check/radio */
     .check-icon-svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; }
     .check-card.checked .check-icon-svg { opacity: 1; }
-    .check-card.checked .radio-box-ui::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block; }
-
-    /* Likert Scale (5-Star Rating Alternative) */
-    .rating-group { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
-    .rating-item { flex: 1; min-width: 55px; text-align: center; }
-    .rating-item input { display: none; }
-    .rating-label { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.25rem; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s; height: 100%; }
-    .rating-label span.num { font-size: 1.25rem; font-weight: 800; color: #64748b; margin-bottom: 0.25rem; }
-    .rating-label span.text { font-size: 0.7rem; font-weight: 700; color: #94a3b8; line-height: 1.2; }
-    .rating-label:hover { background: #f8fafc; border-color: #cbd5e1; }
-    .rating-item input:checked + .rating-label { background: #3b82f6; border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3); }
+    /* Rating ... */
     .rating-item input:checked + .rating-label span { color: #ffffff; }
+
+    /* Custom Select (Dropdown) */
+    .c-select-container { position: relative; width: 100%; user-select: none; }
+    .c-select-trigger { width: 100%; height: 100%; min-height: 4rem; padding: 0 1.25rem; border-radius: 0.75rem; border: 2px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
+    .c-select-trigger:focus, .c-select-container.open .c-select-trigger { background: #ffffff; border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
+    .c-select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); z-index: 50; max-height: 280px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; }
+    .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; font-size: 0.9rem; }
+    .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
+    .c-select-option.selected { background: #eff6ff; color: #3b82f6; font-weight: 700; border-left: 4px solid #3b82f6; padding-left: 1rem;}
 
     /* Autocomplete */
     .autocomplete-dropdown { position: absolute; z-index: 50; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); margin-top: 8px; }
@@ -103,23 +103,34 @@
 
            <!-- โหมดค้นหาด้วย ID -->
            <div id="mode-id">
-             <div class="flex gap-2 w-full mb-4">
-                <div class="w-2/5">
-                  <select id="searchCourse" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-4 pr-8 text-lg font-black text-slate-700 outline-none focus:border-blue-500 transition-all text-center appearance-none">
-                    <option value="MD">MD</option>
-                    <option value="HDS">HDS</option>
-                    <option value="BNS">BNS</option>
-                    <option value="RT">RT</option>
-                    <option value="HKH">HKH</option>
-                    <option value="PMD">PMD</option>
-                    <option value="INMS">INMS</option>
-                    <option value="BME">BME</option>
-                    <option value="MHFT">MHFT</option>
-                  </select>
+             <div class="flex flex-col sm:flex-row gap-3 w-full mb-6">
+                <!-- Custom Dropdown หลักสูตร -->
+                <div class="w-full sm:w-3/5 relative z-40">
+                   <div class="c-select-container" id="customCourseSelect">
+                      <div class="c-select-trigger" tabindex="0">
+                         <span id="courseDisplayText" class="truncate font-bold">MD</span>
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-400 shrink-0"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                      </div>
+                      <div class="c-select-dropdown text-left">
+                         <div class="c-select-option selected" data-value="MD">MD (แพทยศาสตร์)</div>
+                         <div class="c-select-option" data-value="HDS">HDS (วิทยาศาสตร์ข้อมูลสุขภาพ)</div>
+                         <div class="c-select-option" data-value="BNS">BNS (พยาบาลศาสตร์)</div>
+                         <div class="c-select-option" data-value="RT">RT (รังสีเทคนิค)</div>
+                         <div class="c-select-option" data-value="HKH">HKH (วิทยาศาสตร์การเคลื่อนไหวฯ)</div>
+                         <div class="c-select-option" data-value="PMD">PMD (ฉุกเฉินการแพทย์)</div>
+                         <div class="c-select-option" data-value="INMS">INMS (นวัตกรรมฯ การแพทย์)</div>
+                         <div class="c-select-option" data-value="BME">BME (วิศวกรรมชีวการแพทย์)</div>
+                         <div class="c-select-option" data-value="MHFT">MHFT (เทคโนโลยีอาหารการแพทย์ฯ)</div>
+                      </div>
+                   </div>
+                   <!-- เก็บเฉพาะตัวย่อไว้ทำงานเบื้องหลัง -->
+                   <input type="hidden" id="searchCourse" value="MD">
                 </div>
-                <div class="w-3/5 relative">
+                
+                <!-- ช่องกรอกตัวเลข -->
+                <div class="w-full sm:w-2/5 relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-2xl">-</span>
-                  <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
+                  <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full h-full min-h-[4rem] bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
                 </div>
              </div>
              <button type="button" onclick="verifyById()" id="btnVerifyId" class="w-full btn-primary py-4 rounded-xl font-bold text-lg mb-4 flex items-center justify-center gap-2">
@@ -446,6 +457,7 @@
          .catch(err => console.log(err));
 
        renderChannels();
+       setupCustomCourseSelect(); // <--- เรียกฟังก์ชันเพื่อเปิดใช้งาน Custom Dropdown
        
        // Setup Email Autocomplete
        const emailInput = document.getElementById('editEmail');
@@ -458,6 +470,44 @@
        });
        document.addEventListener('click', (e) => { if(e.target.id !== 'editEmail') emailDrop.style.display = 'none'; });
     };
+
+    // --- ฟังก์ชันควบคุม Custom Dropdown ---
+    function setupCustomCourseSelect() {
+       const container = document.getElementById('customCourseSelect');
+       if (!container) return; 
+       const trigger = container.querySelector('.c-select-trigger');
+       const options = container.querySelectorAll('.c-select-option');
+       const hiddenInput = document.getElementById('searchCourse');
+       const displayText = document.getElementById('courseDisplayText');
+
+       trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          container.classList.toggle('open');
+       });
+
+       options.forEach(opt => {
+          opt.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const val = opt.getAttribute('data-value');
+             hiddenInput.value = val; // เก็บเฉพาะตัวย่อ (เช่น RT)
+             displayText.innerText = val; // แสดงเฉพาะตัวย่อ (เช่น RT)
+             
+             options.forEach(o => o.classList.remove('selected'));
+             opt.classList.add('selected');
+             container.classList.remove('open');
+             
+             // พอกดเลือกหลักสูตรเสร็จ ให้ Focus ไปที่ช่องกรอกตัวเลขทันทีเพื่อความสะดวก
+             document.getElementById('searchId').focus(); 
+          });
+       });
+
+       // กดพื้นที่อื่นบนจอ ให้ปิด Dropdown
+       document.addEventListener('click', (e) => {
+          if(!e.target.closest('#customCourseSelect')) {
+             container.classList.remove('open');
+          }
+       });
+    }
 
     function renderChannels() {
        const group = document.getElementById('channelGroup');
