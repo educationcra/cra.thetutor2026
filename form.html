@@ -24,27 +24,6 @@
     .input-field:focus { border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
     .input-field:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
 
-    /* Custom Checkbox/Radio Cards (ปรับปรุงใหม่ แก้ปัญหาล้นขอบ) */
-    .check-card { display: flex; align-items: center; padding: 1.1rem 1.25rem; background: #ffffff; border-radius: 1rem; cursor: pointer; transition: all 0.2s; border: 2px solid #e2e8f0; gap: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .check-card:hover { border-color: #cbd5e1; background: #f8fafc; }
-    
-    /* จุด Radio Button แบบ CSS แท้ */
-    .radio-dot-ui { position: relative; width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 50%; flex-shrink: 0; transition: all 0.2s ease; background: white; }
-    .radio-dot-ui::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 10px; height: 10px; border-radius: 50%; background-color: white; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .check-card.checked .radio-dot-ui { border-color: #3b82f6; background-color: #3b82f6; }
-    .check-card.checked .radio-dot-ui::after { transform: translate(-50%, -50%) scale(1); }
-
-    /* กล่อง Checkbox แบบ CSS แท้ */
-    .check-box-ui { position: relative; width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; flex-shrink: 0; transition: all 0.2s ease; background: white; display: flex; justify-content: center; align-items: center; }
-    .check-card.checked .check-box-ui { border-color: #3b82f6; background-color: #3b82f6; }
-    /* สร้างเครื่องหมายถูกด้วย CSS borders */
-    .check-box-ui::after { content: ''; position: absolute; width: 6px; height: 11px; border: solid white; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) scale(0); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 2px; }
-    .check-card.checked .check-box-ui::after { transform: rotate(45deg) scale(1); }
-
-    .check-card.checked { background: #eff6ff; border-color: #3b82f6; }
-    .check-card.checked .card-text { color: #1d4ed8; font-weight: 700; }
-
-    /* Custom Dropdown */
     .c-select-container { position: relative; width: 100%; user-select: none; }
     .c-select-trigger { width: 100%; height: 100%; min-height: 4rem; padding: 0 1.25rem; border-radius: 0.75rem; border: 2px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 1rem; }
     .c-select-trigger:focus, .c-select-container.open .c-select-trigger { background: #ffffff; border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
@@ -59,6 +38,287 @@
     .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; display: flex; align-items: center; justify-content: space-between; }
     .autocomplete-dropdown li:hover { background-color: #f1f5f9; color: #0f172a; padding-left: 1.5rem; }
 
+    /* ====================================================
+       CHECKBOX & RADIO STYLE (Splash-12 Animation)
+       ==================================================== */
+    .checkbox-wrapper-12 {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      background: #ffffff;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid #e2e8f0;
+      gap: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      overflow: hidden; 
+    }
+    .checkbox-wrapper-12:hover {
+        border-color: #cbd5e1; background: #f8fafc;
+    }
+
+    .checkbox-wrapper-12 > svg {
+      position: absolute;
+      top: -130%;
+      left: -170%;
+      width: 110px;
+      pointer-events: none;
+    }
+
+    .checkbox-wrapper-12 * {
+      box-sizing: border-box;
+    }
+
+    .checkbox-wrapper-12 input[type="checkbox"],
+    .checkbox-wrapper-12 input[type="radio"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      margin: 0;
+      position: absolute; 
+      opacity: 0;
+    }
+
+    .checkbox-wrapper-12 .cbx {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .checkbox-wrapper-12 .cbx .box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #bfbfc0;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      background: #ffffff; /* กันสีพื้นหลังรั่ว */
+    }
+
+    /* กรณีที่เป็น checkbox ให้กล่องเป็นสี่เหลี่ยม */
+    .checkbox-wrapper-12.is-checkbox .cbx .box {
+        border-radius: 6px;
+    }
+
+    .checkbox-wrapper-12 .cbx .label-splash {
+      width: 24px;
+      height: 24px;
+      background: none;
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .checkbox-wrapper-12 .cbx svg {
+      position: absolute;
+      top: 5px;
+      left: 4px;
+      z-index: 1;
+      pointer-events: none;
+      width: 16px;
+      height: 16px;
+    }
+
+    .checkbox-wrapper-12 .cbx svg path {
+      fill: none; /* 🔴 CRITICAL FIX: ป้องกันเบราว์เซอร์ถมสีดำลงใน SVG */
+      stroke: #ffffff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      transition: stroke-dashoffset 0.3s ease;
+      transition-delay: 0.1s;
+    }
+
+    /* State: Checked */
+    .checkbox-wrapper-12 input:checked ~ .cbx .label-splash {
+      animation: splash-12 0.6s ease forwards;
+    }
+    
+    .checkbox-wrapper-12 input:checked ~ .cbx .box {
+        border-color: transparent;
+        background: transparent;
+    }
+
+    .checkbox-wrapper-12 input:checked ~ .cbx svg path {
+      stroke-dashoffset: 0;
+    }
+    
+    .checkbox-wrapper-12.checked {
+        background: #eff6ff; border-color: #3b82f6;
+    }
+    .checkbox-wrapper-12.checked .card-text {
+        color: #1d4ed8; font-weight: 700;
+    }
+
+    @keyframes splash-12 {
+      40% {
+        background: #3b82f6; 
+        box-shadow: 0 -18px 0 -8px #3b82f6, 16px -8px 0 -8px #3b82f6, 16px 8px 0 -8px #3b82f6, 0 18px 0 -8px #3b82f6, -16px 8px 0 -8px #3b82f6, -16px -8px 0 -8px #3b82f6;
+      }
+      100% {
+        background: #3b82f6;
+        box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
+      }
+    }
+
+    /* ====================================================
+       STAR RATING STYLE (Particle Explosion & Shimmer)
+       ==================================================== */
+    .rating-container {
+        display: flex;
+        flex-direction: column;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .star-label-text {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .rating-desc {
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        min-height: 1.25rem;
+        margin-top: 0.5rem;
+        transition: color 0.3s;
+    }
+
+    .radio {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-direction: row-reverse;
+      position: relative;
+    }
+
+    .radio > input {
+      position: absolute;
+      appearance: none;
+      opacity: 0;
+    }
+
+    .radio > label {
+      cursor: pointer;
+      font-size: 38px; /* ขนาดดาว */
+      position: relative;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .radio > label > svg {
+      fill: #cbd5e1; /* สีดาวตอนยังไม่กด */
+      transition: fill 0.3s ease, filter 0.3s ease;
+      width: 1em;
+      height: 1em;
+    }
+
+    /* Particle Effect */
+    .radio > label::before,
+    .radio > label::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: #f59e0b; /* สีส้ม */
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .radio > label::before {
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+    }
+
+    .radio > label::after {
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+    }
+
+    /* Hover & Focus Effects */
+    @media (hover: hover) {
+        .radio > label:hover::before,
+        .radio > label:hover::after {
+          opacity: 1;
+          transform: translateX(-50%) scale(1.5);
+          animation: particle-explosion 0.8s ease-out;
+        }
+
+        .radio > label:hover {
+          transform: scale(1.2);
+          animation: pulse 0.6s infinite alternate;
+        }
+
+        .radio > label:hover > svg,
+        .radio > label:hover ~ label > svg {
+          fill: #f59e0b;
+          filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
+          animation: shimmer 1s ease infinite alternate;
+        }
+    }
+
+    /* Checked State */
+    .radio > input:checked + label > svg,
+    .radio > input:checked + label ~ label > svg {
+      fill: #f59e0b;
+      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
+      animation: pulse-checked 0.5s ease forwards;
+    }
+    
+    /* Animation สำหรับตอนกดบนมือถือ (Touch) */
+    .radio > input:checked + label::before,
+    .radio > input:checked + label::after {
+        opacity: 1;
+        animation: particle-explosion 0.6s ease-out forwards;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.1); }
+    }
+    
+    @keyframes pulse-checked {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1.15); }
+    }
+
+    @keyframes particle-explosion {
+      0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.5); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0); }
+    }
+
+    @keyframes shimmer {
+      0% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4)); }
+      100% { filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.8)); }
+    }
+
     .btn-primary { background: #0f172a; color: white; transition: all 0.3s ease; }
     .btn-primary:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -66,7 +326,6 @@
 </head>
 <body class="bg-slate-50 min-h-screen pb-20">
 
-  <!-- Header -->
   <div class="bg-[#0f172a] text-white pt-16 pb-24 px-5 relative overflow-hidden">
      <div class="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
      <div class="max-w-3xl mx-auto relative z-10 text-center">
@@ -81,7 +340,6 @@
      </div>
   </div>
 
-  <!-- Main Content -->
   <div class="max-w-3xl mx-auto px-5 -mt-12 relative z-20">
     <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-5 sm:p-8 md:p-10">
       
@@ -96,7 +354,7 @@
         <div id="step1" class="step-section active visible">
            <div class="text-center mb-8">
               <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500">
-                 <!-- Inline SVG: Identification Badge -->
+                 <!-- Icon: ID Card -->
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
                    <path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 014.5 3h15A1.5 1.5 0 0121 4.5v15a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 19.5v-15zM12 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM6 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2H6v-2z" clip-rule="evenodd" />
                  </svg>
@@ -112,7 +370,8 @@
                 <div class="w-full sm:w-3/5 relative z-40">
                    <div class="c-select-container" id="customCourseSelect">
                       <div class="c-select-trigger" tabindex="0">
-                         <span id="courseDisplayText" class="truncate font-bold">MD</span>
+                         <!-- เปลี่ยนเป็น MD ค่าตั้งต้น -->
+                         <span id="courseDisplayText" class="truncate font-bold text-lg">MD</span>
                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-400 shrink-0"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
                       </div>
                       <div class="c-select-dropdown text-left">
@@ -131,7 +390,7 @@
                    <input type="hidden" id="searchCourse" value="MD">
                 </div>
                 
-                <!-- ช่องกรอกตัวเลข -->
+                <!-- ช่องกรอกตัวเลข ไม่เกิน 2 หลัก -->
                 <div class="w-full sm:w-2/5 relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-2xl">-</span>
                   <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full h-full min-h-[4rem] bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
@@ -214,24 +473,24 @@
            <div class="input-wrapper mb-8">
              <label class="input-label text-blue-600 mb-4">รอบการรับสมัครที่ท่านสนใจ (TCAS)<span class="req">*</span></label>
              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-               <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="round" value="รอบที่ 1: Portfolio" class="hidden">
+               <label class="checkbox-wrapper-12" onclick="toggleRadioCard(this, 'round')">
+                 <input type="radio" name="round" value="รอบที่ 1: Portfolio">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">รอบที่ 1: Portfolio</span>
                </label>
-               <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="round" value="รอบที่ 2: Quota" class="hidden">
+               <label class="checkbox-wrapper-12" onclick="toggleRadioCard(this, 'round')">
+                 <input type="radio" name="round" value="รอบที่ 2: Quota">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">รอบที่ 2: Quota</span>
                </label>
-               <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="round" value="รอบที่ 3: Admission" class="hidden">
+               <label class="checkbox-wrapper-12" onclick="toggleRadioCard(this, 'round')">
+                 <input type="radio" name="round" value="รอบที่ 3: Admission">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">รอบที่ 3: Admission</span>
                </label>
-               <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="round" value="รอบที่ 4: Direct Admission" class="hidden">
+               <label class="checkbox-wrapper-12" onclick="toggleRadioCard(this, 'round')">
+                 <input type="radio" name="round" value="รอบที่ 4: Direct Admission">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">รอบที่ 4: Direct Admission</span>
                </label>
              </div>
@@ -240,14 +499,14 @@
            <div class="input-wrapper mb-8">
              <label class="input-label text-blue-600 mb-4">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่<span class="req">*</span></label>
              <div class="flex flex-col sm:flex-row gap-3">
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="knewBefore" value="รู้จัก" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
+                 <input type="radio" name="knewBefore" value="รู้จัก">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">รู้จักมาก่อนแล้ว</span>
                </label>
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="knewBefore" value="ไม่รู้จัก" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
+                 <input type="radio" name="knewBefore" value="ไม่รู้จัก">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">เพิ่งรู้จักงานนี้เป็นครั้งแรก</span>
                </label>
              </div>
@@ -269,7 +528,7 @@
            </div>
         </div>
 
-        <!-- STEP 4: ความพึงพอใจ -->
+        <!-- STEP 4: ความพึงพอใจ (Star Rating) -->
         <div id="step4" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center justify-between">
               <div class="flex items-center gap-4">
@@ -278,13 +537,13 @@
                  </div>
                  <div>
                     <h2 class="text-xl font-black text-slate-800">ประเมินความพึงพอใจ</h2>
-                    <p class="text-slate-500 text-sm mt-0.5">กรุณาให้คะแนนตามความเป็นจริง</p>
+                    <p class="text-slate-500 text-sm mt-0.5">กดที่รูปดาวเพื่อให้คะแนน 5-1 ตามความเป็นจริง</p>
                  </div>
               </div>
            </div>
 
            <div class="space-y-6 mb-8" id="ratingContainer">
-              <!-- Rating Blocks generated via JS -->
+              <!-- Rating Stars generated via JS -->
            </div>
 
            <div class="flex gap-3">
@@ -306,16 +565,16 @@
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label text-blue-600 mb-4">หากราชวิทยาลัยจุฬาภรณ์จัดกิจกรรม CRA The Tutor อีกในปีถัดไป ท่านจะแนะนำคนรู้จักมาเข้าร่วมหรือไม่<span class="req">*</span></label>
+             <label class="input-label text-blue-600 mb-4">หากราชวิทยาลัยจุฬาภรณ์จัดกิจกรรม CRA The Tutor ราชวิทยาลัยจุฬาภรณ์ อีกในปีถัดไป ท่านจะแนะนำคนรู้จักมาเข้าร่วมหรือไม่<span class="req">*</span></label>
              <div class="flex flex-col sm:flex-row gap-3">
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'recommend')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="recommend" value="แนะนำ" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'recommend')">
+                 <input type="radio" name="recommend" value="แนะนำ">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">แนะนำแน่นอน</span>
                </label>
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'recommend')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="recommend" value="ไม่แนะนำ" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'recommend')">
+                 <input type="radio" name="recommend" value="ไม่แนะนำ">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">ไม่แนะนำ</span>
                </label>
              </div>
@@ -324,22 +583,21 @@
            <div class="input-wrapper mb-8">
              <label class="input-label text-blue-600 mb-4">ราชวิทยาลัยจุฬาภรณ์จะจัดกิจกรรมแนะแนวการศึกษา CRA Open House 2027 ในวันเสาร์ที่ 10 ตุลาคม 2569 ท่านสนใจเข้าร่วมหรือไม่<span class="req">*</span></label>
              <div class="flex flex-col sm:flex-row gap-3">
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="openhouse" value="สนใจ" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'openhouse')">
+                 <input type="radio" name="openhouse" value="สนใจ">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">สนใจเข้าร่วม</span>
                </label>
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
-                 <div class="radio-dot-ui"></div>
-                 <input type="radio" name="openhouse" value="ไม่สนใจ" class="hidden">
+               <label class="checkbox-wrapper-12 flex-1" onclick="toggleRadioCard(this, 'openhouse')">
+                 <input type="radio" name="openhouse" value="ไม่สนใจ">
+                 <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
                  <span class="font-medium text-slate-700 card-text">ไม่สนใจ</span>
                </label>
              </div>
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label text-blue-600 mb-3">ข้อเสนอแนะเพิ่มเติม <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(ไม่บังคับ)</span></label>
-             <p class="text-sm text-slate-500 mb-3">บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน</p>
+             <label class="input-label text-blue-600 mb-3">ข้อเสนอแนะเพิ่มเติม <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน)</span></label>
              <textarea id="feedback" rows="4" class="input-field" placeholder="พิมพ์ข้อความ..."></textarea>
            </div>
 
@@ -354,7 +612,7 @@
       </form>
 
       <!-- SUCCESS VIEW (Certificate) -->
-      <div id="successView" class="step-section text-center py-4">
+      <div id="successView" class="step-section text-center py-4 hidden">
          <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
             <div class="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-emerald-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
@@ -417,15 +675,15 @@
     const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
     
     const channels = [
-      "ภายในกิจกรรม CRA Press Tour นี้", "กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา",
-      "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)", "กิจกรรม CRA Open House",
+      "ภายในกิจกรรม CRA The Tutor 2026 นี้","ภกิจกรรม CRA Open House", "กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา",
+      "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)", "กิจกรรม CRA Press Tour",
       "สื่อสังคมออนไลน์ Education CRA และสื่อราชวิทยาลัยจุฬาภรณ์",
       "สื่อเพจต่าง ๆ ของหลักสูตร ภายในราชวิทยาลัยจุฬาภรณ์", "เว็บไซต์ของราชวิทยาลัยจุฬาภรณ์",
       "เว็บไซต์ข่าว/หนังสือพิมพ์ / วารสาร / โบว์ชัวร์", "โทรทัศน์และวิทยุ",
       "เพื่อน/คนรู้จัก/ครอบครัว/ครูที่โรงเรียน"
     ];
 
-    // คำถามแบบเต็ม
+    // คำถามแบบเต็ม ไม่ย่อ
     const ratingQuestions = [
       { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
       { id: "q_reg", title: "ท่านให้คะแนนความสะดวกในการลงทะเบียนเข้าร่วมระดับใด" },
@@ -438,6 +696,14 @@
       { id: "q_qa", title: "กิจกรรม Q&A พูดคุยกับรุ่นพี่ทุกหลักสูตร “เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์ให้โดนใจกรรมการ” ท่านพึงพอใจระดับใด" },
       { id: "q_overall", title: "ให้คะแนนภาพรวมของกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2 ท่านพึงพอใจระดับใด" }
     ];
+
+    const starDesc = {
+        5: "มากที่สุด",
+        4: "มาก",
+        3: "ปานกลาง",
+        2: "น้อย",
+        1: "น้อยที่สุด"
+    };
 
     window.onload = () => {
        fetch(SCRIPT_URL + "?action=getRegisteredList")
@@ -477,6 +743,7 @@
              e.stopPropagation();
              const val = opt.getAttribute('data-value');
              hiddenInput.value = val; 
+             // อัปเดตให้แสดงแค่ตัวย่อ หลังจากเลือก
              displayText.innerText = val; 
              
              options.forEach(o => o.classList.remove('selected'));
@@ -498,100 +765,91 @@
        const group = document.getElementById('channelGroup');
        channels.forEach(ch => {
           group.innerHTML += `
-            <label class="check-card" onclick="toggleCheckCard(this)">
-              <div class="check-box-ui"></div>
-              <input type="checkbox" name="channels" value="${ch}" class="hidden">
+            <label class="checkbox-wrapper-12 is-checkbox" onclick="toggleCheckCard(this)">
+              <input type="checkbox" name="channels" value="${ch}">
+              <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
               <span class="font-medium text-slate-700 text-sm leading-relaxed card-text">${ch}</span>
             </label>
           `;
        });
        group.innerHTML += `
-         <label class="check-card" onclick="toggleCheckCard(this); toggleOtherChannel();">
-            <div class="check-box-ui"></div>
-            <input type="checkbox" id="chkOther" class="hidden">
+         <label class="checkbox-wrapper-12 is-checkbox" onclick="toggleCheckCard(this); toggleOtherChannel();">
+            <input type="checkbox" id="chkOther">
+            <div class="cbx"><div class="box"></div><div class="label-splash"></div><svg viewBox="0 0 20 20"><path d="M4 10l4 4l8-8"/></svg></div>
             <span class="font-medium text-slate-700 text-sm card-text">อื่นๆ (โปรดระบุ)</span>
          </label>
-         <div id="wrapOther" class="hidden pl-[3.5rem] pr-2 pb-2 transition-all">
+         <div id="wrapOther" class="hidden pl-[4.5rem] pr-2 pb-4 transition-all">
              <input type="text" id="otherInput" class="input-field !py-2.5 !text-sm !bg-white border-blue-200 focus:border-blue-500" placeholder="ระบุช่องทาง...">
          </div>
        `;
     }
 
-    // เรนเดอร์ UI ให้คะแนน 1-5 แบบ Card Button ใหม่ล่าสุด
     function renderRatings(courseName) {
        const container = document.getElementById('ratingContainer');
        container.innerHTML = '';
-       const labels = ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"];
 
        ratingQuestions.forEach((q, index) => {
           let title = q.title;
           if (q.dynamicSuffix && courseName) title += ` (${courseName}) ${q.suffixText}`;
           
           let html = `
-            <div class="mb-8 bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm">
-              <label class="flex items-start gap-3 mb-5">
+            <div class="rating-container">
+              <div class="flex items-start gap-3 mb-2">
                  <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">${index+1}</span>
-                 <span class="font-bold text-slate-700 leading-snug">${title} <span class="req">*</span></span>
-              </label>
-              <div class="flex flex-col gap-2.5 sm:pl-10">
+                 <p class="star-label-text">${title} <span class="req">*</span></p>
+              </div>
+              <div class="radio" id="starGroup_${q.id}">
           `;
 
+          // สร้างดาว 5 ดวง เรียงจาก 5 ไป 1
           for(let i=5; i>=1; i--) {
-             let labelText = labels[i-1];
-             // ใช้ onclick สลับคลาสเพื่อความชัวร์ 100% ทุกมือถือ
              html += `
-                <label class="rating-card-ui relative flex items-center p-3 sm:p-3.5 border-2 border-slate-100 rounded-xl cursor-pointer transition-colors bg-white hover:bg-slate-50" onclick="toggleRatingCard(this, '${q.id}')">
-                  <input type="radio" name="${q.id}" value="${i}" class="hidden">
-                  <div class="num-circle w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-black flex items-center justify-center transition-colors shrink-0 mr-3 text-sm">${i}</div>
-                  <span class="text-label font-medium text-slate-600 transition-colors flex-1 text-[15px]">${labelText}</span>
-                  <div class="radio-dot w-5 h-5 rounded-full border-2 border-slate-300 transition-all shrink-0 ml-2"></div>
+                <input type="radio" name="${q.id}" id="${q.id}_${i}" value="${i}" onchange="updateStarDesc('${q.id}', ${i})">
+                <label for="${q.id}_${i}">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"/></svg>
                 </label>
              `;
           }
-          html += `</div></div>`;
+          
+          html += `
+              </div>
+              <p class="rating-desc" id="desc_${q.id}">กรุณาให้คะแนน</p>
+            </div>
+          `;
           container.innerHTML += html;
        });
     }
 
-    // ฟังก์ชันจัดการสีปุ่มให้คะแนน 1-5
-    function toggleRatingCard(el, groupName) {
-        document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
-            const card = r.closest('.rating-card-ui');
-            card.classList.remove('border-blue-500', 'bg-blue-50');
-            card.classList.add('border-slate-100', 'bg-white');
-            
-            const numCircle = card.querySelector('.num-circle');
-            numCircle.classList.remove('bg-blue-500', 'text-white');
-            numCircle.classList.add('bg-slate-100', 'text-slate-500');
-            
-            const radioDot = card.querySelector('.radio-dot');
-            radioDot.classList.remove('border-[6px]', 'border-blue-500');
-            radioDot.classList.add('border-2', 'border-slate-300');
-            
-            const textSpan = card.querySelector('.text-label');
-            textSpan.classList.remove('text-blue-700', 'font-black');
-            textSpan.classList.add('text-slate-600', 'font-medium');
-        });
-
-        el.classList.remove('border-slate-100', 'bg-white');
-        el.classList.add('border-blue-500', 'bg-blue-50');
-        
-        el.querySelector('.num-circle').classList.remove('bg-slate-100', 'text-slate-500');
-        el.querySelector('.num-circle').classList.add('bg-blue-500', 'text-white');
-        
-        el.querySelector('.radio-dot').classList.remove('border-2', 'border-slate-300');
-        el.querySelector('.radio-dot').classList.add('border-[6px]', 'border-blue-500');
-        
-        el.querySelector('.text-label').classList.remove('text-slate-600', 'font-medium');
-        el.querySelector('.text-label').classList.add('text-blue-700', 'font-black');
-        
-        el.querySelector('input').checked = true;
+    function updateStarDesc(groupId, val) {
+        const descEl = document.getElementById(`desc_${groupId}`);
+        descEl.innerText = `${val} - ${starDesc[val]}`;
+        descEl.style.color = '#f59e0b';
     }
 
     // UI Helpers
-    function toggleCheckCard(el) { const c = el.querySelector('input[type="checkbox"]'); c.checked = !c.checked; if(c.checked) el.classList.add('checked'); else el.classList.remove('checked'); }
-    function toggleRadioCard(el, groupName) { document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => { r.checked = false; r.closest('.check-card').classList.remove('checked'); }); el.querySelector('input').checked = true; el.classList.add('checked'); }
-    function toggleOtherChannel() { const w = document.getElementById('wrapOther'); const i = document.getElementById('otherInput'); if(document.getElementById('chkOther').checked) { w.classList.remove('hidden'); i.focus(); } else { w.classList.add('hidden'); i.value = ''; } }
+    function toggleCheckCard(el) { 
+        const c = el.querySelector('input[type="checkbox"]'); 
+        c.checked = !c.checked; 
+        if(c.checked) el.classList.add('checked'); 
+        else el.classList.remove('checked'); 
+    }
+    
+    function toggleRadioCard(el, groupName) { 
+        document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => { 
+            r.checked = false; 
+            r.closest('.checkbox-wrapper-12').classList.remove('checked'); 
+        }); 
+        el.querySelector('input').checked = true; 
+        el.classList.add('checked'); 
+    }
+    
+    function toggleOtherChannel() { 
+        const w = document.getElementById('wrapOther'); 
+        const i = document.getElementById('otherInput'); 
+        if(document.getElementById('chkOther').checked) { w.classList.remove('hidden'); i.focus(); } 
+        else { w.classList.add('hidden'); i.value = ''; } 
+    }
+    
     function applyEmail(full) { document.getElementById('editEmail').value = full; document.getElementById('emailDropdown').style.display = 'none'; }
     function formatEmail(el) { el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, ''); }
 
@@ -622,13 +880,12 @@
        if(target === 5) {
           let allAnswered = true;
           ratingQuestions.forEach(q => { if(!document.querySelector(`input[name="${q.id}"]:checked`)) allAnswered = false; });
-          if(!allAnswered) return Swal.fire('ให้คะแนนไม่ครบ', 'กรุณาให้คะแนนความพึงพอใจให้ครบทุกข้อ', 'warning');
+          if(!allAnswered) return Swal.fire('ให้คะแนนไม่ครบ', 'กรุณากดให้คะแนนดาวให้ครบทุกข้อ', 'warning');
        }
        showStep(target);
     }
     function prevStep(target) { showStep(target); }
 
-    // Search Logic
     function toggleSearchMode() {
        const mId = document.getElementById('mode-id');
        const mName = document.getElementById('mode-name');
@@ -639,7 +896,7 @@
     function verifyById() {
        const prefix = document.getElementById('searchCourse').value;
        let num = document.getElementById('searchId').value.trim();
-       if(!num) return Swal.fire('เกิดข้อผิดพลาด', 'กรุณาระบุตัวเลขรหัส 2 หลัก', 'warning');
+       if(!num) return Swal.fire('เกิดข้อผิดพลาด', 'กรุณาระบุตัวเลขรหัส', 'warning');
        
        num = ("0" + num).slice(-2);
        const fullId = prefix + "-" + num;
@@ -692,7 +949,6 @@
        showStep(1);
     }
 
-    // Submit Logic
     function submitEvaluation() {
        if(!document.querySelector('input[name="recommend"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุว่าจะแนะนำกิจกรรมนี้หรือไม่', 'warning');
        if(!document.querySelector('input[name="openhouse"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุความสนใจงาน Open House', 'warning');
@@ -714,6 +970,7 @@
           feedback: document.getElementById('feedback').value,
        };
 
+       // เก็บค่าดาว (เลข 1-5)
        ratingQuestions.forEach(q => { payload[q.id] = document.querySelector(`input[name="${q.id}"]:checked`).value; });
        currentData = payload; 
 
@@ -726,7 +983,7 @@
          .then(r => r.json())
          .then(res => {
             if(res.status === 'success') {
-               // ซ่อนฟอร์มและโชว์หน้า Success ทันที
+               // ✅ ปิดฟอร์มหน้าเดิม และเปิดหน้า Success
                document.getElementById('evalForm').style.display = 'none';
                if(document.getElementById('progressContainer')) {
                   document.getElementById('progressContainer').style.display = 'none';
@@ -753,14 +1010,12 @@
                   emailBtn.classList.remove('hidden');
                   emailBtn.classList.add('flex');
 
-                  let fileId = res.certId || "";
-                  if (!fileId) {
-                     const match = res.certUrl.match(/[-\w]{25,}/);
-                     if (match) fileId = match[0];
-                  }
+                  // ✅ สกัด File ID เพื่อดึงรูปพรีวิวแบบคมชัด
+                  let fileId = "";
+                  const match = res.certUrl.match(/[-\w]{25,}/);
+                  if (match) fileId = match[0];
 
                   if (fileId) {
-                     // ดึงภาพ Thumbnail คุณภาพสูงเพื่อแสดงผลแทนการยัด Link ลง iFrame
                      certImg.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
                      certImg.onload = () => {
                         certImg.classList.remove('hidden');
