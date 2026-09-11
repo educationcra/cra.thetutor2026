@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>แบบสอบถามความพึงพอใจ | CRA THE TUTOR</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,10 +13,10 @@
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #f8fafc; }
     
     /* Animations */
-    .step-section { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
+    .step-section { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     .step-section.visible { display: block; opacity: 1; transform: translateY(0); }
     
-    /* Inputs */
+    /* Text Inputs */
     .input-wrapper { margin-bottom: 1.5rem; position: relative; }
     .input-label { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; line-height: 1.5; }
     .req { color: #ef4444; margin-left: 2px; }
@@ -24,27 +24,33 @@
     .input-field:focus { border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
     .input-field:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
 
-    /* Custom Checkbox/Radio Cards */
-    .check-card { display: flex; align-items: flex-start; padding: 1.1rem 1.25rem; background: #ffffff; border-radius: 1rem; cursor: pointer; transition: all 0.2s; border: 2px solid #e2e8f0; gap: 1rem; }
+    /* Custom Checkbox/Radio Cards (ปรับปรุงใหม่ แก้ปัญหาล้นขอบ) */
+    .check-card { display: flex; align-items: center; padding: 1.1rem 1.25rem; background: #ffffff; border-radius: 1rem; cursor: pointer; transition: all 0.2s; border: 2px solid #e2e8f0; gap: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .check-card:hover { border-color: #cbd5e1; background: #f8fafc; }
-    .check-card.checked { background: #eff6ff; border-color: #3b82f6; }
-    .check-box-ui { width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: white; flex-shrink: 0; margin-top: 2px; }
-    .radio-box-ui { border-radius: 50%; }
-    .check-card.checked .check-box-ui, .check-card.checked .radio-box-ui { background: #3b82f6; border-color: #3b82f6; }
     
-    /* SVG Icons for check/radio */
-    .check-icon-svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; }
-    .check-card.checked .check-icon-svg { opacity: 1; }
-    /* Rating ... */
-    .rating-item input:checked + .rating-label span { color: #ffffff; }
+    /* จุด Radio Button แบบ CSS แท้ */
+    .radio-dot-ui { position: relative; width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 50%; flex-shrink: 0; transition: all 0.2s ease; background: white; }
+    .radio-dot-ui::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); width: 10px; height: 10px; border-radius: 50%; background-color: white; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .check-card.checked .radio-dot-ui { border-color: #3b82f6; background-color: #3b82f6; }
+    .check-card.checked .radio-dot-ui::after { transform: translate(-50%, -50%) scale(1); }
 
-    /* Custom Select (Dropdown) */
+    /* กล่อง Checkbox แบบ CSS แท้ */
+    .check-box-ui { position: relative; width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; flex-shrink: 0; transition: all 0.2s ease; background: white; display: flex; justify-content: center; align-items: center; }
+    .check-card.checked .check-box-ui { border-color: #3b82f6; background-color: #3b82f6; }
+    /* สร้างเครื่องหมายถูกด้วย CSS borders */
+    .check-box-ui::after { content: ''; position: absolute; width: 6px; height: 11px; border: solid white; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) scale(0); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 2px; }
+    .check-card.checked .check-box-ui::after { transform: rotate(45deg) scale(1); }
+
+    .check-card.checked { background: #eff6ff; border-color: #3b82f6; }
+    .check-card.checked .card-text { color: #1d4ed8; font-weight: 700; }
+
+    /* Custom Dropdown */
     .c-select-container { position: relative; width: 100%; user-select: none; }
-    .c-select-trigger { width: 100%; height: 100%; min-height: 4rem; padding: 0 1.25rem; border-radius: 0.75rem; border: 2px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 0.95rem; }
+    .c-select-trigger { width: 100%; height: 100%; min-height: 4rem; padding: 0 1.25rem; border-radius: 0.75rem; border: 2px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 1rem; }
     .c-select-trigger:focus, .c-select-container.open .c-select-trigger { background: #ffffff; border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
     .c-select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); z-index: 50; max-height: 280px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; }
     .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
-    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; font-size: 0.9rem; }
+    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
     .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
     .c-select-option.selected { background: #eff6ff; color: #3b82f6; font-weight: 700; border-left: 4px solid #3b82f6; padding-left: 1rem;}
 
@@ -56,8 +62,6 @@
     .btn-primary { background: #0f172a; color: white; transition: all 0.3s ease; }
     .btn-primary:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-    
-    svg.icon { width: 1.25rem; height: 1.25rem; fill: currentColor; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-20">
@@ -79,7 +83,7 @@
 
   <!-- Main Content -->
   <div class="max-w-3xl mx-auto px-5 -mt-12 relative z-20">
-    <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-10">
+    <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-5 sm:p-8 md:p-10">
       
       <!-- Progress Bar -->
       <div class="w-full bg-slate-100 h-2 rounded-full mb-8 relative overflow-hidden hidden" id="progressContainer">
@@ -133,12 +137,11 @@
                   <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full h-full min-h-[4rem] bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
                 </div>
              </div>
-             <button type="button" onclick="verifyById()" id="btnVerifyId" class="w-full btn-primary py-4 rounded-xl font-bold text-lg mb-4 flex items-center justify-center gap-2">
+             <button type="button" onclick="verifyById()" id="btnVerifyId" class="w-full btn-primary py-4 rounded-xl font-bold text-lg mb-4 flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
                 ตรวจสอบข้อมูล 
-                <!-- Search Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg>
              </button>
-             <button type="button" onclick="toggleSearchMode()" class="w-full text-slate-500 font-bold hover:text-blue-500 transition-colors text-sm py-2">
+             <button type="button" onclick="toggleSearchMode()" class="w-full text-slate-500 font-bold hover:text-blue-500 transition-colors text-sm py-2 underline underline-offset-4">
                 ลืมรหัสประจำตัว? (ค้นหาด้วยชื่อ)
              </button>
            </div>
@@ -146,12 +149,11 @@
            <!-- โหมดค้นหาด้วยชื่อ -->
            <div id="mode-name" class="hidden">
              <div class="input-wrapper relative">
-                <!-- Search Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 absolute left-4 top-[1.2rem] text-slate-400"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg>
                 <input type="text" id="searchName" oninput="searchByName(this.value)" class="input-field pl-12" placeholder="พิมพ์ชื่อเพื่อค้นหา...">
                 <ul id="nameDropdown" class="autocomplete-dropdown"></ul>
              </div>
-             <button type="button" onclick="toggleSearchMode()" class="w-full text-slate-500 font-bold hover:text-blue-500 transition-colors text-sm mt-4">
+             <button type="button" onclick="toggleSearchMode()" class="w-full text-slate-500 font-bold hover:text-blue-500 transition-colors text-sm mt-4 underline underline-offset-4">
                 กลับไปค้นหาด้วยรหัสประจำตัว
              </button>
            </div>
@@ -161,7 +163,6 @@
         <div id="step2" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
               <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shrink-0">
-                 <!-- User Check SVG -->
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path d="M11 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2h-12v-2z" /><path d="M17 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /><path fill-rule="evenodd" d="M10.2 4.414l-2.5 2.5a.75.75 0 01-1.06 0l-1.5-1.5a.75.75 0 011.06-1.06l.97.97 1.97-1.97a.75.75 0 111.06 1.06z" clip-rule="evenodd" /></svg>
               </div>
               <div>
@@ -175,7 +176,6 @@
                  <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">รหัส & หลักสูตร</p>
                  <div class="font-black text-blue-700 text-xl" id="displayIdCourse">--</div>
               </div>
-              <!-- Check Circle -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-blue-300"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
            </div>
 
@@ -194,10 +194,9 @@
            </div>
 
            <div class="flex gap-3">
-             <button type="button" onclick="resetSearch()" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">ไม่ใช่ฉัน</button>
+             <button type="button" onclick="resetSearch()" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 border border-slate-200">ไม่ใช่ฉัน</button>
              <button type="button" onclick="nextStep(3)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
                 ข้อมูลถูกต้อง ถัดไป
-                <!-- Arrow Right -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
              </button>
            </div>
@@ -207,66 +206,64 @@
         <div id="step3" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
               <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 shrink-0">
-                 <!-- Info SVG -->
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.732l-1.162 3.939l-1.021 3.426a.75.75 0 01-1.44-.39l1.022-3.426l1.162-3.94c.14-.473-.34-.91-.81-.675l-1.52.76a.75.75 0 01-.67-1.343l1.52-.76zm.526-4.52a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z" clip-rule="evenodd" /></svg>
               </div>
               <div><h2 class="text-xl font-black text-slate-800">ข้อมูลความสนใจเบื้องต้น</h2></div>
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">รอบการรับสมัครที่ท่านสนใจ (TCAS)<span class="req">*</span></label>
+             <label class="input-label text-blue-600 mb-4">รอบการรับสมัครที่ท่านสนใจ (TCAS)<span class="req">*</span></label>
              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="round" value="รอบที่ 1: Portfolio" class="hidden">
-                 <span class="font-bold text-slate-700">รอบที่ 1: Portfolio</span>
+                 <span class="font-medium text-slate-700 card-text">รอบที่ 1: Portfolio</span>
                </label>
                <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="round" value="รอบที่ 2: Quota" class="hidden">
-                 <span class="font-bold text-slate-700">รอบที่ 2: Quota</span>
+                 <span class="font-medium text-slate-700 card-text">รอบที่ 2: Quota</span>
                </label>
                <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="round" value="รอบที่ 3: Admission" class="hidden">
-                 <span class="font-bold text-slate-700">รอบที่ 3: Admission</span>
+                 <span class="font-medium text-slate-700 card-text">รอบที่ 3: Admission</span>
                </label>
                <label class="check-card" onclick="toggleRadioCard(this, 'round')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="round" value="รอบที่ 4: Direct Admission" class="hidden">
-                 <span class="font-bold text-slate-700">รอบที่ 4: Direct Admission</span>
+                 <span class="font-medium text-slate-700 card-text">รอบที่ 4: Direct Admission</span>
                </label>
              </div>
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่<span class="req">*</span></label>
-             <div class="flex gap-3">
+             <label class="input-label text-blue-600 mb-4">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่<span class="req">*</span></label>
+             <div class="flex flex-col sm:flex-row gap-3">
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="knewBefore" value="รู้จัก" class="hidden">
-                 <span class="font-bold text-slate-700">รู้จัก</span>
+                 <span class="font-medium text-slate-700 card-text">รู้จักมาก่อนแล้ว</span>
                </label>
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'knewBefore')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="knewBefore" value="ไม่รู้จัก" class="hidden">
-                 <span class="font-bold text-slate-700">ไม่รู้จัก</span>
+                 <span class="font-medium text-slate-700 card-text">เพิ่งรู้จักงานนี้เป็นครั้งแรก</span>
                </label>
              </div>
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์จากช่องทางใด (ตอบได้มากกว่า 1 ข้อ)<span class="req">*</span></label>
+             <label class="input-label text-blue-600 mb-4">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์จากช่องทางใด <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(ตอบได้มากกว่า 1)</span><span class="req">*</span></label>
              <div id="channelGroup" class="flex flex-col gap-2">
                 <!-- Checkboxes generated via JS -->
              </div>
            </div>
 
            <div class="flex gap-3">
-             <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
+             <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 border border-slate-200">กลับ</button>
              <button type="button" onclick="nextStep(4)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex justify-center items-center gap-2">
                 ถัดไป
-                <!-- Arrow -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
              </button>
            </div>
@@ -277,23 +274,22 @@
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center justify-between">
               <div class="flex items-center gap-4">
                  <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 shrink-0">
-                    <!-- Star SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
                  </div>
                  <div>
                     <h2 class="text-xl font-black text-slate-800">ประเมินความพึงพอใจ</h2>
-                    <p class="text-slate-500 text-xs mt-0.5">5 = มากที่สุด, 1 = น้อยที่สุด</p>
+                    <p class="text-slate-500 text-sm mt-0.5">กรุณาให้คะแนนตามความเป็นจริง</p>
                  </div>
               </div>
            </div>
 
-           <div class="space-y-8 mb-8" id="ratingContainer">
+           <div class="space-y-6 mb-8" id="ratingContainer">
               <!-- Rating Blocks generated via JS -->
            </div>
 
            <div class="flex gap-3">
-             <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
-             <button type="button" onclick="nextStep(5)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex justify-center items-center gap-2">
+             <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 border border-slate-200">กลับ</button>
+             <button type="button" onclick="nextStep(5)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg shadow-slate-200">
                 ถัดไป
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
              </button>
@@ -304,54 +300,53 @@
         <div id="step5" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
               <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 shrink-0">
-                 <!-- Comment Heart SVG -->
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M4.804 21.644A6.707 6.707 0 006 21.75a6.721 6.721 0 003.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 01-.814 1.686.75.75 0 00.44 1.223zM8.25 10.875a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zM10.875 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" clip-rule="evenodd" /></svg>
               </div>
               <div><h2 class="text-xl font-black text-slate-800">ความคิดเห็นเพิ่มเติม</h2></div>
            </div>
 
-           <div class="input-wrapper mb-6">
-             <label class="input-label">หากราชวิทยาลัยจุฬาภรณ์จัดกิจกรรม CRA The Tutor อีกในปีถัดไป ท่านจะแนะนำคนรู้จักมาเข้าร่วมหรือไม่<span class="req">*</span></label>
-             <div class="flex gap-3">
+           <div class="input-wrapper mb-8">
+             <label class="input-label text-blue-600 mb-4">หากราชวิทยาลัยจุฬาภรณ์จัดกิจกรรม CRA The Tutor อีกในปีถัดไป ท่านจะแนะนำคนรู้จักมาเข้าร่วมหรือไม่<span class="req">*</span></label>
+             <div class="flex flex-col sm:flex-row gap-3">
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'recommend')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="recommend" value="แนะนำ" class="hidden">
-                 <span class="font-bold text-slate-700">แนะนำ</span>
+                 <span class="font-medium text-slate-700 card-text">แนะนำแน่นอน</span>
                </label>
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'recommend')">
-                 <div class="check-box-ui radio-box-ui"></div>
+                 <div class="radio-dot-ui"></div>
                  <input type="radio" name="recommend" value="ไม่แนะนำ" class="hidden">
-                 <span class="font-bold text-slate-700">ไม่แนะนำ</span>
-               </label>
-             </div>
-           </div>
-
-           <div class="input-wrapper mb-6">
-             <label class="input-label">ราชวิทยาลัยจุฬาภรณ์จะจัดกิจกรรมแนะแนวการศึกษา CRA Open House 2027 ในวันเสาร์ที่ 10 ตุลาคม 2569 ท่านสนใจเข้าร่วมหรือไม่<span class="req">*</span></label>
-             <div class="flex gap-3">
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
-                 <div class="check-box-ui radio-box-ui"></div>
-                 <input type="radio" name="openhouse" value="สนใจ" class="hidden">
-                 <span class="font-bold text-slate-700">สนใจ</span>
-               </label>
-               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
-                 <div class="check-box-ui radio-box-ui"></div>
-                 <input type="radio" name="openhouse" value="ไม่สนใจ" class="hidden">
-                 <span class="font-bold text-slate-700">ไม่สนใจ</span>
+                 <span class="font-medium text-slate-700 card-text">ไม่แนะนำ</span>
                </label>
              </div>
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">ข้อเสนอแนะเพิ่มเติม (บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน)</label>
+             <label class="input-label text-blue-600 mb-4">ราชวิทยาลัยจุฬาภรณ์จะจัดกิจกรรมแนะแนวการศึกษา CRA Open House 2027 ในวันเสาร์ที่ 10 ตุลาคม 2569 ท่านสนใจเข้าร่วมหรือไม่<span class="req">*</span></label>
+             <div class="flex flex-col sm:flex-row gap-3">
+               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
+                 <div class="radio-dot-ui"></div>
+                 <input type="radio" name="openhouse" value="สนใจ" class="hidden">
+                 <span class="font-medium text-slate-700 card-text">สนใจเข้าร่วม</span>
+               </label>
+               <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
+                 <div class="radio-dot-ui"></div>
+                 <input type="radio" name="openhouse" value="ไม่สนใจ" class="hidden">
+                 <span class="font-medium text-slate-700 card-text">ไม่สนใจ</span>
+               </label>
+             </div>
+           </div>
+
+           <div class="input-wrapper mb-8">
+             <label class="input-label text-blue-600 mb-3">ข้อเสนอแนะเพิ่มเติม <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(ไม่บังคับ)</span></label>
+             <p class="text-sm text-slate-500 mb-3">บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน</p>
              <textarea id="feedback" rows="4" class="input-field" placeholder="พิมพ์ข้อความ..."></textarea>
            </div>
 
            <div class="flex gap-3">
-             <button type="button" onclick="prevStep(4)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
+             <button type="button" onclick="prevStep(4)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 border border-slate-200">กลับ</button>
              <button type="button" id="submitBtn" onclick="submitEvaluation()" class="w-2/3 bg-blue-600 text-white py-3.5 rounded-xl font-black hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
                 ส่งแบบสอบถาม
-                <!-- Paper plane SVG -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
              </button>
            </div>
@@ -360,65 +355,60 @@
 
       <!-- SUCCESS VIEW (Certificate) -->
       <div id="successView" class="step-section text-center py-4">
-         <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+         <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 relative">
             <div class="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
-            <!-- Success SVG -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-emerald-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-emerald-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
          </div>
          <h2 class="text-3xl font-black text-slate-800 mb-2">บันทึกสำเร็จ!</h2>
          <p class="text-slate-500 mb-8 font-medium">ระบบได้บันทึกข้อมูลและเตรียมเกียรติบัตรให้ท่านแล้ว</p>
          
-         <div class="bg-slate-800 p-6 rounded-3xl text-left border border-slate-700 shadow-xl relative overflow-hidden mb-8">
+         <div class="bg-slate-800 p-5 sm:p-6 rounded-3xl text-left border border-slate-700 shadow-xl relative overflow-hidden mb-8 max-w-lg mx-auto">
             <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
             <h3 class="text-white font-black text-xl mb-4 flex items-center gap-2">
-               <!-- Diploma SVG -->
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-blue-400"><path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.15.085-.15-.085a49.949 49.949 0 00-9.902-3.912.75.75 0 01-.231-1.337A60.653 60.653 0 0111.7 2.805z" /><path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.251 4.284a.75.75 0 01-.46.711 47.87 47.87 0 00-8.105 4.342.75.75 0 01-.832 0 47.87 47.87 0 00-8.104-4.342.75.75 0 01-.461-.71c.032-1.44.117-2.87.251-4.284a48.5 48.5 0 017.666 3.281.75.75 0 00.15.085 49.954 49.954 0 011.83 1.059v-1.124a.75.75 0 00-.361-.643z" /></svg>
                E-Certificate
             </h3>
             
-            <div id="certPreview" class="w-full bg-white rounded-xl aspect-[1.414/1] mb-4 flex items-center justify-center overflow-hidden border-4 border-slate-600 relative group">
-               <!-- แสดงรูปตัวอย่าง ถ้ามี -->
-               <img id="certImg" src="" alt="Certificate Preview" class="w-full h-full object-contain hidden">
-               <!-- กรณีดึงภาพไม่ได้ ให้ขึ้นปุ่มแทน -->
+            <div id="certPreview" class="w-full bg-white rounded-xl aspect-[1.414/1] mb-5 flex items-center justify-center overflow-hidden border-4 border-slate-600 relative">
+               <img id="certImg" src="" alt="Certificate Preview" class="w-full h-full object-contain hidden bg-slate-100">
                <div id="certFallback" class="text-center p-4">
-                  <!-- Document SVG -->
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-slate-300 mx-auto mb-2"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z" /><path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" /></svg>
-                  <p class="text-slate-400 font-bold text-sm">เกียรติบัตรพร้อมดาวน์โหลด</p>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-slate-300 mx-auto mb-2"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z" /><path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" /></svg>
+                  <p class="text-slate-400 font-bold text-sm">กำลังประมวลผลรูปภาพ...</p>
                </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 relative z-10">
-               <a id="downloadCertBtn" href="#" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-center no-underline">
+               <a id="downloadCertBtn" href="#" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition text-center no-underline shadow-lg shadow-blue-500/20 hidden">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clip-rule="evenodd" /></svg>
                   เปิดไฟล์ดาวน์โหลด
                </a>
-               <button id="emailCertBtn" onclick="sendCertToEmail()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
+               <button id="emailCertBtn" onclick="sendCertToEmail()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition hidden">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" /><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" /></svg>
                   ส่งเข้าอีเมล
                </button>
             </div>
          </div>
 
-         <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl text-left mb-6 flex items-start gap-3">
+         <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-left mb-6 flex items-start gap-3 max-w-lg mx-auto">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-rose-500 shrink-0 mt-0.5"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
             <div>
                <p class="text-rose-800 font-bold text-sm mb-1">พบปัญหาชื่อ-สกุลผิด?</p>
-               <p class="text-rose-600 text-xs">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเราเพื่อแก้ไข</p>
-               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-2 bg-white border border-rose-200 text-rose-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition no-underline">
+               <p class="text-rose-600 text-xs leading-relaxed">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเราเพื่อแก้ไข</p>
+               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
                   แจ้งปัญหา
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
                </a>
             </div>
          </div>
          
-         <a href="index.html" class="inline-block font-bold text-slate-500 hover:text-slate-800 underline">กลับสู่หน้าหลัก</a>
+         <a href="index.html" class="inline-block font-bold text-slate-500 hover:text-slate-800 underline underline-offset-4 mb-4">กลับสู่หน้าหลัก</a>
       </div>
 
     </div>
   </div>
 
   <script>
-    // ⚠️ ลิงก์ Web App (ใช้ตัวใหม่ที่เพิ่ง Deploy)
+    // ⚠️ ลิงก์ Web App 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
     
     let allAttendees = [];
@@ -427,7 +417,7 @@
     const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
     
     const channels = [
-      "ภายในกิจกรรม CRA The Tutor 2026 นี้", "กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา","กิจกรรม Press Tous",
+      "ภายในกิจกรรม CRA Press Tour นี้", "กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา",
       "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)", "กิจกรรม CRA Open House",
       "สื่อสังคมออนไลน์ Education CRA และสื่อราชวิทยาลัยจุฬาภรณ์",
       "สื่อเพจต่าง ๆ ของหลักสูตร ภายในราชวิทยาลัยจุฬาภรณ์", "เว็บไซต์ของราชวิทยาลัยจุฬาภรณ์",
@@ -435,7 +425,7 @@
       "เพื่อน/คนรู้จัก/ครอบครัว/ครูที่โรงเรียน"
     ];
 
-    // คำถามแบบเต็ม ไม่ย่อ
+    // คำถามแบบเต็ม
     const ratingQuestions = [
       { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
       { id: "q_reg", title: "ท่านให้คะแนนความสะดวกในการลงทะเบียนเข้าร่วมระดับใด" },
@@ -443,13 +433,12 @@
       { id: "q_location", title: "ท่านพึงพอใจสถานที่จัดงานระดับใด" },
       { id: "q_courseInt", title: "หลังจากเข้าร่วมกิจกรรมทำให้ท่านสนใจหลักสูตรมากขึ้นระดับใด" },
       { id: "q_tcas", title: "กิจกรรมบรรยายพิเศษหัวข้อ “เจาะลึก TCAS 70” โดย พี่ลาเต้ วิทยากรจาก Dek-D.com ท่านพึงพอใจในระดับใด" },
-      { id: "q_base", title: "กิจกรรมฐานประจำหลักสูตร", dynamicSuffix: true, suffixText: " ได้ความรู้มากขึ้นระดับใด" },
+      { id: "q_base", title: "กิจกรรมฐานกิจกรรมประจำหลักสูตร", dynamicSuffix: true, suffixText: " ได้ความรู้มากขึ้นระดับใด" },
       { id: "q_future", title: "กิจกรรมบรรยายพิเศษ “มุมมองการศึกษาและอนาคต” โดย พี่ท็อป วิทยากรจากเพจ เรียนต่อไหนดี! ท่านพึงพอใจในระดับใด" },
       { id: "q_qa", title: "กิจกรรม Q&A พูดคุยกับรุ่นพี่ทุกหลักสูตร “เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์ให้โดนใจกรรมการ” ท่านพึงพอใจระดับใด" },
       { id: "q_overall", title: "ให้คะแนนภาพรวมของกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2 ท่านพึงพอใจระดับใด" }
     ];
 
-    // โหลดข้อมูลรายชื่อตั้งต้น
     window.onload = () => {
        fetch(SCRIPT_URL + "?action=getRegisteredList")
          .then(r => r.json())
@@ -457,9 +446,8 @@
          .catch(err => console.log(err));
 
        renderChannels();
-       setupCustomCourseSelect(); // <--- เรียกฟังก์ชันเพื่อเปิดใช้งาน Custom Dropdown
+       setupCustomCourseSelect(); 
        
-       // Setup Email Autocomplete
        const emailInput = document.getElementById('editEmail');
        const emailDrop = document.getElementById('emailDropdown');
        emailInput.addEventListener('input', (e) => {
@@ -471,7 +459,6 @@
        document.addEventListener('click', (e) => { if(e.target.id !== 'editEmail') emailDrop.style.display = 'none'; });
     };
 
-    // --- ฟังก์ชันควบคุม Custom Dropdown ---
     function setupCustomCourseSelect() {
        const container = document.getElementById('customCourseSelect');
        if (!container) return; 
@@ -489,19 +476,17 @@
           opt.addEventListener('click', (e) => {
              e.stopPropagation();
              const val = opt.getAttribute('data-value');
-             hiddenInput.value = val; // เก็บเฉพาะตัวย่อ (เช่น RT)
-             displayText.innerText = val; // แสดงเฉพาะตัวย่อ (เช่น RT)
+             hiddenInput.value = val; 
+             displayText.innerText = val; 
              
              options.forEach(o => o.classList.remove('selected'));
              opt.classList.add('selected');
              container.classList.remove('open');
              
-             // พอกดเลือกหลักสูตรเสร็จ ให้ Focus ไปที่ช่องกรอกตัวเลขทันทีเพื่อความสะดวก
              document.getElementById('searchId').focus(); 
           });
        });
 
-       // กดพื้นที่อื่นบนจอ ให้ปิด Dropdown
        document.addEventListener('click', (e) => {
           if(!e.target.closest('#customCourseSelect')) {
              container.classList.remove('open');
@@ -514,17 +499,17 @@
        channels.forEach(ch => {
           group.innerHTML += `
             <label class="check-card" onclick="toggleCheckCard(this)">
-              <div class="check-box-ui"><svg viewBox="0 0 24 24" class="check-icon-svg"><path d="M5 13l4 4L19 7"/></svg></div>
+              <div class="check-box-ui"></div>
               <input type="checkbox" name="channels" value="${ch}" class="hidden">
-              <span class="font-bold text-slate-700 text-sm leading-tight">${ch}</span>
+              <span class="font-medium text-slate-700 text-sm leading-relaxed card-text">${ch}</span>
             </label>
           `;
        });
        group.innerHTML += `
          <label class="check-card" onclick="toggleCheckCard(this); toggleOtherChannel();">
-            <div class="check-box-ui"><svg viewBox="0 0 24 24" class="check-icon-svg"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="check-box-ui"></div>
             <input type="checkbox" id="chkOther" class="hidden">
-            <span class="font-bold text-slate-700 text-sm">อื่นๆ (โปรดระบุ)</span>
+            <span class="font-medium text-slate-700 text-sm card-text">อื่นๆ (โปรดระบุ)</span>
          </label>
          <div id="wrapOther" class="hidden pl-[3.5rem] pr-2 pb-2 transition-all">
              <input type="text" id="otherInput" class="input-field !py-2.5 !text-sm !bg-white border-blue-200 focus:border-blue-500" placeholder="ระบุช่องทาง...">
@@ -532,34 +517,75 @@
        `;
     }
 
+    // เรนเดอร์ UI ให้คะแนน 1-5 แบบ Card Button ใหม่ล่าสุด
     function renderRatings(courseName) {
        const container = document.getElementById('ratingContainer');
        container.innerHTML = '';
+       const labels = ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"];
+
        ratingQuestions.forEach((q, index) => {
           let title = q.title;
           if (q.dynamicSuffix && courseName) title += ` (${courseName}) ${q.suffixText}`;
           
           let html = `
-            <div class="mb-6">
-              <label class="input-label mb-3"><span class="bg-blue-100 text-blue-600 min-w-[24px] h-6 rounded-full inline-flex items-center justify-center text-xs mr-2 mt-0.5 flex-shrink-0">${index+1}</span> <span>${title}<span class="req">*</span></span></label>
-              <div class="rating-group">
+            <div class="mb-8 bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm">
+              <label class="flex items-start gap-3 mb-5">
+                 <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-black shrink-0 mt-0.5">${index+1}</span>
+                 <span class="font-bold text-slate-700 leading-snug">${title} <span class="req">*</span></span>
+              </label>
+              <div class="flex flex-col gap-2.5 sm:pl-10">
           `;
+
           for(let i=5; i>=1; i--) {
-             let labelText = ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"][i-1];
-             // บันทึกค่า (value) เป็นตัวเลข 5, 4, 3, 2, 1
+             let labelText = labels[i-1];
+             // ใช้ onclick สลับคลาสเพื่อความชัวร์ 100% ทุกมือถือ
              html += `
-                <div class="rating-item">
-                  <input type="radio" name="${q.id}" id="${q.id}_${i}" value="${i}">
-                  <label class="rating-label" for="${q.id}_${i}">
-                    <span class="num">${i}</span>
-                    <span class="text">${labelText}</span>
-                  </label>
-                </div>
+                <label class="rating-card-ui relative flex items-center p-3 sm:p-3.5 border-2 border-slate-100 rounded-xl cursor-pointer transition-colors bg-white hover:bg-slate-50" onclick="toggleRatingCard(this, '${q.id}')">
+                  <input type="radio" name="${q.id}" value="${i}" class="hidden">
+                  <div class="num-circle w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-black flex items-center justify-center transition-colors shrink-0 mr-3 text-sm">${i}</div>
+                  <span class="text-label font-medium text-slate-600 transition-colors flex-1 text-[15px]">${labelText}</span>
+                  <div class="radio-dot w-5 h-5 rounded-full border-2 border-slate-300 transition-all shrink-0 ml-2"></div>
+                </label>
              `;
           }
           html += `</div></div>`;
           container.innerHTML += html;
        });
+    }
+
+    // ฟังก์ชันจัดการสีปุ่มให้คะแนน 1-5
+    function toggleRatingCard(el, groupName) {
+        document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+            const card = r.closest('.rating-card-ui');
+            card.classList.remove('border-blue-500', 'bg-blue-50');
+            card.classList.add('border-slate-100', 'bg-white');
+            
+            const numCircle = card.querySelector('.num-circle');
+            numCircle.classList.remove('bg-blue-500', 'text-white');
+            numCircle.classList.add('bg-slate-100', 'text-slate-500');
+            
+            const radioDot = card.querySelector('.radio-dot');
+            radioDot.classList.remove('border-[6px]', 'border-blue-500');
+            radioDot.classList.add('border-2', 'border-slate-300');
+            
+            const textSpan = card.querySelector('.text-label');
+            textSpan.classList.remove('text-blue-700', 'font-black');
+            textSpan.classList.add('text-slate-600', 'font-medium');
+        });
+
+        el.classList.remove('border-slate-100', 'bg-white');
+        el.classList.add('border-blue-500', 'bg-blue-50');
+        
+        el.querySelector('.num-circle').classList.remove('bg-slate-100', 'text-slate-500');
+        el.querySelector('.num-circle').classList.add('bg-blue-500', 'text-white');
+        
+        el.querySelector('.radio-dot').classList.remove('border-2', 'border-slate-300');
+        el.querySelector('.radio-dot').classList.add('border-[6px]', 'border-blue-500');
+        
+        el.querySelector('.text-label').classList.remove('text-slate-600', 'font-medium');
+        el.querySelector('.text-label').classList.add('text-blue-700', 'font-black');
+        
+        el.querySelector('input').checked = true;
     }
 
     // UI Helpers
@@ -583,13 +609,14 @@
           else { document.getElementById('progressContainer').classList.add('hidden'); }
        }, 400);
     }
+    
     function nextStep(target) {
        if(target === 3) {
           if(!document.getElementById('editName').value || !document.getElementById('editEmail').value) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อและอีเมล', 'warning');
        }
        if(target === 4) {
           if(!document.querySelector('input[name="round"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกรอบการรับสมัคร', 'warning');
-          if(!document.querySelector('input[name="knewBefore"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกว่ารู้จักจุฬาภรณ์มาก่อนหรือไม่', 'warning');
+          if(!document.querySelector('input[name="knewBefore"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกว่ารู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่', 'warning');
           if(document.querySelectorAll('input[name="channels"]:checked').length === 0 && !document.getElementById('chkOther').checked) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่องทางที่รู้จักอย่างน้อย 1 ข้อ', 'warning');
        }
        if(target === 5) {
@@ -611,9 +638,11 @@
 
     function verifyById() {
        const prefix = document.getElementById('searchCourse').value;
-       const num = document.getElementById('searchId').value.trim();
-       if(!num) return Swal.fire('เกิดข้อผิดพลาด', 'กรุณาระบุตัวเลขรหัส', 'warning');
-       const fullId = prefix + "-" + ("0" + num).slice(-2);
+       let num = document.getElementById('searchId').value.trim();
+       if(!num) return Swal.fire('เกิดข้อผิดพลาด', 'กรุณาระบุตัวเลขรหัส 2 หลัก', 'warning');
+       
+       num = ("0" + num).slice(-2);
+       const fullId = prefix + "-" + num;
        const found = allAttendees.find(a => a.id === fullId);
        
        if(found) confirmUser(found);
@@ -625,8 +654,8 @@
        if(query.trim().length < 2) { drop.style.display = 'none'; return; }
        const res = allAttendees.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
        if(res.length > 0) {
-          drop.innerHTML = res.map(a => `<li onclick="selectUser('${a.id}')"><span class="font-bold text-slate-700">${a.name}</span> <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded">${a.id}</span></li>`).join('');
-       } else { drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-2 justify-center">ไม่พบรายชื่อนี้</li>`; }
+          drop.innerHTML = res.map(a => `<li onclick="selectUser('${a.id}')"><span class="font-bold text-slate-700">${a.name}</span> <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded shadow-sm">${a.id}</span></li>`).join('');
+       } else { drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-3 justify-center">ไม่พบรายชื่อนี้</li>`; }
        drop.style.display = 'block';
     }
 
@@ -639,9 +668,10 @@
     function confirmUser(user) {
        Swal.fire({
           title: 'ใช่คุณหรือไม่?',
-          html: `รหัส: <strong class="text-blue-500">${user.id}</strong><br>ชื่อ: <strong class="text-slate-800">${user.name}</strong>`,
+          html: `รหัส: <strong class="text-blue-500 bg-blue-50 px-2 py-0.5 rounded ml-1">${user.id}</strong><br>ชื่อ: <strong class="text-slate-800">${user.name}</strong>`,
           icon: 'question', showCancelButton: true, confirmButtonText: 'ใช่, ข้อมูลฉันเอง', cancelButtonText: 'ไม่ใช่',
-          confirmButtonColor: '#3b82f6', cancelButtonColor: '#94a3b8'
+          confirmButtonColor: '#3b82f6', cancelButtonColor: '#94a3b8',
+          customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl shadow-md', cancelButton: 'rounded-xl' }
        }).then((res) => {
           if(res.isConfirmed) {
              document.getElementById('sysId').value = user.id;
@@ -696,6 +726,7 @@
          .then(r => r.json())
          .then(res => {
             if(res.status === 'success') {
+               // ซ่อนฟอร์มและโชว์หน้า Success ทันที
                document.getElementById('evalForm').style.display = 'none';
                if(document.getElementById('progressContainer')) {
                   document.getElementById('progressContainer').style.display = 'none';
@@ -717,8 +748,10 @@
 
                if(res.certUrl) {
                   downloadBtn.href = res.certUrl;
-                  downloadBtn.style.display = 'flex';
-                  emailBtn.style.display = 'flex';
+                  downloadBtn.classList.remove('hidden');
+                  downloadBtn.classList.add('flex');
+                  emailBtn.classList.remove('hidden');
+                  emailBtn.classList.add('flex');
 
                   let fileId = res.certId || "";
                   if (!fileId) {
@@ -727,6 +760,7 @@
                   }
 
                   if (fileId) {
+                     // ดึงภาพ Thumbnail คุณภาพสูงเพื่อแสดงผลแทนการยัด Link ลง iFrame
                      certImg.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
                      certImg.onload = () => {
                         certImg.classList.remove('hidden');
@@ -742,7 +776,7 @@
                } else {
                   downloadBtn.style.display = 'none';
                   emailBtn.style.display = 'none';
-                  certFallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-2"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg><p class="text-amber-600 font-bold text-sm">ไม่พบไฟล์เกียรติบัตรของท่านในระบบ<br><span class="text-xs font-normal text-slate-500">กรุณากดปุ่มแจ้งปัญหาด้านล่างเพื่อติดต่อทีมงาน</span></p>';
+                  certFallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-3 drop-shadow"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg><p class="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-2 rounded-lg inline-block">ไม่พบไฟล์เกียรติบัตรของท่านในระบบ<br><span class="text-xs font-medium text-slate-500 mt-1 block">กรุณากดปุ่มแจ้งปัญหาด้านล่างเพื่อติดต่อทีมงาน</span></p>';
                   certFallback.style.display = 'block';
                }
             } else {
@@ -760,14 +794,14 @@
        const btn = document.getElementById('emailCertBtn');
        const originalText = btn.innerHTML;
        btn.disabled = true; 
-       btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> กำลังส่ง...';
+       btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ส่ง...';
 
        fetch(SCRIPT_URL, {
           method: 'POST',
           body: JSON.stringify({ action: 'sendCertEmail', email: currentData.email, name: currentData.name, certUrl: currentData.certUrl })
        })
        .then(r=>r.json()).then(res => {
-          if(res.status === 'success') Swal.fire({toast: true, position: 'top', icon: 'success', title: 'ส่งเข้าอีเมลสำเร็จ!', showConfirmButton: false, timer: 2500});
+          if(res.status === 'success') Swal.fire({toast: true, position: 'top', icon: 'success', title: 'ส่งเข้าอีเมลสำเร็จ!', showConfirmButton: false, timer: 2500, customClass: {popup: 'rounded-2xl'}});
           else Swal.fire('ผิดพลาด', 'ส่งอีเมลไม่สำเร็จ', 'error');
           btn.disabled = false; btn.innerHTML = originalText;
        })
