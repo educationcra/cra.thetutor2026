@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียน Walk-in - CRA THE TUTOR 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+  
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #ffffff; }
+    .step-section { display: none; opacity: 0; transform: translateX(0); }
+    .step-section.visible { display: block; opacity: 1; }
+    @keyframes stepInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes stepInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+    .ani-next { animation: stepInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    .ani-prev { animation: stepInLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    
+    .input-wrapper { margin-bottom: 1.5rem; position: relative; }
+    .input-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 700; color: #334155; margin-bottom: 0.6rem; }
+    .req { color: #8b5cf6; }
+    .input-field { width: 100%; padding: 1.125rem 1.25rem; border-radius: 0.85rem; border: 2px solid #f1f5f9; background: #f8fafc; outline: none; transition: all 0.25s ease; font-weight: 600; color: #0f172a; font-size: 0.95rem; }
+    .input-field:focus { background: #ffffff; border-color: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1); }
+
+    .c-select-container { position: relative; width: 100%; user-select: none; }
+    .c-select-trigger { width: 100%; padding: 1.125rem 1.25rem; border-radius: 0.85rem; border: 2px solid #f1f5f9; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 600; color: #64748b; font-size: 0.95rem; }
+    .c-select-trigger.has-value { color: #0f172a; }
+    .c-select-trigger:focus, .c-select-container.open .c-select-trigger { background: #ffffff; border-color: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1); }
+    .trigger-content { display: flex; align-items: center; gap: 0.75rem; }
+    .trigger-icon { color: #94a3b8; font-size: 1.1rem; display: flex; align-items: center; transition: color 0.2s; }
+    .c-select-trigger.has-value .trigger-icon { color: #0f172a; }
+    
+    .c-select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); z-index: 50; max-height: 250px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; }
+    .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; }
+    .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
+    .c-select-option.selected { background: #f5f3ff; color: #8b5cf6; font-weight: 700; border-left: 4px solid #8b5cf6; padding-left: 1rem;}
+    
+    .autocomplete-dropdown { position: absolute; z-index: 50; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); margin-top: 8px; }
+    .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; }
+    .autocomplete-dropdown li:hover { background-color: #f5f3ff; color: #8b5cf6; padding-left: 1.5rem; }
+
+    .course-card { background: #f8fafc; border: 2px solid transparent; border-radius: 1.25rem; padding: 1.25rem; cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+    .course-card:not(.disabled):hover { border-color: #8b5cf6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.15); }
+    .course-card.selected { background: #f5f3ff; border-color: #8b5cf6; }
+    .course-card.disabled { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; }
+    
+    .check-card { display: flex; align-items: center; padding: 1.1rem 1.25rem; background: #f8fafc; border-radius: 1rem; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; gap: 1rem; }
+    .check-card:hover { background: #f1f5f9; }
+    .check-card.checked { background: #f5f3ff; border-color: #8b5cf6; }
+    .check-box-ui { width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: white; flex-shrink: 0; }
+    .check-card.checked .check-box-ui { background: #8b5cf6; border-color: #8b5cf6; }
+    .check-card.checked .check-box-ui i { opacity: 1; color: white; }
+    .check-box-ui i { opacity: 0; font-size: 0.8rem; margin-top: 2px; }
+
+    .btn-primary { background: #8b5cf6; color: white; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4); }
+    .btn-primary:hover:not(:disabled) { background: #7c3aed; transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.4); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; transform: none; background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-white min-h-screen text-slate-800">
+
+  <div class="flex min-h-screen w-full">
+    
+    <!-- Left Banner -->
+    <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-[#0f172a] text-white flex-col justify-between relative overflow-hidden">
+        <div class="absolute top-[-20%] left-[-20%] w-[70%] h-[70%] bg-[#8b5cf6] rounded-full mix-blend-screen filter blur-[150px] opacity-30"></div>
+        <div class="absolute bottom-[-10%] right-[-20%] w-[60%] h-[60%] bg-[#3b82f6] rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+        
+        <div class="relative z-10 p-12 xl:p-20 pt-16 h-full flex flex-col">
+            <div>
+                <span class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-bold tracking-widest uppercase mb-6 text-[#a78bfa]">
+                    Fast Track Registration
+                </span>
+                <h1 class="text-4xl xl:text-6xl font-black leading-[1.1] tracking-tight mb-4">
+                    WALK-IN <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#a78bfa] to-[#60a5fa]">REGISTRATION</span>
+                </h1>
+                <p class="text-lg xl:text-xl text-slate-300 font-medium leading-relaxed max-w-md">
+                    ลงทะเบียนหน้างาน (ด่วน) โควตารับเพิ่มจำนวนจำกัด
+                </p>
+            </div>
+            
+            <div class="mt-auto">
+                <div class="flex items-center gap-4 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 w-fit">
+                    <div class="w-12 h-12 rounded-full bg-[#8b5cf6]/20 flex items-center justify-center text-[#a78bfa]">
+                        <i class="fi fi-sr-bolt text-2xl mt-1"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-400">สถานะการเช็คอิน</p>
+                        <p class="text-lg font-bold text-white">เช็คอินสำเร็จอัตโนมัติเมื่อลงทะเบียน</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="w-full lg:w-7/12 xl:w-1/2 flex flex-col relative bg-white">
+        <div class="lg:hidden w-full h-1.5 bg-gradient-to-r from-[#0f172a] via-[#8b5cf6] to-[#3b82f6]"></div>
+
+        <div class="flex-grow flex flex-col px-5 py-8 sm:px-12 md:px-16 lg:px-12 xl:px-20">
+            <div class="flex justify-between items-center mb-8">
+               <a href="index.html" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#8b5cf6] font-bold transition-colors no-underline">
+                 <i class="fi fi-sr-arrow-small-left mt-0.5 text-xl"></i> กลับหน้าหลัก
+               </a>
+            </div>
+
+            <!-- Global Form Loading -->
+            <div id="formLoading" class="flex-grow flex flex-col items-center justify-center text-center py-20">
+                <i class="fi fi-sr-spinner animate-spin text-5xl text-[#8b5cf6] mb-4"></i>
+                <p class="font-bold text-slate-700 text-lg">กำลังตรวจสอบโควตา Walk-in...</p>
+            </div>
+
+            <div class="w-full max-w-[600px] mx-auto hidden" id="formWrapper">
+                
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mb-8 relative overflow-hidden" id="progressContainer">
+                  <div id="progressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#8b5cf6] to-[#3b82f6] transition-all duration-500 ease-out w-1/4"></div>
+                </div>
+
+                <form id="regForm">
+                  
+                  <!-- STEP 1: เลือกหลักสูตร -->
+                  <div id="step1" class="step-section active visible ani-next">
+                    <div class="mb-8 flex items-center gap-4">
+                       <div class="w-12 h-12 rounded-2xl bg-purple-50 text-[#8b5cf6] flex items-center justify-center shrink-0">
+                           <i class="fi fi-sr-books text-2xl mt-1"></i>
+                       </div>
+                       <div>
+                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">1. เลือกหลักสูตร (Walk-in)</h2>
+                           <p class="text-slate-500 font-medium text-sm">รับเพิ่มหลักสูตรละ 5 คนเท่านั้น</p>
+                       </div>
+                    </div>
+                    
+                    <input type="hidden" id="courseVal" value="">
+                    
+                    <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"></div>
+
+                    <div class="mt-8">
+                      <button type="button" onclick="nextStep(2)" class="w-full btn-primary py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                    </div>
+                  </div>
+
+                  <!-- STEP 2: ข้อมูลส่วนตัว -->
+                  <div id="step2" class="step-section">
+                    <div class="mb-8 flex items-center gap-4">
+                       <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                           <i class="fi fi-sr-user text-2xl mt-1"></i>
+                       </div>
+                       <div>
+                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">2. ข้อมูลส่วนตัว</h2>
+                       </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-12 gap-x-4 gap-y-4 mb-5">
+                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
+                        <label class="input-label"><i class="fi fi-sr-venus-mars text-slate-400"></i> คำนำหน้า<span class="req">*</span></label>
+                        <div class="c-select-container" id="c-prefix">
+                           <div class="c-select-trigger" tabindex="0">
+                               <div class="trigger-content"><span>เลือก</span></div>
+                               <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                           </div>
+                           <div class="c-select-dropdown">
+                              <div class="c-select-option" data-value="นาย">นาย</div>
+                              <div class="c-select-option" data-value="นางสาว"> นางสาว</div>
+                           </div>
+                        </div>
+                        <input type="hidden" id="prefix" value="">
+                      </div>
+
+                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
+                        <label class="input-label"><i class="fi fi-sr-id-badge text-slate-400"></i> ชื่อจริง<span class="req">*</span></label>
+                        <input type="text" id="fname" class="input-field" placeholder="ชื่อ">
+                      </div>
+
+                      <div class="col-span-12 md:col-span-4 input-wrapper mb-0">
+                        <label class="input-label"><i class="fi fi-sr-users text-slate-400"></i> นามสกุล<span class="req">*</span></label>
+                        <input type="text" id="lname" class="input-field" placeholder="นามสกุล">
+                      </div>
+                    </div>
+                    
+                    <div class="input-wrapper mb-5">
+                      <label class="input-label"><i class="fi fi-sr-envelope text-slate-400"></i> อีเมล<span class="req">*</span></label>
+                      <input type="email" id="email" class="input-field" placeholder="example@gmail.com" autocomplete="off" oninput="formatEmail(this)">
+                      <ul id="emailDropdown" class="autocomplete-dropdown"></ul>
+                    </div>
+
+                    <div class="input-wrapper">
+                      <label class="input-label"><i class="fi fi-sr-smartphone text-slate-400"></i> เบอร์โทรศัพท์มือถือ<span class="req">*</span></label>
+                      <input type="tel" id="phone" class="input-field tracking-widest text-lg" maxlength="12" placeholder="0XX-XXX-XXXX" oninput="formatPhone(this)">
+                    </div>
+
+                    <div class="flex gap-4 mt-8">
+                      <button type="button" onclick="prevStep(1)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                      <button type="button" onclick="nextStep(3)" class="w-2/3 btn-primary py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                    </div>
+                  </div>
+
+                  <!-- STEP 3: ข้อมูลการศึกษา -->
+                  <div id="step3" class="step-section">
+                    <div class="mb-8 flex items-center gap-4">
+                       <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                           <i class="fi fi-sr-graduation-cap text-2xl mt-1"></i>
+                       </div>
+                       <div>
+                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">3. ข้อมูลการศึกษา</h2>
+                       </div>
+                    </div>
+                    
+                    <div class="input-wrapper">
+                      <label class="input-label"><i class="fi fi-sr-school text-slate-400"></i> โรงเรียนที่กำลังศึกษา<span class="req">*</span></label>
+                      <input type="text" id="schoolSearch" class="input-field" placeholder="พิมพ์ชื่อโรงเรียนเพื่อค้นหา..." oninput="searchSchool(this.value)" autocomplete="off">
+                      <ul id="schoolDropdown" class="autocomplete-dropdown"></ul>
+                    </div>
+
+                    <div class="input-wrapper">
+                      <label class="input-label"><i class="fi fi-sr-map-marker text-slate-400"></i> จังหวัดของโรงเรียน<span class="req">*</span></label>
+                      <div class="c-select-container" id="c-province">
+                         <div class="c-select-trigger" tabindex="0">
+                             <div class="trigger-content"><span>เลื่อนเพื่อเลือกจังหวัด</span></div>
+                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                         </div>
+                         <div class="c-select-dropdown" id="provinceList"></div>
+                      </div>
+                      <input type="hidden" id="province">
+                    </div>
+
+                    <div class="input-wrapper">
+                      <label class="input-label"><i class="fi fi-sr-book-alt text-slate-400"></i> ระดับชั้น<span class="req">*</span></label>
+                      <div class="c-select-container" id="c-grade">
+                         <div class="c-select-trigger" tabindex="0">
+                             <div class="trigger-content"><span>เลือกระดับชั้น</span></div>
+                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                         </div>
+                         <div class="c-select-dropdown">
+                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 4"> มัธยมศึกษาปีที่ 4</div>
+                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 5"> มัธยมศึกษาปีที่ 5</div>
+                            <div class="c-select-option" data-value="มัธยมศึกษาปีที่ 6"> มัธยมศึกษาปีที่ 6</div>
+                         </div>
+                      </div>
+                      <input type="hidden" id="grade">
+                    </div>
+
+                    <div class="flex gap-4 mt-8">
+                      <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                      <button type="button" onclick="nextStep(4)" class="w-2/3 btn-primary py-4 rounded-2xl font-bold text-[17px] flex items-center justify-center gap-2">ถัดไป <i class="fi fi-sr-arrow-right mt-0.5"></i></button>
+                    </div>
+                  </div>
+
+                  <!-- STEP 4: แบบสำรวจ -->
+                  <div id="step4" class="step-section">
+                    <div class="mb-8 flex items-center gap-4">
+                       <div class="w-12 h-12 rounded-2xl bg-purple-50 text-[#8b5cf6] flex items-center justify-center shrink-0">
+                           <i class="fi fi-sr-poll-h text-2xl mt-1"></i>
+                       </div>
+                       <div>
+                           <h2 class="text-2xl font-black text-[#0f172a] tracking-tight">4. แบบสำรวจ</h2>
+                       </div>
+                    </div>
+                    
+                    <div class="input-wrapper mb-8 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                      <label class="input-label text-[#8b5cf6] mb-4">ท่านรู้จักเราจากช่องทางใด (ตอบได้มากกว่า 1)<span class="req">*</span></label>
+                      <div id="sourceGroup" class="flex flex-col gap-1"></div>
+                    </div>
+
+                    <div class="input-wrapper">
+                      <label class="input-label"><i class="fi fi-sr-social-network text-slate-400"></i> ปัจจุบันติดตามเพจ Education CRA หรือไม่<span class="req">*</span></label>
+                      <div class="c-select-container" id="c-followPage">
+                         <div class="c-select-trigger" tabindex="0">
+                             <div class="trigger-content">
+                                 <i class="fi fi-sr-thumbs-up trigger-icon mt-0.5"></i>
+                                 <span>เลือกสถานะ</span>
+                             </div>
+                             <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                         </div>
+                         <div class="c-select-dropdown">
+                            <div class="c-select-option" data-value="ติดตาม"> ใช่, ติดตาม</div>
+                            <div class="c-select-option" data-value="ไม่ได้ติดตาม">ไม่ได้ติดตาม</div>
+                         </div>
+                      </div>
+                      <input type="hidden" id="followPage">
+                      
+                      <div id="wrapPlatform" class="hidden bg-purple-50/50 p-5 rounded-2xl border border-purple-100 mt-4">
+                        <label class="input-label text-[#8b5cf6]"><i class="fi fi-sr-cursor text-purple-400"></i> แพลตฟอร์มที่ติดตามหลัก<span class="req">*</span></label>
+                        <div class="c-select-container" id="c-followPlatform">
+                           <div class="c-select-trigger bg-white border-white" tabindex="0">
+                               <div class="trigger-content">
+                                   <i class="fi fi-sr-apps trigger-icon mt-0.5"></i>
+                                   <span>เลือกแพลตฟอร์ม</span>
+                               </div>
+                               <i class="fi fi-sr-angle-small-down text-slate-400"></i>
+                           </div>
+                           <div class="c-select-dropdown">
+                              <div class="c-select-option" data-value="Facebook"> Facebook</div>
+                              <div class="c-select-option" data-value="Instagram"> Instagram</div>
+                              <div class="c-select-option" data-value="TikTok">TikTok</div>
+                              <div class="c-select-option" data-value="X (Twitter)"> X (Twitter)</div>
+                           </div>
+                        </div>
+                        <input type="hidden" id="followPlatform">
+                      </div>
+                    </div>
+
+                    <div class="flex gap-4 mt-8">
+                      <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 hover:bg-slate-200 py-4 rounded-2xl font-bold transition-all">กลับ</button>
+                      <button type="button" id="submitBtn" onclick="submitFinal()" class="w-2/3 btn-primary py-4 rounded-2xl font-black text-[17px] flex items-center justify-center gap-2">
+                         ลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <!-- หน้า Success -->
+                <div id="successView" class="step-section text-center py-6 hidden">
+                   <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <i class="fi fi-sr-check-circle text-4xl text-green-500 mt-2"></i>
+                   </div>
+                   <h2 class="text-3xl font-black text-[#0f172a] mb-2 tracking-tight">ลงทะเบียนหน้างานสำเร็จ!</h2>
+                   <p class="text-emerald-600 font-bold mb-8 bg-emerald-50 py-2 px-4 rounded-full inline-block">ระบบเช็คอินให้ท่านเรียบร้อยแล้ว เข้าร่วมงานได้ทันที</p>
+                   
+                   <div id="ticketCard" class="bg-[#0f172a] p-8 pb-10 rounded-[2rem] text-white shadow-2xl mx-auto mb-8 relative overflow-hidden" style="max-width: 400px;">
+                       <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-[#8b5cf6] rounded-full mix-blend-screen filter blur-[60px] opacity-40"></div>
+                       
+                       <div class="relative z-10">
+                           <p class="text-[11px] text-slate-400 font-bold mb-2 uppercase tracking-widest">หลักสูตรที่ลงทะเบียน</p>
+                           <div id="displayCourseBadge" class="inline-block px-5 py-2 rounded-full text-[15px] font-black mb-6 shadow-md bg-[#8b5cf6] text-white">--</div>
+                           
+                           <p class="text-[11px] text-slate-400 font-bold mb-1 uppercase tracking-widest">รหัสประจำตัว (โซนพิเศษ)</p>
+                           <div class="text-5xl sm:text-6xl font-black tracking-widest mb-2 drop-shadow-md text-[#a78bfa]" id="displayId">--</div>
+                           
+                           <div class="text-lg font-bold text-white mb-8" id="displayName">--</div>
+                       </div>
+                   </div>
+
+                   <button onclick="window.location.reload();" class="inline-flex w-full max-w-[400px] justify-center items-center gap-2 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold hover:bg-slate-200 transition text-[17px] mx-auto">
+                      กลับไปหน้าแรก (สำหรับคนต่อไป)
+                   </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ นำ Web App URL อันล่าสุดมาใส่ที่นี่
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec"; 
+    
+    const courseConfig = {
+      "แพทยศาสตร์": { prefix: "MD", icon: "fi-sr-stethoscope" },
+      "วิทยาศาสตร์ข้อมูลสุขภาพ": { prefix: "HDS", icon: "fi-sr-chart-histogram" },
+      "พยาบาลศาสตร์(4 ปี/หลักสูตรนานาชาติ 4 ปี)": { prefix: "BNS", icon: "fi-sr-user-nurse" },
+      "รังสีเทคนิค": { prefix: "RT", icon: "fi-sr-bone" },
+      "วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ": { prefix: "HKH", icon: "fi-sr-running" },
+      "ฉุกเฉินการแพทย์": { prefix: "PMD", icon: "fi-sr-ambulance" },
+      "นวัตกรรมวิทยาศาสตร์การแพทย์": { prefix: "INMS", icon: "fi-sr-microscope" },
+      "วิศวกรรมชีวการแพทย์": { prefix: "BME", icon: "fi-sr-microchip" },
+      "เทคโนโลยีอาหารทางการแพทย์และสุขภาพ": { prefix: "MHFT", icon: "fi-sr-apple-whole" }
+    };
+
+    let schoolData = [];
+    const provincesList = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+    const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
+    const sources = ["CRA Roadshow (ที่โรงเรียนของท่าน)", "CRA Open House", "Dek-D's TCAS Fair", "สื่อสังคมออนไลน์ราชวิทยาลัยจุฬาภรณ์ และ Education CRA", "เว็บไซต์ราชวิทยาลัยจุฬาภรณ์", "เพื่อน / คนรู้จัก / ครูแนะนำ", "แบนเนอร์ประชาสัมพันธ์"];
+
+    window.onload = () => {
+      fetchSeatsAndRender();
+      fetch(SCRIPT_URL + "?action=getSchools").then(r => r.json()).then(data => schoolData = data).catch(err => console.log(err));
+      
+      const provListUI = document.getElementById('provinceList');
+      provincesList.forEach(p => { provListUI.innerHTML += `<div class="c-select-option" data-value="${p}">${p}</div>`; });
+
+      const group = document.getElementById('sourceGroup');
+      sources.forEach((s) => {
+        group.innerHTML += `
+          <label class="check-card" onclick="toggleCheckCard(this)">
+            <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
+            <input type="checkbox" name="src" value="${s}" class="hidden">
+            <span class="font-bold text-slate-700 text-[15px]">${s}</span>
+          </label>`;
+      });
+      group.innerHTML += `
+        <label class="check-card" onclick="toggleCheckCard(this); toggleOtherSource();">
+            <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
+            <input type="checkbox" id="chkOtherSource" class="hidden">
+            <span class="font-bold text-slate-700 text-[15px]">อื่นๆ (โปรดระบุ)</span>
+        </label>
+        <div id="wrapOtherSource" class="hidden pl-[3.5rem] pr-2 pb-2 transition-all">
+             <input type="text" id="otherSourceInput" class="input-field !py-2.5 !text-[15px] !bg-white border-2 border-purple-200 focus:border-[#8b5cf6]" placeholder="พิมพ์ระบุช่องทาง...">
+        </div>
+      `;
+
+      setupCustomSelects();
+
+      const emailInput = document.getElementById('email');
+      const emailDrop = document.getElementById('emailDropdown');
+      emailInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if(val.includes('@') || val.length < 1) { emailDrop.style.display = 'none'; return; }
+        emailDrop.innerHTML = domains.map(d => `<li onclick="applyEmail('${val}${d}')">${val}<b class="text-[#8b5cf6]">${d}</b></li>`).join('');
+        emailDrop.style.display = 'block';
+      });
+    };
+
+    function fetchSeatsAndRender() {
+        fetch(SCRIPT_URL + "?action=getWalkinSeats")
+        .then(r => r.json())
+        .then(data => {
+            renderCourseCards(data);
+            document.getElementById('formLoading').style.display = 'none';
+            document.getElementById('formWrapper').classList.remove('hidden');
+        }).catch(err => {
+            Swal.fire('Error', 'ไม่สามารถเชื่อมต่อระบบโควตาได้', 'error');
+        });
+    }
+
+    function renderCourseCards(data) {
+        const grid = document.getElementById('courseGrid');
+        let html = '';
+        let totalRemaining = 0;
+
+        data.order.forEach(courseName => {
+            const conf = courseConfig[courseName];
+            const max = 5; 
+            let remaining = data.remaining[courseName];
+            if(remaining < 0) remaining = 0;
+            totalRemaining += remaining;
+            const isFull = remaining <= 0;
+            const percent = ((max - remaining) / max) * 100;
+            
+            html += `
+                <div class="course-card group ${isFull ? 'disabled' : ''}" id="card-${conf.prefix}" onclick="${isFull ? '' : `selectCourse('${courseName}', '${conf.prefix}')`}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-slate-800 text-sm group-hover:text-[#8b5cf6] transition-colors w-4/5 leading-tight">${courseName}</h3>
+                        <i class="fi ${conf.icon} text-slate-300 group-hover:text-[#8b5cf6] text-xl transition-colors"></i>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] font-bold mb-1">
+                            <span class="${isFull ? 'text-slate-500' : 'text-[#8b5cf6]'}">${isFull ? 'โควตาเต็ม' : `ว่าง ${remaining} ที่นั่ง`}</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                            <div class="${isFull ? 'bg-slate-400' : 'bg-[#8b5cf6]'} h-full rounded-full transition-all duration-1000" style="width: ${percent}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        grid.innerHTML = html;
+
+        if(totalRemaining <= 0) {
+           document.getElementById('step1').innerHTML = `
+              <div class="text-center py-10 bg-slate-50 rounded-3xl border border-slate-200">
+                 <i class="fi fi-sr-sad-tear text-5xl text-slate-400 mb-4"></i>
+                 <h2 class="text-2xl font-black text-[#0f172a] mb-2">ปิดรับ Walk-in</h2>
+                 <p class="text-slate-500 font-medium">ขณะนี้โควตาหน้างานทุกหลักสูตรเต็มครบถ้วนแล้วครับ</p>
+                 <a href="index.html" class="inline-block mt-6 bg-[#0f172a] text-white py-3 px-8 rounded-xl font-bold no-underline">กลับหน้าหลัก</a>
+              </div>
+           `;
+        }
+    }
+
+    function selectCourse(courseName, prefix) {
+        document.getElementById('courseVal').value = courseName;
+        document.querySelectorAll('.course-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById(`card-${prefix}`).classList.add('selected');
+    }
+
+    function toggleCheckCard(el) { const checkbox = el.querySelector('input[type="checkbox"]'); checkbox.checked = !checkbox.checked; if(checkbox.checked) el.classList.add('checked'); else el.classList.remove('checked'); }
+    function toggleOtherSource() { const wrap = document.getElementById('wrapOtherSource'); const inp = document.getElementById('otherSourceInput'); if(document.getElementById('chkOtherSource').checked) { wrap.classList.remove('hidden'); inp.focus(); } else { wrap.classList.add('hidden'); inp.value = ''; } }
+
+    function setupCustomSelects() {
+        document.querySelectorAll('.c-select-container').forEach(container => {
+            const trigger = container.querySelector('.c-select-trigger');
+            const options = container.querySelectorAll('.c-select-option');
+            const hiddenInput = document.getElementById(container.id.replace('c-', ''));
+            const triggerSpan = trigger.querySelector('.trigger-content span');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.c-select-container').forEach(c => { if(c !== container) c.classList.remove('open'); });
+                container.classList.toggle('open');
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    hiddenInput.value = val;
+                    triggerSpan.innerHTML = opt.innerHTML; 
+                    trigger.classList.add('has-value');
+                    
+                    options.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    container.classList.remove('open');
+
+                    if(hiddenInput.id === 'followPage') {
+                        const wrapPlatform = document.getElementById('wrapPlatform');
+                        if(val === 'ติดตาม') wrapPlatform.classList.remove('hidden');
+                        else { 
+                           wrapPlatform.classList.add('hidden'); 
+                           document.getElementById('followPlatform').value = ""; 
+                           document.querySelector('#c-followPlatform .trigger-content span').innerText = "เลือกแพลตฟอร์ม"; 
+                           document.querySelector('#c-followPlatform .c-select-trigger').classList.remove('has-value');
+                        }
+                    }
+                });
+            });
+        });
+        
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.c-select-container')) document.querySelectorAll('.c-select-container').forEach(c => c.classList.remove('open'));
+            if(e.target.id !== 'schoolSearch') document.getElementById('schoolDropdown').style.display = 'none';
+            if(e.target.id !== 'email') document.getElementById('emailDropdown').style.display = 'none';
+        });
+    }
+
+    function setCustomSelectValue(id, val) {
+        const container = document.getElementById('c-' + id);
+        if(!container) return;
+        const hiddenInput = document.getElementById(id);
+        const triggerSpan = container.querySelector('.trigger-content span');
+        const trigger = container.querySelector('.c-select-trigger');
+        const options = container.querySelectorAll('.c-select-option');
+        hiddenInput.value = val; triggerSpan.innerText = val; trigger.classList.add('has-value');
+        options.forEach(opt => { if(opt.getAttribute('data-value') === val) { opt.classList.add('selected'); } else { opt.classList.remove('selected'); } });
+    }
+
+    function applyEmail(fullEmail) { document.getElementById('email').value = fullEmail; document.getElementById('emailDropdown').style.display = 'none'; document.getElementById('email').focus(); }
+    function formatEmail(el) { el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, ''); }
+    function formatPhone(el) {
+      let v = el.value.replace(/\D/g,'');
+      if(v.length > 10) v = v.substring(0,10);
+      if(v.length > 6) el.value = v.substring(0,3)+'-'+v.substring(3,6)+'-'+v.substring(6);
+      else if(v.length > 3) el.value = v.substring(0,3)+'-'+v.substring(3);
+      else el.value = v;
+    }
+
+    function searchSchool(query) {
+      const drop = document.getElementById('schoolDropdown');
+      if(query.trim().length < 2) { drop.style.display = 'none'; return; }
+      const res = schoolData.filter(s => s[0].toLowerCase().includes(query.toLowerCase())).slice(0, 8);
+      if(res.length > 0) {
+          drop.innerHTML = res.map(s => `<li class="flex justify-between items-center" onclick="selectSchool('${s[0]}','${s[1]}')"><span class="font-bold text-[#0f172a]">${s[0]}</span> <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">จ.${s[1]}</span></li>`).join('');
+      } else { drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-2">พิมพ์ชื่อโรงเรียนเต็มได้เลยครับ</li>`; }
+      drop.style.display = 'block';
+    }
+    function selectSchool(name, prov) { document.getElementById('schoolSearch').value = name; setCustomSelectValue('province', prov); document.getElementById('schoolDropdown').style.display = 'none'; }
+
+    function updateProgress(step) {
+        const bar = document.getElementById('progressBar');
+        if(step === 1) bar.style.width = '25%';
+        else if(step === 2) bar.style.width = '50%';
+        else if(step === 3) bar.style.width = '75%';
+        else if(step === 4) bar.style.width = '100%';
+        else document.getElementById('progressContainer').style.display = 'none';
+    }
+
+    function animateStepChange(targetStepNum, animationClass) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        updateProgress(targetStepNum);
+        document.querySelectorAll('.step-section').forEach(sec => { sec.classList.remove('visible', 'ani-next', 'ani-prev'); });
+        document.getElementById('step' + targetStepNum).classList.add('visible', animationClass);
+    }
+
+    function nextStep(s) { 
+      if(s === 2) {
+          if(!document.getElementById('courseVal').value) return Swal.fire({icon: 'warning', title: 'ยังไม่ได้เลือกหลักสูตร', text: 'กรุณาคลิกเลือกการ์ดหลักสูตร 1 อันเพื่อดำเนินการต่อครับ', confirmButtonColor: '#0f172a'});
+      }
+      if(s === 3) {
+          if(!document.getElementById('prefix').value || !document.getElementById('fname').value || !document.getElementById('lname').value || !document.getElementById('email').value || !document.getElementById('phone').value) {
+              return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลส่วนตัวให้ครบถ้วน', confirmButtonColor: '#0f172a'});
+          }
+          if(document.getElementById('phone').value.length !== 12) { return Swal.fire({icon: 'warning', title: 'เบอร์โทรไม่ถูกต้อง', text: 'กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก', confirmButtonColor: '#0f172a'}); }
+      }
+      if(s === 4) {
+          if(!document.getElementById('schoolSearch').value || !document.getElementById('province').value || !document.getElementById('grade').value) {
+              return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลการศึกษาให้ครบถ้วน', confirmButtonColor: '#0f172a'});
+          }
+      }
+      animateStepChange(s, 'ani-next');
+    }
+
+    function prevStep(s) { animateStepChange(s, 'ani-prev'); }
+
+    function submitFinal() {
+      const srcNodes = document.querySelectorAll('input[name="src"]:checked');
+      let selectedSources = Array.from(srcNodes).map(n => n.value);
+      
+      const chkOther = document.getElementById('chkOtherSource');
+      const otherInput = document.getElementById('otherSourceInput').value.trim();
+      if(chkOther && chkOther.checked) {
+         if(!otherInput) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาระบุช่องทางอื่นๆ ที่ท่านรู้จักเรา', confirmButtonColor: '#0f172a'}); 
+         selectedSources.push("อื่นๆ: " + otherInput);
+      }
+
+      const followPage = document.getElementById('followPage').value;
+      const followPlatform = document.getElementById('followPlatform').value;
+
+      if(selectedSources.length === 0) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกช่องทางที่ท่านทราบข่าวอย่างน้อย 1 ข้อ', confirmButtonColor: '#0f172a'});
+      if(!followPage) return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกว่าท่านติดตามเพจ Education CRA หรือไม่', confirmButtonColor: '#0f172a'});
+      if(followPage === 'ติดตาม' && !followPlatform) {
+          return Swal.fire({icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาเลือกแพลตฟอร์มที่ท่านติดตามหลักด้วยครับ', confirmButtonColor: '#0f172a'});
+      }
+      
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; 
+      btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-0.5"></i> กำลังบันทึก...';
+
+      const payload = {
+        action: 'submitWalkin',
+        course: document.getElementById('courseVal').value,
+        prefix: document.getElementById('prefix').value,
+        fname: document.getElementById('fname').value.trim(),
+        lname: document.getElementById('lname').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value,
+        school: document.getElementById('schoolSearch').value.trim(),
+        province: document.getElementById('province').value,
+        grade: document.getElementById('grade').value,
+        source: selectedSources.join(', '),
+        followPage: followPage,
+        followPlatform: followPage === 'ไม่ได้ติดตาม' ? '-' : followPlatform
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(res => {
+        if(res.status === 'success') {
+          document.getElementById('regForm').style.display = 'none';
+          document.getElementById('progressContainer').style.display = 'none';
+          const successView = document.getElementById('successView');
+          successView.classList.remove('hidden');
+          successView.classList.add('visible', 'ani-next');
+          
+          document.getElementById('displayId').innerText = res.id;
+          
+          const prefixName = document.getElementById('prefix').value;
+          const fName = document.getElementById('fname').value;
+          const lName = document.getElementById('lname').value;
+          document.getElementById('displayName').innerText = `${prefixName}${fName} ${lName}`;
+          
+          const badge = document.getElementById('displayCourseBadge');
+          badge.innerText = res.course;
+          
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (res.status === 'full') {
+          fetchSeatsAndRender(); 
+          animateStepChange(1, 'ani-prev'); 
+          Swal.fire({icon: 'warning', title: 'โควตาเต็ม', text: 'ขออภัยครับ โควตาหน้างานของหลักสูตรนี้เต็มพอดี', confirmButtonColor: '#0f172a'});
+          btn.disabled = false; btn.innerHTML = 'ลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+        } else {
+          Swal.fire({icon: 'error', title: 'ไม่สามารถลงทะเบียนได้', text: res.message, confirmButtonColor: '#0f172a'});
+          btn.disabled = false; btn.innerHTML = 'ลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+        }
+      })
+      .catch(err => {
+          Swal.fire({icon: 'error', title: 'ระบบขัดข้อง', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', confirmButtonColor: '#0f172a'});
+          btn.disabled = false; btn.innerHTML = 'ลงทะเบียน <i class="fi fi-sr-rocket-lunch mt-0.5"></i>';
+      });
+    }
+  </script>
+</body>
+</html>
