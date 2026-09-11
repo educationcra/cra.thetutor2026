@@ -12,11 +12,9 @@
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #f8fafc; }
     
-    /* Animations */
     .step-section { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     .step-section.visible { display: block; opacity: 1; transform: translateY(0); }
     
-    /* Text Inputs */
     .input-wrapper { margin-bottom: 1.5rem; position: relative; }
     .input-label { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; line-height: 1.5; }
     .req { color: #ef4444; margin-left: 2px; }
@@ -33,14 +31,11 @@
     .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
     .c-select-option.selected { background: #eff6ff; color: #3b82f6; font-weight: 700; border-left: 4px solid #3b82f6; padding-left: 1rem;}
 
-    /* Autocomplete */
     .autocomplete-dropdown { position: absolute; z-index: 50; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); margin-top: 8px; }
     .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; display: flex; align-items: center; justify-content: space-between; }
     .autocomplete-dropdown li:hover { background-color: #f1f5f9; color: #0f172a; padding-left: 1.5rem; }
 
-    /* ====================================================
-       CHECKBOX & RADIO STYLE (Splash-12 Animation)
-       ==================================================== */
+    /* CSS สำหรับ Checkbox / Radio Animation */
     .checkbox-wrapper-12 {
       position: relative;
       display: flex;
@@ -55,269 +50,55 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       overflow: hidden; 
     }
-    .checkbox-wrapper-12:hover {
-        border-color: #cbd5e1; background: #f8fafc;
-    }
-
-    .checkbox-wrapper-12 > svg {
-      position: absolute;
-      top: -130%;
-      left: -170%;
-      width: 110px;
-      pointer-events: none;
-    }
-
-    .checkbox-wrapper-12 * {
-      box-sizing: border-box;
-    }
-
+    .checkbox-wrapper-12:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .checkbox-wrapper-12 > svg { position: absolute; top: -130%; left: -170%; width: 110px; pointer-events: none; }
+    .checkbox-wrapper-12 * { box-sizing: border-box; }
     .checkbox-wrapper-12 input[type="checkbox"],
-    .checkbox-wrapper-12 input[type="radio"] {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      -webkit-tap-highlight-color: transparent;
-      cursor: pointer;
-      margin: 0;
-      position: absolute; 
-      opacity: 0;
-    }
-
-    .checkbox-wrapper-12 .cbx {
-      position: relative;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-
-    .checkbox-wrapper-12 .cbx .box {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 24px;
-      height: 24px;
-      border: 2px solid #bfbfc0;
-      border-radius: 50%;
-      transition: all 0.2s ease;
-      background: #ffffff; /* กันสีพื้นหลังรั่ว */
-    }
-
-    /* กรณีที่เป็น checkbox ให้กล่องเป็นสี่เหลี่ยม */
-    .checkbox-wrapper-12.is-checkbox .cbx .box {
-        border-radius: 6px;
-    }
-
-    .checkbox-wrapper-12 .cbx .label-splash {
-      width: 24px;
-      height: 24px;
-      background: none;
-      border-radius: 50%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-    }
-
-    .checkbox-wrapper-12 .cbx svg {
-      position: absolute;
-      top: 5px;
-      left: 4px;
-      z-index: 1;
-      pointer-events: none;
-      width: 16px;
-      height: 16px;
-    }
-
-    .checkbox-wrapper-12 .cbx svg path {
-      fill: none; /* 🔴 CRITICAL FIX: ป้องกันเบราว์เซอร์ถมสีดำลงใน SVG */
-      stroke: #ffffff;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 20;
-      stroke-dashoffset: 20;
-      transition: stroke-dashoffset 0.3s ease;
-      transition-delay: 0.1s;
-    }
-
-    /* State: Checked */
-    .checkbox-wrapper-12 input:checked ~ .cbx .label-splash {
-      animation: splash-12 0.6s ease forwards;
-    }
+    .checkbox-wrapper-12 input[type="radio"] { appearance: none; -webkit-tap-highlight-color: transparent; cursor: pointer; margin: 0; position: absolute; opacity: 0; }
+    .checkbox-wrapper-12 .cbx { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
+    .checkbox-wrapper-12 .cbx .box { position: absolute; top: 0; left: 0; width: 24px; height: 24px; border: 2px solid #bfbfc0; border-radius: 50%; transition: all 0.2s ease; background: #ffffff; }
+    .checkbox-wrapper-12.is-checkbox .cbx .box { border-radius: 6px; }
+    .checkbox-wrapper-12 .cbx .label-splash { width: 24px; height: 24px; background: none; border-radius: 50%; position: absolute; top: 0; left: 0; pointer-events: none; }
+    .checkbox-wrapper-12 .cbx svg { position: absolute; top: 5px; left: 4px; z-index: 1; pointer-events: none; width: 16px; height: 16px; }
+    .checkbox-wrapper-12 .cbx svg path { fill: none; stroke: #ffffff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 0.3s ease; transition-delay: 0.1s; }
     
-    .checkbox-wrapper-12 input:checked ~ .cbx .box {
-        border-color: transparent;
-        background: transparent;
-    }
-
-    .checkbox-wrapper-12 input:checked ~ .cbx svg path {
-      stroke-dashoffset: 0;
-    }
-    
-    .checkbox-wrapper-12.checked {
-        background: #eff6ff; border-color: #3b82f6;
-    }
-    .checkbox-wrapper-12.checked .card-text {
-        color: #1d4ed8; font-weight: 700;
-    }
+    .checkbox-wrapper-12 input:checked ~ .cbx .label-splash { animation: splash-12 0.6s ease forwards; }
+    .checkbox-wrapper-12 input:checked ~ .cbx .box { border-color: transparent; background: transparent; }
+    .checkbox-wrapper-12 input:checked ~ .cbx svg path { stroke-dashoffset: 0; }
+    .checkbox-wrapper-12.checked { background: #eff6ff; border-color: #3b82f6; }
+    .checkbox-wrapper-12.checked .card-text { color: #1d4ed8; font-weight: 700; }
 
     @keyframes splash-12 {
-      40% {
-        background: #3b82f6; 
-        box-shadow: 0 -18px 0 -8px #3b82f6, 16px -8px 0 -8px #3b82f6, 16px 8px 0 -8px #3b82f6, 0 18px 0 -8px #3b82f6, -16px 8px 0 -8px #3b82f6, -16px -8px 0 -8px #3b82f6;
-      }
-      100% {
-        background: #3b82f6;
-        box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
-      }
+      40% { background: #3b82f6; box-shadow: 0 -18px 0 -8px #3b82f6, 16px -8px 0 -8px #3b82f6, 16px 8px 0 -8px #3b82f6, 0 18px 0 -8px #3b82f6, -16px 8px 0 -8px #3b82f6, -16px -8px 0 -8px #3b82f6; }
+      100% { background: #3b82f6; box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent; }
     }
 
-    /* ====================================================
-       STAR RATING STYLE (Particle Explosion & Shimmer)
-       ==================================================== */
-    .rating-container {
-        display: flex;
-        flex-direction: column;
-        background: white;
-        padding: 1.5rem;
-        border-radius: 1.5rem;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
+    /* CSS สำหรับ Star Rating */
+    .rating-container { display: flex; flex-direction: column; background: white; padding: 1.5rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .star-label-text { font-weight: 700; color: #1e293b; margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.5; }
+    .rating-desc { text-align: center; font-size: 0.85rem; font-weight: 600; color: #64748b; min-height: 1.25rem; margin-top: 0.5rem; transition: color 0.3s; }
+    .radio { display: flex; justify-content: center; gap: 12px; flex-direction: row-reverse; position: relative; }
+    .radio > input { position: absolute; appearance: none; opacity: 0; }
+    .radio > label { cursor: pointer; font-size: 38px; position: relative; display: inline-block; transition: transform 0.3s ease; -webkit-tap-highlight-color: transparent; }
+    .radio > label > svg { fill: #cbd5e1; transition: fill 0.3s ease, filter 0.3s ease; width: 1em; height: 1em; }
     
-    .star-label-text {
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 1rem;
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-    
-    .rating-desc {
-        text-align: center;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #64748b;
-        min-height: 1.25rem;
-        margin-top: 0.5rem;
-        transition: color 0.3s;
-    }
+    .radio > label::before, .radio > label::after { content: ""; position: absolute; width: 6px; height: 6px; background-color: #f59e0b; border-radius: 50%; opacity: 0; transform: scale(0); transition: transform 0.4s ease, opacity 0.4s ease; pointer-events: none; }
+    .radio > label::before { top: -10px; left: 50%; transform: translateX(-50%) scale(0); }
+    .radio > label::after { bottom: -10px; left: 50%; transform: translateX(-50%) scale(0); }
 
-    .radio {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-direction: row-reverse;
-      position: relative;
-    }
-
-    .radio > input {
-      position: absolute;
-      appearance: none;
-      opacity: 0;
-    }
-
-    .radio > label {
-      cursor: pointer;
-      font-size: 38px; /* ขนาดดาว */
-      position: relative;
-      display: inline-block;
-      transition: transform 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .radio > label > svg {
-      fill: #cbd5e1; /* สีดาวตอนยังไม่กด */
-      transition: fill 0.3s ease, filter 0.3s ease;
-      width: 1em;
-      height: 1em;
-    }
-
-    /* Particle Effect */
-    .radio > label::before,
-    .radio > label::after {
-      content: "";
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background-color: #f59e0b; /* สีส้ม */
-      border-radius: 50%;
-      opacity: 0;
-      transform: scale(0);
-      transition: transform 0.4s ease, opacity 0.4s ease;
-      pointer-events: none;
-    }
-
-    .radio > label::before {
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%) scale(0);
-    }
-
-    .radio > label::after {
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%) scale(0);
-    }
-
-    /* Hover & Focus Effects */
     @media (hover: hover) {
-        .radio > label:hover::before,
-        .radio > label:hover::after {
-          opacity: 1;
-          transform: translateX(-50%) scale(1.5);
-          animation: particle-explosion 0.8s ease-out;
-        }
-
-        .radio > label:hover {
-          transform: scale(1.2);
-          animation: pulse 0.6s infinite alternate;
-        }
-
-        .radio > label:hover > svg,
-        .radio > label:hover ~ label > svg {
-          fill: #f59e0b;
-          filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
-          animation: shimmer 1s ease infinite alternate;
-        }
+        .radio > label:hover::before, .radio > label:hover::after { opacity: 1; transform: translateX(-50%) scale(1.5); animation: particle-explosion 0.8s ease-out; }
+        .radio > label:hover { transform: scale(1.2); animation: pulse 0.6s infinite alternate; }
+        .radio > label:hover > svg, .radio > label:hover ~ label > svg { fill: #f59e0b; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6)); animation: shimmer 1s ease infinite alternate; }
     }
 
-    /* Checked State */
-    .radio > input:checked + label > svg,
-    .radio > input:checked + label ~ label > svg {
-      fill: #f59e0b;
-      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
-      animation: pulse-checked 0.5s ease forwards;
-    }
-    
-    /* Animation สำหรับตอนกดบนมือถือ (Touch) */
-    .radio > input:checked + label::before,
-    .radio > input:checked + label::after {
-        opacity: 1;
-        animation: particle-explosion 0.6s ease-out forwards;
-    }
+    .radio > input:checked + label > svg, .radio > input:checked + label ~ label > svg { fill: #f59e0b; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6)); animation: pulse-checked 0.5s ease forwards; }
+    .radio > input:checked + label::before, .radio > input:checked + label::after { opacity: 1; animation: particle-explosion 0.6s ease-out forwards; }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.1); }
-    }
-    
-    @keyframes pulse-checked {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.3); }
-        100% { transform: scale(1.15); }
-    }
-
-    @keyframes particle-explosion {
-      0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
-      50% { opacity: 1; transform: translateX(-50%) scale(1.5); }
-      100% { opacity: 0; transform: translateX(-50%) scale(0); }
-    }
-
-    @keyframes shimmer {
-      0% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4)); }
-      100% { filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.8)); }
-    }
+    @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+    @keyframes pulse-checked { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1.15); } }
+    @keyframes particle-explosion { 0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 50% { opacity: 1; transform: translateX(-50%) scale(1.5); } 100% { opacity: 0; transform: translateX(-50%) scale(0); } }
+    @keyframes shimmer { 0% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4)); } 100% { filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.8)); } }
 
     .btn-primary { background: #0f172a; color: white; transition: all 0.3s ease; }
     .btn-primary:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
@@ -343,7 +124,6 @@
   <div class="max-w-3xl mx-auto px-5 -mt-12 relative z-20">
     <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-5 sm:p-8 md:p-10">
       
-      <!-- Progress Bar -->
       <div class="w-full bg-slate-100 h-2 rounded-full mb-8 relative overflow-hidden hidden" id="progressContainer">
         <div id="progressBar" class="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-500 ease-out w-1/4"></div>
       </div>
@@ -354,10 +134,7 @@
         <div id="step1" class="step-section active visible">
            <div class="text-center mb-8">
               <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500">
-                 <!-- Icon: ID Card -->
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
-                   <path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 014.5 3h15A1.5 1.5 0 0121 4.5v15a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 19.5v-15zM12 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM6 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2H6v-2z" clip-rule="evenodd" />
-                 </svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 014.5 3h15A1.5 1.5 0 0121 4.5v15a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 19.5v-15zM12 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM6 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2H6v-2z" clip-rule="evenodd" /></svg>
               </div>
               <h2 class="text-2xl font-black text-slate-800">ค้นหาข้อมูลผู้เข้าร่วม</h2>
               <p class="text-slate-500 text-sm mt-2">ระบุรหัสประจำตัว หรือ ค้นหาด้วยชื่อของท่าน</p>
@@ -366,11 +143,10 @@
            <!-- โหมดค้นหาด้วย ID -->
            <div id="mode-id">
              <div class="flex flex-col sm:flex-row gap-3 w-full mb-6">
-                <!-- Custom Dropdown หลักสูตร -->
+                <!-- Dropdown หลักสูตร -->
                 <div class="w-full sm:w-3/5 relative z-40">
                    <div class="c-select-container" id="customCourseSelect">
                       <div class="c-select-trigger" tabindex="0">
-                         <!-- เปลี่ยนเป็น MD ค่าตั้งต้น -->
                          <span id="courseDisplayText" class="truncate font-bold text-lg">MD</span>
                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-400 shrink-0"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
                       </div>
@@ -379,18 +155,17 @@
                          <div class="c-select-option" data-value="HDS">HDS (วิทยาศาสตร์ข้อมูลสุขภาพ)</div>
                          <div class="c-select-option" data-value="BNS">BNS (พยาบาลศาสตร์)</div>
                          <div class="c-select-option" data-value="RT">RT (รังสีเทคนิค)</div>
-                         <div class="c-select-option" data-value="HKH">HKH (วิทยาศาสตร์การเคลื่อนไหวฯ)</div>
+                         <div class="c-select-option" data-value="HKH">HKH (วิทยาศาสตร์การเคลื่อนไหวและสุขภาพ)</div>
                          <div class="c-select-option" data-value="PMD">PMD (ฉุกเฉินการแพทย์)</div>
                          <div class="c-select-option" data-value="INMS">INMS (นวัตกรรมฯ การแพทย์)</div>
                          <div class="c-select-option" data-value="BME">BME (วิศวกรรมชีวการแพทย์)</div>
-                         <div class="c-select-option" data-value="MHFT">MHFT (เทคโนโลยีอาหารการแพทย์ฯ)</div>
+                         <div class="c-select-option" data-value="MHFT">MHFT (เทคโนโลยีอาหารการแพทย์และสุขภาพ)</div>
                       </div>
                    </div>
-                   <!-- เก็บเฉพาะตัวย่อไว้ทำงานเบื้องหลัง -->
                    <input type="hidden" id="searchCourse" value="MD">
                 </div>
                 
-                <!-- ช่องกรอกตัวเลข ไม่เกิน 2 หลัก -->
+                <!-- ช่องตัวเลข -->
                 <div class="w-full sm:w-2/5 relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-2xl">-</span>
                   <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full h-full min-h-[4rem] bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
@@ -418,7 +193,7 @@
            </div>
         </div>
 
-        <!-- STEP 2: ตรวจสอบและแก้ไขข้อมูลส่วนตัว -->
+        <!-- STEP 2: ข้อมูลส่วนตัว -->
         <div id="step2" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
               <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shrink-0">
@@ -426,7 +201,7 @@
               </div>
               <div>
                  <h2 class="text-xl font-black text-slate-800 leading-tight">ตรวจสอบข้อมูลส่วนตัว</h2>
-                 <p class="text-slate-500 text-sm mt-0.5">ท่านสามารถแก้ไขชื่อและอีเมลให้ถูกต้องก่อนรับเกียรติบัตรได้</p>
+                 <p class="text-slate-500 text-sm mt-0.5">แก้ไขชื่อและอีเมลให้ถูกต้องก่อนรับเกียรติบัตร</p>
               </div>
            </div>
 
@@ -461,7 +236,7 @@
            </div>
         </div>
 
-        <!-- STEP 3: ข้อมูลทั่วไป -->
+        <!-- STEP 3: ข้อมูลเบื้องต้น -->
         <div id="step3" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
               <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 shrink-0">
@@ -513,10 +288,8 @@
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label text-blue-600 mb-4">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์จากช่องทางใด <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(ตอบได้มากกว่า 1)</span><span class="req">*</span></label>
-             <div id="channelGroup" class="flex flex-col gap-2">
-                <!-- Checkboxes generated via JS -->
-             </div>
+             <label class="input-label text-blue-600 mb-4">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์จากช่องทางใด (ตอบได้มากกว่า 1)<span class="req">*</span></label>
+             <div id="channelGroup" class="flex flex-col gap-2"></div>
            </div>
 
            <div class="flex gap-3">
@@ -528,7 +301,7 @@
            </div>
         </div>
 
-        <!-- STEP 4: ความพึงพอใจ (Star Rating) -->
+        <!-- STEP 4: ความพึงพอใจ -->
         <div id="step4" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center justify-between">
               <div class="flex items-center gap-4">
@@ -542,9 +315,7 @@
               </div>
            </div>
 
-           <div class="space-y-6 mb-8" id="ratingContainer">
-              <!-- Rating Stars generated via JS -->
-           </div>
+           <div class="space-y-6 mb-8" id="ratingContainer"></div>
 
            <div class="flex gap-3">
              <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 border border-slate-200">กลับ</button>
@@ -597,8 +368,8 @@
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label text-blue-600 mb-3">ข้อเสนอแนะเพิ่มเติม <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน)</span></label>
-             <textarea id="feedback" rows="4" class="input-field" placeholder="พิมพ์ข้อความ..."></textarea>
+             <label class="input-label text-blue-600 mb-3">ข้อเสนอแนะเพิ่มเติม <span class="text-xs text-slate-500 font-normal ml-1 bg-slate-100 px-2 py-1 rounded">(บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง)</span><span class="req">*</span></label>
+             <textarea id="feedback" rows="4" class="input-field" placeholder="พิมพ์ข้อความ (หากไม่มีให้พิมพ์ 'ไม่มี')..."></textarea>
            </div>
 
            <div class="flex gap-3">
@@ -647,12 +418,12 @@
             </div>
          </div>
 
-         <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-left mb-6 flex items-start gap-3 max-w-lg mx-auto">
+         <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-left flex items-start gap-3 max-w-lg mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-rose-500 shrink-0 mt-0.5"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
             <div>
                <p class="text-rose-800 font-bold text-sm mb-1">พบปัญหาชื่อ-สกุลผิด?</p>
                <p class="text-rose-600 text-xs leading-relaxed">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเราเพื่อแก้ไข</p>
-               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
+               <a id="reportIssueBtn" href="#" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
                   แจ้งปัญหา
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
                </a>
@@ -666,26 +437,23 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ Web App 
+    // ⚠️ ลิงก์ Web App
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
     
     let allAttendees = [];
     let currentData = {}; 
-
     const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
-    
     const channels = [
-      "ภายในกิจกรรม CRA The Tutor 2026 นี้","ภกิจกรรม CRA Open House", "กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา",
-      "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)", "กิจกรรม CRA Press Tour",
+      "ภายในกิจกรรม CRA The Tutor 2026: Portfolio Level Up  นี้","กิจกรรม DEK-D’s TCAS Fair ไบเทค บางนา","กิจกรรม CRA Press Tour นี้",
+      "กิจกรรม CRA Roadshow (ที่โรงเรียนของท่าน)", "กิจกรรม CRA Open House",
       "สื่อสังคมออนไลน์ Education CRA และสื่อราชวิทยาลัยจุฬาภรณ์",
       "สื่อเพจต่าง ๆ ของหลักสูตร ภายในราชวิทยาลัยจุฬาภรณ์", "เว็บไซต์ของราชวิทยาลัยจุฬาภรณ์",
       "เว็บไซต์ข่าว/หนังสือพิมพ์ / วารสาร / โบว์ชัวร์", "โทรทัศน์และวิทยุ",
       "เพื่อน/คนรู้จัก/ครอบครัว/ครูที่โรงเรียน"
     ];
 
-    // คำถามแบบเต็ม ไม่ย่อ
     const ratingQuestions = [
-      { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
+      { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม CRA The Tutor 2026: Portfolio Level Up ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
       { id: "q_reg", title: "ท่านให้คะแนนความสะดวกในการลงทะเบียนเข้าร่วมระดับใด" },
       { id: "q_time", title: "ช่วงเวลาในการจัดกิจกรรม ท่านพึงพอใจในระดับใด" },
       { id: "q_location", title: "ท่านพึงพอใจสถานที่จัดงานระดับใด" },
@@ -694,16 +462,10 @@
       { id: "q_base", title: "กิจกรรมฐานกิจกรรมประจำหลักสูตร", dynamicSuffix: true, suffixText: " ได้ความรู้มากขึ้นระดับใด" },
       { id: "q_future", title: "กิจกรรมบรรยายพิเศษ “มุมมองการศึกษาและอนาคต” โดย พี่ท็อป วิทยากรจากเพจ เรียนต่อไหนดี! ท่านพึงพอใจในระดับใด" },
       { id: "q_qa", title: "กิจกรรม Q&A พูดคุยกับรุ่นพี่ทุกหลักสูตร “เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์ให้โดนใจกรรมการ” ท่านพึงพอใจระดับใด" },
-      { id: "q_overall", title: "ให้คะแนนภาพรวมของกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2 ท่านพึงพอใจระดับใด" }
+      { id: "q_overall", title: "ให้คะแนนภาพรวมของกิจกรรม CRA The Tutor 2026: Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2 ท่านพึงพอใจระดับใด" }
     ];
 
-    const starDesc = {
-        5: "มากที่สุด",
-        4: "มาก",
-        3: "ปานกลาง",
-        2: "น้อย",
-        1: "น้อยที่สุด"
-    };
+    const starDesc = { 5: "มากที่สุด", 4: "มาก", 3: "ปานกลาง", 2: "น้อย", 1: "น้อยที่สุด" };
 
     window.onload = () => {
        fetch(SCRIPT_URL + "?action=getRegisteredList")
@@ -743,7 +505,6 @@
              e.stopPropagation();
              const val = opt.getAttribute('data-value');
              hiddenInput.value = val; 
-             // อัปเดตให้แสดงแค่ตัวย่อ หลังจากเลือก
              displayText.innerText = val; 
              
              options.forEach(o => o.classList.remove('selected'));
@@ -755,9 +516,7 @@
        });
 
        document.addEventListener('click', (e) => {
-          if(!e.target.closest('#customCourseSelect')) {
-             container.classList.remove('open');
-          }
+          if(!e.target.closest('#customCourseSelect')) container.classList.remove('open');
        });
     }
 
@@ -801,7 +560,6 @@
               <div class="radio" id="starGroup_${q.id}">
           `;
 
-          // สร้างดาว 5 ดวง เรียงจาก 5 ไป 1
           for(let i=5; i>=1; i--) {
              html += `
                 <input type="radio" name="${q.id}" id="${q.id}_${i}" value="${i}" onchange="updateStarDesc('${q.id}', ${i})">
@@ -826,7 +584,6 @@
         descEl.style.color = '#f59e0b';
     }
 
-    // UI Helpers
     function toggleCheckCard(el) { 
         const c = el.querySelector('input[type="checkbox"]'); 
         c.checked = !c.checked; 
@@ -853,7 +610,6 @@
     function applyEmail(full) { document.getElementById('editEmail').value = full; document.getElementById('emailDropdown').style.display = 'none'; }
     function formatEmail(el) { el.value = el.value.replace(/[^a-zA-Z0-9@._-]/g, ''); }
 
-    // Step Navigation
     function updateProgress(s) { document.getElementById('progressBar').style.width = (s * 25) + '%'; }
     function showStep(s) {
        document.querySelectorAll('.step-section').forEach(el => { el.classList.remove('visible'); setTimeout(()=>{el.style.display='none';}, 400); });
@@ -870,20 +626,25 @@
     
     function nextStep(target) {
        if(target === 3) {
-          if(!document.getElementById('editName').value || !document.getElementById('editEmail').value) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อและอีเมล', 'warning');
+          if(!document.getElementById('editName').value.trim() || !document.getElementById('editEmail').value.trim()) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อและอีเมล', 'warning');
        }
        if(target === 4) {
           if(!document.querySelector('input[name="round"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกรอบการรับสมัคร', 'warning');
           if(!document.querySelector('input[name="knewBefore"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกว่ารู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่', 'warning');
-          if(document.querySelectorAll('input[name="channels"]:checked').length === 0 && !document.getElementById('chkOther').checked) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่องทางที่รู้จักอย่างน้อย 1 ข้อ', 'warning');
+          
+          let hasChannel = false;
+          if(document.querySelectorAll('input[name="channels"]:checked').length > 0) hasChannel = true;
+          if(document.getElementById('chkOther') && document.getElementById('chkOther').checked && document.getElementById('otherInput').value.trim() !== '') hasChannel = true;
+          if(!hasChannel) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่องทางที่รู้จักอย่างน้อย 1 ข้อ (หากเลือกอื่นๆ โปรดระบุ)', 'warning');
        }
        if(target === 5) {
           let allAnswered = true;
           ratingQuestions.forEach(q => { if(!document.querySelector(`input[name="${q.id}"]:checked`)) allAnswered = false; });
-          if(!allAnswered) return Swal.fire('ให้คะแนนไม่ครบ', 'กรุณากดให้คะแนนดาวให้ครบทุกข้อ', 'warning');
+          if(!allAnswered) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากดให้คะแนนดาวให้ครบทุกข้อ', 'warning');
        }
        showStep(target);
     }
+    
     function prevStep(target) { showStep(target); }
 
     function toggleSearchMode() {
@@ -952,6 +713,7 @@
     function submitEvaluation() {
        if(!document.querySelector('input[name="recommend"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุว่าจะแนะนำกิจกรรมนี้หรือไม่', 'warning');
        if(!document.querySelector('input[name="openhouse"]:checked')) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุความสนใจงาน Open House', 'warning');
+       if(document.getElementById('feedback').value.trim() === '') return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ข้อเสนอแนะเพิ่มเติม (หากไม่มีให้พิมพ์ว่า "ไม่มี")', 'warning');
 
        let selectedCh = Array.from(document.querySelectorAll('input[name="channels"]:checked')).map(n => n.value);
        if(document.getElementById('chkOther').checked) selectedCh.push("อื่นๆ: " + document.getElementById('otherInput').value);
@@ -970,7 +732,6 @@
           feedback: document.getElementById('feedback').value,
        };
 
-       // เก็บค่าดาว (เลข 1-5)
        ratingQuestions.forEach(q => { payload[q.id] = document.querySelector(`input[name="${q.id}"]:checked`).value; });
        currentData = payload; 
 
@@ -983,7 +744,6 @@
          .then(r => r.json())
          .then(res => {
             if(res.status === 'success') {
-               // ✅ ปิดฟอร์มหน้าเดิม และเปิดหน้า Success
                document.getElementById('evalForm').style.display = 'none';
                if(document.getElementById('progressContainer')) {
                   document.getElementById('progressContainer').style.display = 'none';
@@ -1010,7 +770,6 @@
                   emailBtn.classList.remove('hidden');
                   emailBtn.classList.add('flex');
 
-                  // ✅ สกัด File ID เพื่อดึงรูปพรีวิวแบบคมชัด
                   let fileId = "";
                   const match = res.certUrl.match(/[-\w]{25,}/);
                   if (match) fileId = match[0];
@@ -1034,6 +793,12 @@
                   certFallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-3 drop-shadow"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg><p class="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-2 rounded-lg inline-block">ไม่พบไฟล์เกียรติบัตรของท่านในระบบ<br><span class="text-xs font-medium text-slate-500 mt-1 block">กรุณากดปุ่มแจ้งปัญหาด้านล่างเพื่อติดต่อทีมงาน</span></p>';
                   certFallback.style.display = 'block';
                }
+
+               // อัปเดตลิงก์อีเมลแจ้งปัญหาให้มี ID และชื่อ อัตโนมัติ
+               const mailSubject = encodeURIComponent(`แจ้งปัญหาเกียรติบัตรผิดพลาด - ID: ${currentData.id}`);
+               const mailBody = encodeURIComponent(`สวัสดีครับ/ค่ะ ทีมงาน CRA Education\n\nพบปัญหาบนเกียรติบัตรครับ/ค่ะ\nรหัสประจำตัว (ID): ${currentData.id}\nชื่อ-นามสกุล: ${currentData.name}\n\nรายละเอียดปัญหา:\n(โปรดระบุปัญหาที่พบ...)\n`);
+               document.getElementById('reportIssueBtn').href = `mailto:craopenhouse@gmail.com?subject=${mailSubject}&body=${mailBody}`;
+
             } else {
                Swal.fire('ข้อผิดพลาด', res.message || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
                btn.disabled = false; btn.innerHTML = originalContent;
