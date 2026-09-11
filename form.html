@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
   
   <style>
     body { font-family: 'Noto Sans Thai', sans-serif; overflow-x: hidden; background-color: #f8fafc; }
@@ -19,8 +18,8 @@
     
     /* Inputs */
     .input-wrapper { margin-bottom: 1.5rem; position: relative; }
-    .input-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; line-height: 1.4; }
-    .req { color: #ef4444; }
+    .input-label { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; line-height: 1.5; }
+    .req { color: #ef4444; margin-left: 2px; }
     .input-field { width: 100%; padding: 1.125rem 1.25rem; border-radius: 1rem; border: 2px solid #e2e8f0; background: #ffffff; outline: none; transition: all 0.25s ease; font-weight: 600; color: #0f172a; font-size: 1rem; }
     .input-field:focus { border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
     .input-field:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
@@ -32,29 +31,33 @@
     .check-box-ui { width: 1.5rem; height: 1.5rem; border: 2px solid #cbd5e1; border-radius: 0.4rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: white; flex-shrink: 0; margin-top: 2px; }
     .radio-box-ui { border-radius: 50%; }
     .check-card.checked .check-box-ui, .check-card.checked .radio-box-ui { background: #3b82f6; border-color: #3b82f6; }
-    .check-card.checked .check-box-ui i { opacity: 1; color: white; font-size: 0.8rem; }
+    
+    /* SVG Icons for check/radio */
+    .check-icon-svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.2s; }
+    .check-card.checked .check-icon-svg { opacity: 1; }
     .check-card.checked .radio-box-ui::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block; }
-    .check-box-ui i { opacity: 0; }
 
     /* Likert Scale (5-Star Rating Alternative) */
     .rating-group { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
-    .rating-item { flex: 1; min-width: 45px; text-align: center; }
+    .rating-item { flex: 1; min-width: 55px; text-align: center; }
     .rating-item input { display: none; }
     .rating-label { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.25rem; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s; height: 100%; }
     .rating-label span.num { font-size: 1.25rem; font-weight: 800; color: #64748b; margin-bottom: 0.25rem; }
-    .rating-label span.text { font-size: 0.7rem; font-weight: 700; color: #94a3b8; line-height: 1.1; }
+    .rating-label span.text { font-size: 0.7rem; font-weight: 700; color: #94a3b8; line-height: 1.2; }
     .rating-label:hover { background: #f8fafc; border-color: #cbd5e1; }
     .rating-item input:checked + .rating-label { background: #3b82f6; border-color: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3); }
     .rating-item input:checked + .rating-label span { color: #ffffff; }
 
     /* Autocomplete */
     .autocomplete-dropdown { position: absolute; z-index: 50; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); margin-top: 8px; }
-    .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; }
+    .autocomplete-dropdown li { padding: 1rem 1.25rem; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #334155; font-weight: 500; display: flex; align-items: center; justify-content: space-between; }
     .autocomplete-dropdown li:hover { background-color: #f1f5f9; color: #0f172a; padding-left: 1.5rem; }
 
     .btn-primary { background: #0f172a; color: white; transition: all 0.3s ease; }
     .btn-primary:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    svg.icon { width: 1.25rem; height: 1.25rem; fill: currentColor; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-20">
@@ -89,7 +92,10 @@
         <div id="step1" class="step-section active visible">
            <div class="text-center mb-8">
               <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500">
-                 <i class="fi fi-sr-id-badge text-3xl"></i>
+                 <!-- Inline SVG: Identification Badge -->
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                   <path fill-rule="evenodd" d="M3 4.5A1.5 1.5 0 014.5 3h15A1.5 1.5 0 0121 4.5v15a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 19.5v-15zM12 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zM6 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2H6v-2z" clip-rule="evenodd" />
+                 </svg>
               </div>
               <h2 class="text-2xl font-black text-slate-800">ค้นหาข้อมูลผู้เข้าร่วม</h2>
               <p class="text-slate-500 text-sm mt-2">ระบุรหัสประจำตัว หรือ ค้นหาด้วยชื่อของท่าน</p>
@@ -99,7 +105,7 @@
            <div id="mode-id">
              <div class="flex gap-2 w-full mb-4">
                 <div class="w-2/5">
-                  <select id="searchCourse" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-4 pr-8 text-lg font-black text-slate-700 outline-none focus:border-blue-500 transition-all text-center">
+                  <select id="searchCourse" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-4 pr-8 text-lg font-black text-slate-700 outline-none focus:border-blue-500 transition-all text-center appearance-none">
                     <option value="MD">MD</option>
                     <option value="HDS">HDS</option>
                     <option value="BNS">BNS</option>
@@ -113,11 +119,13 @@
                 </div>
                 <div class="w-3/5 relative">
                   <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-2xl">-</span>
-                  <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01">
+                  <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
                 </div>
              </div>
              <button type="button" onclick="verifyById()" id="btnVerifyId" class="w-full btn-primary py-4 rounded-xl font-bold text-lg mb-4 flex items-center justify-center gap-2">
-                ตรวจสอบข้อมูล <i class="fi fi-sr-search"></i>
+                ตรวจสอบข้อมูล 
+                <!-- Search Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg>
              </button>
              <button type="button" onclick="toggleSearchMode()" class="w-full text-slate-500 font-bold hover:text-blue-500 transition-colors text-sm py-2">
                 ลืมรหัสประจำตัว? (ค้นหาด้วยชื่อ)
@@ -127,7 +135,8 @@
            <!-- โหมดค้นหาด้วยชื่อ -->
            <div id="mode-name" class="hidden">
              <div class="input-wrapper relative">
-                <i class="fi fi-sr-search absolute left-4 top-[1.2rem] text-slate-400"></i>
+                <!-- Search Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 absolute left-4 top-[1.2rem] text-slate-400"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg>
                 <input type="text" id="searchName" oninput="searchByName(this.value)" class="input-field pl-12" placeholder="พิมพ์ชื่อเพื่อค้นหา...">
                 <ul id="nameDropdown" class="autocomplete-dropdown"></ul>
              </div>
@@ -140,7 +149,10 @@
         <!-- STEP 2: ตรวจสอบและแก้ไขข้อมูลส่วนตัว -->
         <div id="step2" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
-              <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shrink-0"><i class="fi fi-sr-user-check text-xl"></i></div>
+              <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shrink-0">
+                 <!-- User Check SVG -->
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path d="M11 14.5c0-1.66 2.686-3 6-3s6 1.34 6 3v2h-12v-2z" /><path d="M17 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /><path fill-rule="evenodd" d="M10.2 4.414l-2.5 2.5a.75.75 0 01-1.06 0l-1.5-1.5a.75.75 0 011.06-1.06l.97.97 1.97-1.97a.75.75 0 111.06 1.06z" clip-rule="evenodd" /></svg>
+              </div>
               <div>
                  <h2 class="text-xl font-black text-slate-800 leading-tight">ตรวจสอบข้อมูลส่วนตัว</h2>
                  <p class="text-slate-500 text-sm mt-0.5">ท่านสามารถแก้ไขชื่อและอีเมลให้ถูกต้องก่อนรับเกียรติบัตรได้</p>
@@ -152,7 +164,8 @@
                  <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">รหัส & หลักสูตร</p>
                  <div class="font-black text-blue-700 text-xl" id="displayIdCourse">--</div>
               </div>
-              <i class="fi fi-sr-check-circle text-3xl text-blue-300"></i>
+              <!-- Check Circle -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-blue-300"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
            </div>
 
            <input type="hidden" id="sysId">
@@ -171,14 +184,21 @@
 
            <div class="flex gap-3">
              <button type="button" onclick="resetSearch()" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">ไม่ใช่ฉัน</button>
-             <button type="button" onclick="nextStep(3)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold">ข้อมูลถูกต้อง ถัดไป <i class="fi fi-sr-arrow-right ml-1"></i></button>
+             <button type="button" onclick="nextStep(3)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                ข้อมูลถูกต้อง ถัดไป
+                <!-- Arrow Right -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
+             </button>
            </div>
         </div>
 
         <!-- STEP 3: ข้อมูลทั่วไป -->
         <div id="step3" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
-              <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 shrink-0"><i class="fi fi-sr-info text-xl"></i></div>
+              <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 shrink-0">
+                 <!-- Info SVG -->
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.732l-1.162 3.939l-1.021 3.426a.75.75 0 01-1.44-.39l1.022-3.426l1.162-3.94c.14-.473-.34-.91-.81-.675l-1.52.76a.75.75 0 01-.67-1.343l1.52-.76zm.526-4.52a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z" clip-rule="evenodd" /></svg>
+              </div>
               <div><h2 class="text-xl font-black text-slate-800">ข้อมูลความสนใจเบื้องต้น</h2></div>
            </div>
 
@@ -225,7 +245,7 @@
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">ท่านรู้จักจากช่องทางใด (ตอบได้มากกว่า 1 ข้อ)<span class="req">*</span></label>
+             <label class="input-label">ท่านรู้จักราชวิทยาลัยจุฬาภรณ์จากช่องทางใด (ตอบได้มากกว่า 1 ข้อ)<span class="req">*</span></label>
              <div id="channelGroup" class="flex flex-col gap-2">
                 <!-- Checkboxes generated via JS -->
              </div>
@@ -233,7 +253,11 @@
 
            <div class="flex gap-3">
              <button type="button" onclick="prevStep(2)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
-             <button type="button" onclick="nextStep(4)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold">ถัดไป <i class="fi fi-sr-arrow-right ml-1"></i></button>
+             <button type="button" onclick="nextStep(4)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex justify-center items-center gap-2">
+                ถัดไป
+                <!-- Arrow -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
+             </button>
            </div>
         </div>
 
@@ -241,7 +265,10 @@
         <div id="step4" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center justify-between">
               <div class="flex items-center gap-4">
-                 <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 shrink-0"><i class="fi fi-sr-star text-xl"></i></div>
+                 <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 shrink-0">
+                    <!-- Star SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+                 </div>
                  <div>
                     <h2 class="text-xl font-black text-slate-800">ประเมินความพึงพอใจ</h2>
                     <p class="text-slate-500 text-xs mt-0.5">5 = มากที่สุด, 1 = น้อยที่สุด</p>
@@ -255,19 +282,25 @@
 
            <div class="flex gap-3">
              <button type="button" onclick="prevStep(3)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
-             <button type="button" onclick="nextStep(5)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold">ถัดไป <i class="fi fi-sr-arrow-right ml-1"></i></button>
+             <button type="button" onclick="nextStep(5)" class="w-2/3 btn-primary py-3.5 rounded-xl font-bold flex justify-center items-center gap-2">
+                ถัดไป
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
+             </button>
            </div>
         </div>
 
         <!-- STEP 5: เสนอแนะ & ยืนยัน -->
         <div id="step5" class="step-section">
            <div class="mb-6 pb-6 border-b border-slate-100 flex items-center gap-4">
-              <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 shrink-0"><i class="fi fi-sr-comment-alt-heart text-xl mt-1"></i></div>
+              <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 shrink-0">
+                 <!-- Comment Heart SVG -->
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path fill-rule="evenodd" d="M4.804 21.644A6.707 6.707 0 006 21.75a6.721 6.721 0 003.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 01-.814 1.686.75.75 0 00.44 1.223zM8.25 10.875a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zM10.875 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" clip-rule="evenodd" /></svg>
+              </div>
               <div><h2 class="text-xl font-black text-slate-800">ความคิดเห็นเพิ่มเติม</h2></div>
            </div>
 
            <div class="input-wrapper mb-6">
-             <label class="input-label">หากปีถัดไปมีจัดกิจกรรมนี้อีก ท่านจะแนะนำคนรู้จักหรือไม่<span class="req">*</span></label>
+             <label class="input-label">หากราชวิทยาลัยจุฬาภรณ์จัดกิจกรรม CRA The Tutor อีกในปีถัดไป ท่านจะแนะนำคนรู้จักมาเข้าร่วมหรือไม่<span class="req">*</span></label>
              <div class="flex gap-3">
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'recommend')">
                  <div class="check-box-ui radio-box-ui"></div>
@@ -283,7 +316,7 @@
            </div>
 
            <div class="input-wrapper mb-6">
-             <label class="input-label">ท่านสนใจเข้าร่วม CRA Open House 2027 (10 ต.ค. 69) หรือไม่<span class="req">*</span></label>
+             <label class="input-label">ราชวิทยาลัยจุฬาภรณ์จะจัดกิจกรรมแนะแนวการศึกษา CRA Open House 2027 ในวันเสาร์ที่ 10 ตุลาคม 2569 ท่านสนใจเข้าร่วมหรือไม่<span class="req">*</span></label>
              <div class="flex gap-3">
                <label class="check-card flex-1" onclick="toggleRadioCard(this, 'openhouse')">
                  <div class="check-box-ui radio-box-ui"></div>
@@ -299,14 +332,16 @@
            </div>
 
            <div class="input-wrapper mb-8">
-             <label class="input-label">ข้อเสนอแนะเพิ่มเติม (บอกเราหน่อยว่ากิจกรรมเป็นอย่างไรบ้าง)</label>
+             <label class="input-label">ข้อเสนอแนะเพิ่มเติม (บอกเราหน่อยกิจกรรมวันนี้เป็นยังไงบ้าง หรือให้กำลังใจทีมงาน)</label>
              <textarea id="feedback" rows="4" class="input-field" placeholder="พิมพ์ข้อความ..."></textarea>
            </div>
 
            <div class="flex gap-3">
              <button type="button" onclick="prevStep(4)" class="w-1/3 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200">กลับ</button>
              <button type="button" id="submitBtn" onclick="submitEvaluation()" class="w-2/3 bg-blue-600 text-white py-3.5 rounded-xl font-black hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
-                ส่งแบบสอบถาม <i class="fi fi-sr-paper-plane mt-1"></i>
+                ส่งแบบสอบถาม
+                <!-- Paper plane SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
              </button>
            </div>
         </div>
@@ -316,7 +351,8 @@
       <div id="successView" class="step-section text-center py-4">
          <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 relative">
             <div class="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
-            <i class="fi fi-sr-check-circle text-4xl text-emerald-500 mt-1"></i>
+            <!-- Success SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-emerald-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
          </div>
          <h2 class="text-3xl font-black text-slate-800 mb-2">บันทึกสำเร็จ!</h2>
          <p class="text-slate-500 mb-8 font-medium">ระบบได้บันทึกข้อมูลและเตรียมเกียรติบัตรให้ท่านแล้ว</p>
@@ -324,36 +360,42 @@
          <div class="bg-slate-800 p-6 rounded-3xl text-left border border-slate-700 shadow-xl relative overflow-hidden mb-8">
             <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
             <h3 class="text-white font-black text-xl mb-4 flex items-center gap-2">
-               <i class="fi fi-sr-diploma text-blue-400"></i> E-Certificate
+               <!-- Diploma SVG -->
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-blue-400"><path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.15.085-.15-.085a49.949 49.949 0 00-9.902-3.912.75.75 0 01-.231-1.337A60.653 60.653 0 0111.7 2.805z" /><path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.251 4.284a.75.75 0 01-.46.711 47.87 47.87 0 00-8.105 4.342.75.75 0 01-.832 0 47.87 47.87 0 00-8.104-4.342.75.75 0 01-.461-.71c.032-1.44.117-2.87.251-4.284a48.5 48.5 0 017.666 3.281.75.75 0 00.15.085 49.954 49.954 0 011.83 1.059v-1.124a.75.75 0 00-.361-.643z" /></svg>
+               E-Certificate
             </h3>
             
             <div id="certPreview" class="w-full bg-white rounded-xl aspect-[1.414/1] mb-4 flex items-center justify-center overflow-hidden border-4 border-slate-600 relative group">
                <!-- แสดงรูปตัวอย่าง ถ้ามี -->
-               <img id="certImg" src="" alt="Certificate Preview" class="w-full h-full object-cover hidden">
+               <img id="certImg" src="" alt="Certificate Preview" class="w-full h-full object-contain hidden">
                <!-- กรณีดึงภาพไม่ได้ ให้ขึ้นปุ่มแทน -->
                <div id="certFallback" class="text-center p-4">
-                  <i class="fi fi-sr-document text-5xl text-slate-300 mb-2"></i>
+                  <!-- Document SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-slate-300 mx-auto mb-2"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z" /><path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" /></svg>
                   <p class="text-slate-400 font-bold text-sm">เกียรติบัตรพร้อมดาวน์โหลด</p>
                </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 relative z-10">
                <a id="downloadCertBtn" href="#" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-center no-underline">
-                  <i class="fi fi-sr-cloud-download-alt"></i> เปิดไฟล์ดาวน์โหลด
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clip-rule="evenodd" /></svg>
+                  เปิดไฟล์ดาวน์โหลด
                </a>
                <button id="emailCertBtn" onclick="sendCertToEmail()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition">
-                  <i class="fi fi-sr-envelope"></i> ส่งเข้าอีเมล
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" /><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" /></svg>
+                  ส่งเข้าอีเมล
                </button>
             </div>
          </div>
 
          <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl text-left mb-6 flex items-start gap-3">
-            <i class="fi fi-sr-engine-warning text-rose-500 mt-1 text-xl"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-rose-500 shrink-0 mt-0.5"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
             <div>
                <p class="text-rose-800 font-bold text-sm mb-1">พบปัญหาชื่อ-สกุลผิด?</p>
                <p class="text-rose-600 text-xs">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเราเพื่อแก้ไข</p>
-               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-block mt-2 bg-white border border-rose-200 text-rose-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition no-underline">
-                  แจ้งปัญหา <i class="fi fi-sr-envelope-open text-[10px]"></i>
+               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-2 bg-white border border-rose-200 text-rose-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50 transition no-underline">
+                  แจ้งปัญหา
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
                </a>
             </div>
          </div>
@@ -369,7 +411,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
     
     let allAttendees = [];
-    let currentData = {}; // เก็บข้อมูล Form ชั่วคราว
+    let currentData = {}; 
 
     const domains = ['@gmail.com', '@hotmail.com', '@yahoo.com', '@outlook.com'];
     
@@ -382,17 +424,18 @@
       "เพื่อน/คนรู้จัก/ครอบครัว/ครูที่โรงเรียน"
     ];
 
+    // คำถามแบบเต็ม ไม่ย่อ
     const ratingQuestions = [
-      { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
-      { id: "q_reg", title: "ความสะดวกในการลงทะเบียนเข้าร่วม" },
-      { id: "q_time", title: "ช่วงเวลาในการจัดกิจกรรม" },
-      { id: "q_location", title: "สถานที่จัดงาน" },
+      { id: "q_study", title: "หลังจากเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up ท่านรู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้นระดับใด" },
+      { id: "q_reg", title: "ท่านให้คะแนนความสะดวกในการลงทะเบียนเข้าร่วมระดับใด" },
+      { id: "q_time", title: "ช่วงเวลาในการจัดกิจกรรม ท่านพึงพอใจในระดับใด" },
+      { id: "q_location", title: "ท่านพึงพอใจสถานที่จัดงานระดับใด" },
       { id: "q_courseInt", title: "หลังจากเข้าร่วมกิจกรรมทำให้ท่านสนใจหลักสูตรมากขึ้นระดับใด" },
-      { id: "q_tcas", title: "กิจกรรมบรรยายพิเศษหัวข้อ “เจาะลึก TCAS 70” โดย พี่ลาเต้" },
-      { id: "q_base", title: "กิจกรรมฐานกิจกรรมประจำหลักสูตร", dynamicSuffix: true }, // เติมชื่อหลักสูตรทีหลัง
-      { id: "q_future", title: "กิจกรรมบรรยายพิเศษ “มุมมองการศึกษาและอนาคต” โดย พี่ท็อป" },
-      { id: "q_qa", title: "กิจกรรม Q&A “เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์”" },
-      { id: "q_overall", title: "ภาพรวมของกิจกรรม CRA The Tutor" }
+      { id: "q_tcas", title: "กิจกรรมบรรยายพิเศษหัวข้อ “เจาะลึก TCAS 70” โดย พี่ลาเต้ วิทยากรจาก Dek-D.com ท่านพึงพอใจในระดับใด" },
+      { id: "q_base", title: "กิจกรรมฐานกิจกรรมประจำหลักสูตร", dynamicSuffix: true, suffixText: " ได้ความรู้มากขึ้นระดับใด" },
+      { id: "q_future", title: "กิจกรรมบรรยายพิเศษ “มุมมองการศึกษาและอนาคต” โดย พี่ท็อป วิทยากรจากเพจ เรียนต่อไหนดี! ท่านพึงพอใจในระดับใด" },
+      { id: "q_qa", title: "กิจกรรม Q&A พูดคุยกับรุ่นพี่ทุกหลักสูตร “เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์ให้โดนใจกรรมการ” ท่านพึงพอใจระดับใด" },
+      { id: "q_overall", title: "ให้คะแนนภาพรวมของกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2 ท่านพึงพอใจระดับใด" }
     ];
 
     // โหลดข้อมูลรายชื่อตั้งต้น
@@ -410,7 +453,7 @@
        emailInput.addEventListener('input', (e) => {
           const val = e.target.value.trim();
           if(val.includes('@') || val.length < 1) { emailDrop.style.display = 'none'; return; }
-          emailDrop.innerHTML = domains.map(d => `<li onclick="applyEmail('${val}${d}')"><i class="fi fi-sr-at text-slate-400 mr-2"></i> ${val}<b class="text-blue-500">${d}</b></li>`).join('');
+          emailDrop.innerHTML = domains.map(d => `<li onclick="applyEmail('${val}${d}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-slate-400 mr-2"><path d="M3 4a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H3zm8 15a7 7 0 110-14 7 7 0 010 14z" /></svg> ${val}<b class="text-blue-500">${d}</b></li>`).join('');
           emailDrop.style.display = 'block';
        });
        document.addEventListener('click', (e) => { if(e.target.id !== 'editEmail') emailDrop.style.display = 'none'; });
@@ -421,7 +464,7 @@
        channels.forEach(ch => {
           group.innerHTML += `
             <label class="check-card" onclick="toggleCheckCard(this)">
-              <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
+              <div class="check-box-ui"><svg viewBox="0 0 24 24" class="check-icon-svg"><path d="M5 13l4 4L19 7"/></svg></div>
               <input type="checkbox" name="channels" value="${ch}" class="hidden">
               <span class="font-bold text-slate-700 text-sm leading-tight">${ch}</span>
             </label>
@@ -429,7 +472,7 @@
        });
        group.innerHTML += `
          <label class="check-card" onclick="toggleCheckCard(this); toggleOtherChannel();">
-            <div class="check-box-ui"><i class="fi fi-sr-check"></i></div>
+            <div class="check-box-ui"><svg viewBox="0 0 24 24" class="check-icon-svg"><path d="M5 13l4 4L19 7"/></svg></div>
             <input type="checkbox" id="chkOther" class="hidden">
             <span class="font-bold text-slate-700 text-sm">อื่นๆ (โปรดระบุ)</span>
          </label>
@@ -444,18 +487,19 @@
        container.innerHTML = '';
        ratingQuestions.forEach((q, index) => {
           let title = q.title;
-          if (q.dynamicSuffix && courseName) title += ` (${courseName})`;
+          if (q.dynamicSuffix && courseName) title += ` (${courseName}) ${q.suffixText}`;
           
           let html = `
             <div class="mb-6">
-              <label class="input-label mb-3"><span class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full inline-flex items-center justify-center text-xs mr-2">${index+1}</span> ${title}<span class="req">*</span></label>
+              <label class="input-label mb-3"><span class="bg-blue-100 text-blue-600 min-w-[24px] h-6 rounded-full inline-flex items-center justify-center text-xs mr-2 mt-0.5 flex-shrink-0">${index+1}</span> <span>${title}<span class="req">*</span></span></label>
               <div class="rating-group">
           `;
           for(let i=5; i>=1; i--) {
              let labelText = ["น้อยที่สุด", "น้อย", "ปานกลาง", "มาก", "มากที่สุด"][i-1];
+             // บันทึกค่า (value) เป็นตัวเลข 5, 4, 3, 2, 1
              html += `
                 <div class="rating-item">
-                  <input type="radio" name="${q.id}" id="${q.id}_${i}" value="${labelText}">
+                  <input type="radio" name="${q.id}" id="${q.id}_${i}" value="${i}">
                   <label class="rating-label" for="${q.id}_${i}">
                     <span class="num">${i}</span>
                     <span class="text">${labelText}</span>
@@ -482,7 +526,6 @@
        setTimeout(() => {
           const target = document.getElementById('step' + s);
           target.style.display = 'block';
-          // Trigger reflow
           void target.offsetWidth;
           target.classList.add('visible');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -500,7 +543,6 @@
           if(document.querySelectorAll('input[name="channels"]:checked').length === 0 && !document.getElementById('chkOther').checked) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่องทางที่รู้จักอย่างน้อย 1 ข้อ', 'warning');
        }
        if(target === 5) {
-          // Check if all ratings are answered
           let allAnswered = true;
           ratingQuestions.forEach(q => { if(!document.querySelector(`input[name="${q.id}"]:checked`)) allAnswered = false; });
           if(!allAnswered) return Swal.fire('ให้คะแนนไม่ครบ', 'กรุณาให้คะแนนความพึงพอใจให้ครบทุกข้อ', 'warning');
@@ -533,8 +575,8 @@
        if(query.trim().length < 2) { drop.style.display = 'none'; return; }
        const res = allAttendees.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
        if(res.length > 0) {
-          drop.innerHTML = res.map(a => `<li class="flex justify-between items-center" onclick="selectUser('${a.id}')"><span class="font-bold text-slate-700">${a.name}</span> <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded">${a.id}</span></li>`).join('');
-       } else { drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-2">ไม่พบรายชื่อนี้</li>`; }
+          drop.innerHTML = res.map(a => `<li onclick="selectUser('${a.id}')"><span class="font-bold text-slate-700">${a.name}</span> <span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-1 rounded">${a.id}</span></li>`).join('');
+       } else { drop.innerHTML = `<li class="text-center text-slate-400 font-medium py-2 justify-center">ไม่พบรายชื่อนี้</li>`; }
        drop.style.display = 'block';
     }
 
@@ -558,7 +600,7 @@
              document.getElementById('editName').value = user.name;
              document.getElementById('editEmail').value = user.email || "";
              
-             renderRatings(user.course); // Generate questions with dynamic course name
+             renderRatings(user.course); 
              showStep(2);
           }
        });
@@ -592,46 +634,83 @@
           feedback: document.getElementById('feedback').value,
        };
 
-       // Add all ratings
        ratingQuestions.forEach(q => { payload[q.id] = document.querySelector(`input[name="${q.id}"]:checked`).value; });
-
-       currentData = payload; // Store for email sending later
+       currentData = payload; 
 
        const btn = document.getElementById('submitBtn');
-       btn.disabled = true; btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin mt-1"></i> กำลังบันทึก...';
+       const originalContent = btn.innerHTML;
+       btn.disabled = true; 
+       btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> กำลังบันทึก...';
 
        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
          .then(r => r.json())
          .then(res => {
             if(res.status === 'success') {
-               showStep(5);
-               currentData.certUrl = res.certUrl; // Store link
+               document.getElementById('evalForm').style.display = 'none';
+               if(document.getElementById('progressContainer')) {
+                  document.getElementById('progressContainer').style.display = 'none';
+               }
+               document.querySelectorAll('.step-section').forEach(el => el.classList.remove('visible'));
+
+               const successView = document.getElementById('successView');
+               successView.style.display = 'block';
+               void successView.offsetWidth; 
+               successView.classList.add('visible');
+               window.scrollTo({ top: 0, behavior: 'smooth' });
+
+               currentData.certUrl = res.certUrl;
+
+               const certImg = document.getElementById('certImg');
+               const certFallback = document.getElementById('certFallback');
+               const downloadBtn = document.getElementById('downloadCertBtn');
+               const emailBtn = document.getElementById('emailCertBtn');
+
                if(res.certUrl) {
-                  document.getElementById('downloadCertBtn').href = res.certUrl;
-                  // If it's a direct image, preview it. (Google Drive links need specific format for <img>, so fallback is safer if PDF)
-                  document.getElementById('certFallback').style.display = 'none';
-                  document.getElementById('certImg').src = res.certUrl.replace(/\/view.*$/, '/preview'); // Try to preview
-                  document.getElementById('certImg').classList.remove('hidden');
+                  downloadBtn.href = res.certUrl;
+                  downloadBtn.style.display = 'flex';
+                  emailBtn.style.display = 'flex';
+
+                  let fileId = res.certId || "";
+                  if (!fileId) {
+                     const match = res.certUrl.match(/[-\w]{25,}/);
+                     if (match) fileId = match[0];
+                  }
+
+                  if (fileId) {
+                     certImg.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+                     certImg.onload = () => {
+                        certImg.classList.remove('hidden');
+                        certFallback.style.display = 'none';
+                     };
+                     certImg.onerror = () => {
+                        certImg.classList.add('hidden');
+                        certFallback.style.display = 'block';
+                     };
+                  } else {
+                     certFallback.style.display = 'block';
+                  }
                } else {
-                  document.getElementById('downloadCertBtn').style.display = 'none';
-                  document.getElementById('emailCertBtn').style.display = 'none';
-                  document.getElementById('certFallback').innerHTML = '<i class="fi fi-sr-exclamation text-4xl text-rose-300 mb-2"></i><p class="text-rose-500 font-bold text-sm">ไม่พบไฟล์เกียรติบัตร<br>กรุณาแจ้งแอดมิน</p>';
+                  downloadBtn.style.display = 'none';
+                  emailBtn.style.display = 'none';
+                  certFallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-2"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg><p class="text-amber-600 font-bold text-sm">ไม่พบไฟล์เกียรติบัตรของท่านในระบบ<br><span class="text-xs font-normal text-slate-500">กรุณากดปุ่มแจ้งปัญหาด้านล่างเพื่อติดต่อทีมงาน</span></p>';
+                  certFallback.style.display = 'block';
                }
             } else {
-               Swal.fire('ข้อผิดพลาด', res.message, 'error');
-               btn.disabled = false; btn.innerHTML = 'ส่งแบบสอบถาม <i class="fi fi-sr-paper-plane mt-1"></i>';
+               Swal.fire('ข้อผิดพลาด', res.message || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+               btn.disabled = false; btn.innerHTML = originalContent;
             }
          })
          .catch(err => {
             Swal.fire('การเชื่อมต่อขัดข้อง', 'กรุณาลองใหม่อีกครั้ง', 'error');
-            btn.disabled = false; btn.innerHTML = 'ส่งแบบสอบถาม <i class="fi fi-sr-paper-plane mt-1"></i>';
+            btn.disabled = false; btn.innerHTML = originalContent;
          });
     }
 
     function sendCertToEmail() {
        const btn = document.getElementById('emailCertBtn');
        const originalText = btn.innerHTML;
-       btn.disabled = true; btn.innerHTML = '<i class="fi fi-sr-spinner animate-spin"></i> กำลังส่ง...';
+       btn.disabled = true; 
+       btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> กำลังส่ง...';
 
        fetch(SCRIPT_URL, {
           method: 'POST',
