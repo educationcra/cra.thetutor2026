@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ตรวจสอบเกียรติบัตร | CRA THE TUTOR</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
+    
+    /* Animations */
+    .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Custom Dropdown */
+    .c-select-container { position: relative; width: 100%; user-select: none; }
+    .c-select-trigger { width: 100%; height: 100%; min-height: 4rem; padding: 0 1.25rem; border-radius: 0.75rem; border: 2px solid #e2e8f0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.25s ease; font-weight: 700; color: #0f172a; font-size: 1.1rem; }
+    .c-select-trigger:focus, .c-select-container.open .c-select-trigger { background: #ffffff; border-color: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); }
+    .c-select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.85rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); z-index: 50; max-height: 280px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; }
+    .c-select-container.open .c-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .c-select-option { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; font-weight: 600; color: #334155; cursor: pointer; transition: 0.15s; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
+    .c-select-option:hover { background: #f8fafc; color: #0f172a; padding-left: 1.5rem; }
+    .c-select-option.selected { background: #eff6ff; color: #3b82f6; font-weight: 700; border-left: 4px solid #3b82f6; padding-left: 1rem;}
+
+    .btn-primary { background: #0f172a; color: white; transition: all 0.3s ease; }
+    .btn-primary:hover:not(:disabled) { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+  <!-- Banner -->
+  <div class="bg-[#0f172a] text-white pt-12 pb-24 px-5 relative overflow-hidden shrink-0">
+     <div class="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
+     
+     <!-- ปุ่มกลับหน้าแรก -->
+     <div class="max-w-3xl mx-auto relative z-10 mb-6">
+        <a href="index.html" class="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white font-bold transition-colors no-underline bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 w-fit">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd" /></svg>
+            กลับหน้าหลัก
+        </a>
+     </div>
+
+     <div class="max-w-3xl mx-auto relative z-10 text-center">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold tracking-widest uppercase mb-4 text-blue-400">
+           E-Certificate System
+        </span>
+        <h1 class="text-3xl md:text-4xl font-black leading-tight mb-4 tracking-tight">
+           ระบบตรวจสอบเกียรติบัตร <br>
+           <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">CRA The Tutor</span>
+        </h1>
+        <p class="text-slate-300 font-medium">ระบุรหัสประจำตัวของท่านเพื่อตรวจสอบและดาวน์โหลด</p>
+     </div>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-3xl w-full mx-auto px-5 -mt-12 relative z-20 flex-grow pb-16">
+    <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 p-6 md:p-10 relative min-h-[300px]">
+      
+      <!-- โหลดรายชื่อ -->
+      <div id="initLoading" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-30 rounded-[2rem] flex flex-col items-center justify-center">
+         <svg class="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+         <p class="text-slate-500 font-bold">กำลังเชื่อมต่อฐานข้อมูล...</p>
+      </div>
+
+      <!-- STEP 1: Search Form -->
+      <div id="searchView" class="fade-in hidden">
+         <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800">ค้นหาข้อมูลผู้เข้าร่วม</h2>
+         </div>
+
+         <div class="flex flex-col sm:flex-row gap-3 w-full mb-6 max-w-lg mx-auto">
+            <!-- Dropdown หลักสูตร -->
+            <div class="w-full sm:w-3/5 relative z-40">
+               <div class="c-select-container" id="customCourseSelect">
+                  <div class="c-select-trigger" tabindex="0">
+                     <span id="courseDisplayText" class="truncate">MD</span>
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-400 shrink-0"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                  </div>
+                  <div class="c-select-dropdown text-left">
+                     <div class="c-select-option selected" data-value="MD">MD (แพทยศาสตร์)</div>
+                     <div class="c-select-option" data-value="HDS">HDS (วิทยาศาสตร์ข้อมูลสุขภาพ)</div>
+                     <div class="c-select-option" data-value="BNS">BNS (พยาบาลศาสตร์)</div>
+                     <div class="c-select-option" data-value="RT">RT (รังสีเทคนิค)</div>
+                     <div class="c-select-option" data-value="HKH">HKH (วิทยาศาสตร์การเคลื่อนไหวฯ)</div>
+                     <div class="c-select-option" data-value="PMD">PMD (ฉุกเฉินการแพทย์)</div>
+                     <div class="c-select-option" data-value="INMS">INMS (นวัตกรรมฯ การแพทย์)</div>
+                     <div class="c-select-option" data-value="BME">BME (วิศวกรรมชีวการแพทย์)</div>
+                     <div class="c-select-option" data-value="MHFT">MHFT (เทคโนโลยีอาหารการแพทย์ฯ)</div>
+                  </div>
+               </div>
+               <input type="hidden" id="searchCourse" value="MD">
+            </div>
+            
+            <!-- ช่องกรอกตัวเลข -->
+            <div class="w-full sm:w-2/5 relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-2xl">-</span>
+              <input type="number" id="searchId" min="1" max="99" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2); if(this.value < 0) this.value = Math.abs(this.value);" class="w-full h-full min-h-[4rem] bg-slate-50 border-2 border-slate-200 rounded-xl py-4 pl-10 pr-4 text-2xl font-black text-slate-800 placeholder-slate-300 outline-none focus:border-blue-500 transition-all text-center tracking-widest" placeholder="01" autocomplete="off">
+            </div>
+         </div>
+         
+         <button type="button" onclick="verifyUser()" id="btnSearch" class="w-full max-w-lg mx-auto block btn-primary py-4 rounded-xl font-bold text-lg mb-4 shadow-lg shadow-slate-200">
+            ตรวจสอบเกียรติบัตร
+         </button>
+      </div>
+
+      <!-- STEP 2: Certificate Display (Success View) -->
+      <div id="certView" class="fade-in hidden text-center py-2">
+         <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-emerald-500"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+         </div>
+         <h2 class="text-2xl font-black text-slate-800 mb-1">พบข้อมูลของคุณ</h2>
+         <p class="text-slate-500 mb-6 font-medium" id="displayNameShow">--</p>
+         
+         <div class="bg-slate-800 p-5 sm:p-6 rounded-3xl text-left border border-slate-700 shadow-xl relative overflow-hidden mb-6 max-w-lg mx-auto">
+            <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
+            <h3 class="text-white font-black text-xl mb-4 flex items-center gap-2">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-blue-400"><path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.15.085-.15-.085a49.949 49.949 0 00-9.902-3.912.75.75 0 01-.231-1.337A60.653 60.653 0 0111.7 2.805z" /><path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.251 4.284a.75.75 0 01-.46.711 47.87 47.87 0 00-8.105 4.342.75.75 0 01-.832 0 47.87 47.87 0 00-8.104-4.342.75.75 0 01-.461-.71c.032-1.44.117-2.87.251-4.284a48.5 48.5 0 017.666 3.281.75.75 0 00.15.085 49.954 49.954 0 011.83 1.059v-1.124a.75.75 0 00-.361-.643z" /></svg>
+               E-Certificate
+            </h3>
+            
+            <div id="certPreviewBox" class="w-full bg-white rounded-xl aspect-[1.414/1] mb-5 flex items-center justify-center overflow-hidden border-4 border-slate-600 relative">
+               <img id="certImg" src="" alt="Certificate Preview" class="w-full h-full object-contain hidden bg-slate-100">
+               <div id="certFallback" class="text-center p-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 text-slate-300 mx-auto mb-2 animate-pulse"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z" /><path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" /></svg>
+                  <p class="text-slate-400 font-bold text-sm">กำลังประมวลผลรูปภาพ...</p>
+               </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 relative z-10">
+               <a id="downloadCertBtn" href="#" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition text-center no-underline shadow-lg shadow-blue-500/20 hidden">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clip-rule="evenodd" /></svg>
+                  เปิดไฟล์ดาวน์โหลด
+               </a>
+               <button id="emailCertBtn" onclick="sendToEmail()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition hidden">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" /><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" /></svg>
+                  ส่งเข้าอีเมล
+               </button>
+            </div>
+         </div>
+
+         <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-left flex items-start gap-3 max-w-lg mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-rose-500 shrink-0 mt-0.5"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
+            <div>
+               <p class="text-rose-800 font-bold text-sm mb-1">พบปัญหาชื่อ-สกุลผิดพลาด?</p>
+               <p class="text-rose-600 text-xs leading-relaxed">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเพื่อแก้ไขข้อมูล</p>
+               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
+                  แจ้งปัญหาทางอีเมล
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
+               </a>
+            </div>
+         </div>
+
+         <button onclick="resetSearch()" class="inline-block font-bold text-slate-500 hover:text-slate-800 underline underline-offset-4">ค้นหารหัสอื่น</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุด)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
+    
+    let allAttendees = [];
+    let currentUser = null; 
+
+    window.onload = () => {
+       fetch(SCRIPT_URL + "?action=getRegisteredList")
+         .then(r => r.json())
+         .then(data => {
+             allAttendees = data;
+             document.getElementById('initLoading').style.display = 'none';
+             document.getElementById('searchView').classList.remove('hidden');
+         })
+         .catch(err => {
+             document.getElementById('initLoading').innerHTML = '<p class="text-rose-500 font-bold">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณารีเฟรช</p>';
+         });
+
+       setupCustomCourseSelect(); 
+    };
+
+    function setupCustomCourseSelect() {
+       const container = document.getElementById('customCourseSelect');
+       if (!container) return; 
+       const trigger = container.querySelector('.c-select-trigger');
+       const options = container.querySelectorAll('.c-select-option');
+       const hiddenInput = document.getElementById('searchCourse');
+       const displayText = document.getElementById('courseDisplayText');
+
+       trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          container.classList.toggle('open');
+       });
+
+       options.forEach(opt => {
+          opt.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const val = opt.getAttribute('data-value');
+             hiddenInput.value = val; 
+             displayText.innerText = val; 
+             
+             options.forEach(o => o.classList.remove('selected'));
+             opt.classList.add('selected');
+             container.classList.remove('open');
+             
+             document.getElementById('searchId').focus(); 
+          });
+       });
+
+       document.addEventListener('click', (e) => {
+          if(!e.target.closest('#customCourseSelect')) {
+             container.classList.remove('open');
+          }
+       });
+    }
+
+    function verifyUser() {
+       const prefix = document.getElementById('searchCourse').value;
+       let num = document.getElementById('searchId').value.trim();
+       if(!num) return Swal.fire('เกิดข้อผิดพลาด', 'กรุณาระบุตัวเลขรหัส', 'warning');
+       
+       num = ("0" + num).slice(-2);
+       const fullId = prefix + "-" + num;
+       const found = allAttendees.find(a => a.id === fullId);
+       
+       if(found) {
+           confirmUser(found);
+       } else {
+           Swal.fire('ไม่พบข้อมูล', `ไม่มีรหัส ${fullId} ในระบบ`, 'error');
+       }
+    }
+
+    function confirmUser(user) {
+       Swal.fire({
+          title: 'ใช่คุณหรือไม่?',
+          html: `รหัส: <strong class="text-blue-500 bg-blue-50 px-2 py-0.5 rounded ml-1">${user.id}</strong><br>ชื่อ: <strong class="text-slate-800">${user.name}</strong>`,
+          icon: 'question', 
+          showCancelButton: true, 
+          confirmButtonText: 'ใช่, ข้อมูลฉันเอง', 
+          cancelButtonText: 'ไม่ใช่',
+          confirmButtonColor: '#3b82f6', 
+          cancelButtonColor: '#94a3b8',
+          customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl shadow-md', cancelButton: 'rounded-xl' }
+       }).then((res) => {
+          if(res.isConfirmed) {
+             currentUser = user;
+             fetchCertificate(user.id);
+          }
+       });
+    }
+
+    function fetchCertificate(id) {
+       Swal.fire({
+          title: 'กำลังประมวลผล...',
+          text: 'กำลังค้นหาไฟล์เกียรติบัตรของคุณในระบบ',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+       });
+
+       fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'getCert', id: id })
+       })
+       .then(r => r.json())
+       .then(res => {
+           Swal.close();
+           if(res.status === 'success') {
+               showCertView(res.certUrl);
+           } else {
+               Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลได้', 'error');
+           }
+       })
+       .catch(err => {
+           Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาในการเชื่อมต่อ', 'error');
+       });
+    }
+
+    function showCertView(certUrl) {
+       document.getElementById('searchView').classList.add('hidden');
+       document.getElementById('certView').classList.remove('hidden');
+       document.getElementById('displayNameShow').innerText = currentUser.name;
+       
+       const certImg = document.getElementById('certImg');
+       const certFallback = document.getElementById('certFallback');
+       const downloadBtn = document.getElementById('downloadCertBtn');
+       const emailBtn = document.getElementById('emailCertBtn');
+
+       if(certUrl) {
+           currentUser.certUrl = certUrl; 
+           
+           downloadBtn.href = certUrl;
+           downloadBtn.classList.remove('hidden');
+           downloadBtn.classList.add('flex');
+           emailBtn.classList.remove('hidden');
+           emailBtn.classList.add('flex');
+
+           // ดึง File ID เพื่อทำรูปตัวอย่าง (Thumbnail)
+           let fileId = "";
+           const match = certUrl.match(/[-\w]{25,}/);
+           if (match) fileId = match[0];
+
+           if (fileId) {
+               certImg.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+               certImg.onload = () => {
+                  certImg.classList.remove('hidden');
+                  certFallback.style.display = 'none';
+               };
+               certImg.onerror = () => {
+                  certImg.classList.add('hidden');
+                  certFallback.style.display = 'block';
+               };
+           } else {
+               certFallback.style.display = 'block';
+           }
+       } else {
+           certFallback.innerHTML = `
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-3 drop-shadow"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
+               <p class="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-2 rounded-lg inline-block">ไม่พบไฟล์เกียรติบัตรของท่านในระบบ<br><span class="text-xs font-medium text-slate-500 mt-1 block">กรุณาแจ้งปัญหาทางอีเมลเพื่อติดต่อทีมงาน</span></p>
+           `;
+           certFallback.style.display = 'block';
+       }
+    }
+
+    function sendToEmail() {
+       if(!currentUser || !currentUser.email) {
+           return Swal.fire('ข้อมูลไม่ครบ', 'ไม่พบอีเมลของคุณในระบบ กรุณาใช้วิธีดาวน์โหลดโดยตรง', 'warning');
+       }
+
+       // สร้างข้อความอีเมล
+       const toEmail = currentUser.email;
+       const subject = encodeURIComponent("เกียรติบัตรเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up");
+       let bodyText = `สวัสดีครับ ${currentUser.name}\n\n`;
+       bodyText += `ขอขอบคุณที่เข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2\n\n`;
+       bodyText += `ท่านสามารถดาวน์โหลดและเก็บลิงก์เกียรติบัตรของท่านไว้ได้ที่ลิงก์ด้านล่างนี้:\n${currentUser.certUrl}\n\n`;
+       bodyText += `ขอบคุณครับ\nทีมงาน CRA Education`;
+       
+       const body = encodeURIComponent(bodyText);
+
+       // สร้างลิงก์ mailto: เพื่อเปิดแอปอีเมลในเครื่อง
+       const mailtoLink = `mailto:${toEmail}?subject=${subject}&body=${body}`;
+
+       // สั่งเปิดแอป Mail ของระบบปฏิบัติการ (iOS/Android/Windows/Mac)
+       window.location.href = mailtoLink;
+
+       Swal.fire({
+           toast: true, 
+           position: 'top', 
+           icon: 'success', 
+           title: 'เปิดแอปอีเมลแล้ว!', 
+           showConfirmButton: false, 
+           timer: 2500, 
+           customClass: {popup: 'rounded-2xl'}
+       });
+    }
+
+    function resetSearch() {
+       document.getElementById('certView').classList.add('hidden');
+       document.getElementById('searchView').classList.remove('hidden');
+       document.getElementById('searchId').value = '';
+       document.getElementById('searchId').focus();
+       currentUser = null;
+    }
+  </script>
+</body>
+</html>
