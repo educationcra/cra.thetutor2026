@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CRA THE TUTOR 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['"Noto Sans Thai"', 'sans-serif'] } } }
+    }
+  </script>
+  <style>
+    body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8fafc; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+      .glass-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; break-inside: avoid; margin-bottom: 2rem !important; padding: 1rem !important; }
+      .overflow-x-auto, .max-h-[350px] { overflow: visible !important; max-height: none !important; height: auto !important; }
+      table { page-break-inside: auto; width: 100% !important; }
+      tr { page-break-inside: avoid !important; page-break-after: auto; }
+      thead { display: table-header-group; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .loader { border: 4px solid #f1f5f9; border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="text-slate-800 antialiased pb-10">
+
+  <div id="loading" class="fixed inset-0 bg-white/95 z-[60] flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="loader mb-4"></div>
+    <p class="text-blue-600 font-bold animate-pulse text-xl">กำลังดึงข้อมูลประเมิน Real-time...</p>
+  </div>
+
+  <div id="mainApp" class="container mx-auto px-4 py-8 max-w-[90rem] opacity-0 transition-opacity duration-700 hidden">
+
+    <!-- Header & Filters -->
+    <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-slate-200 pb-6 no-print">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex justify-center items-center text-blue-500 shadow-inner shrink-0 border border-blue-100">
+            <i class="fi fi-sr-chart-pie-alt text-3xl mt-1"></i>
+        </div>
+        <div>
+            <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">CRA THE TUTOR 2026</h1>
+            <p class="text-slate-500 font-medium mt-1">Evaluation Dashboard</p>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap justify-center gap-3">
+        <!-- Filter หลักสูตร -->
+        <select id="courseFilter" onchange="processAndRenderData()" class="bg-white border-2 border-slate-200 text-blue-700 px-4 py-3 rounded-xl font-bold outline-none focus:border-blue-500 shadow-sm cursor-pointer transition">
+            <option value="all">ภาพรวมทุกหลักสูตร</option>
+            <option value="MD">MD (แพทยศาสตร์)</option>
+            <option value="HDS">HDS (วิทยาศาสตร์ข้อมูลสุขภาพ)</option>
+            <option value="BNS">BNS (พยาบาลศาสตร์)</option>
+            <option value="RT">RT (รังสีเทคนิค)</option>
+            <option value="HKH">HKH (วิทยาศาสตร์การเคลื่อนไหวฯ)</option>
+            <option value="PMD">PMD (ฉุกเฉินการแพทย์)</option>
+            <option value="INMS">INMS (นวัตกรรมฯ การแพทย์)</option>
+            <option value="BME">BME (วิศวกรรมชีวการแพทย์)</option>
+            <option value="MHFT">MHFT (เทคโนโลยีอาหารการแพทย์ฯ)</option>
+        </select>
+
+        <button onclick="fetchData()" class="flex items-center gap-2 px-4 py-3 bg-white border-2 border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition shadow-sm">
+          <i class="fi fi-sr-refresh"></i>
+        </button>
+        <button onclick="window.print()" class="flex items-center gap-2 px-5 py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition shadow-md">
+          <i class="fi fi-sr-print"></i> พิมพ์รายงาน
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <div class="mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+       <!-- ผู้ตอบแบบประเมินทั้งหมด -->
+       <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 shadow-lg shadow-blue-500/20 text-white flex items-center justify-between transform hover:-translate-y-1 transition">
+          <div>
+             <p class="text-blue-100 font-bold text-sm mb-1">จำนวนผู้ประเมิน</p>
+             <div class="flex items-baseline gap-2"><span class="text-4xl font-black" id="kpiTotal">0</span><span class="text-sm font-bold text-blue-200">คน</span></div>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white"><i class="fi fi-sr-users-alt mt-1 text-xl"></i></div>
+       </div>
+
+       <!-- แนะนำต่อ -->
+       <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+          <div>
+             <p class="text-emerald-500 font-bold text-sm mb-1">จะแนะนำคนรู้จักมาเข้าร่วม</p>
+             <div class="flex items-baseline gap-2"><span class="text-4xl font-black text-slate-800" id="kpiRecommend">0%</span></div>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500"><i class="fi fi-sr-thumbs-up mt-1 text-xl"></i></div>
+       </div>
+
+       <!-- สนใจ Open House -->
+       <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+          <div>
+             <p class="text-purple-500 font-bold text-sm mb-1">สนใจ Open House 2027</p>
+             <div class="flex items-baseline gap-2"><span class="text-4xl font-black text-slate-800" id="kpiOpenhouse">0%</span></div>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500"><i class="fi fi-sr-building mt-1 text-xl"></i></div>
+       </div>
+
+       <!-- คะแนนเฉลี่ย -->
+       <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+          <div>
+             <p class="text-amber-500 font-bold text-sm mb-1">คะแนนภาพรวมกิจกรรม</p>
+             <div class="flex items-baseline gap-2"><span class="text-4xl font-black text-slate-800" id="kpiOverall">0.00</span><span class="text-xl font-bold text-slate-300">/ 5</span></div>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-500"><i class="fi fi-sr-star mt-1 text-xl"></i></div>
+       </div>
+    </div>
+
+    <!-- ส่วนที่ 1: ข้อมูลประชากรศาสตร์ -->
+    <div class="mb-6 text-xl font-bold text-slate-700 px-2 flex items-center gap-2">
+        <i class="fi fi-sr-chart-histogram text-blue-500 text-2xl"></i> ข้อมูลเบื้องต้น (Demographics)
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- รอบ TCAS ที่สนใจ -->
+        <div class="glass-card p-6 md:p-8">
+            <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-3">
+              <i class="fi fi-sr-crosshair text-blue-500 text-xl"></i> รอบการรับสมัคร TCAS ที่สนใจ
+            </h3>
+            <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-600 font-bold uppercase">
+                        <tr><th class="p-3">รอบ TCAS</th><th class="p-3 text-right">จำนวน</th><th class="p-3 text-right">ร้อยละ</th></tr>
+                    </thead>
+                    <tbody id="roundTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- รู้จักมาก่อนหรือไม่ -->
+        <div class="glass-card p-6 md:p-8">
+            <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-3">
+              <i class="fi fi-sr-eye text-blue-500 text-xl"></i> การรับรู้ (รู้จักราชวิทยาลัยจุฬาภรณ์มาก่อนหรือไม่)
+            </h3>
+            <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                <table class="w-full text-sm text-left border-collapse relative">
+                    <thead class="bg-slate-50 text-slate-600 font-bold uppercase">
+                        <tr><th class="p-3">สถานะการรับรู้</th><th class="p-3 text-right w-24">จำนวน</th><th class="p-3 text-right w-24">ร้อยละ</th></tr>
+                    </thead>
+                    <tbody id="knewBeforeTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- แหล่งข่าวสาร -->
+    <div class="glass-card p-6 md:p-8 mb-10">
+        <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-3">
+            <i class="fi fi-sr-megaphone text-blue-500 text-xl"></i> ช่องทางที่ทราบข่าวสารกิจกรรม
+        </h3>
+        <div class="overflow-x-auto border border-slate-100 rounded-xl">
+            <table class="w-full text-sm text-left border-collapse">
+                <thead class="bg-slate-50 text-slate-600 font-bold uppercase border-b border-slate-100">
+                    <tr><th class="p-3">แหล่งข่าวสาร</th><th class="p-3 text-right w-24">จำนวน</th><th class="p-3 text-right w-24">ร้อยละ</th></tr>
+                </thead>
+                <tbody id="channelsTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr class="my-10 border-slate-200">
+
+    <!-- ส่วนที่ 2: คะแนนความพึงพอใจรายหัวข้อ -->
+    <div class="glass-card p-6 md:p-8 mb-10">
+      <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center gap-3">
+        <i class="fi fi-sr-star text-amber-500 text-2xl"></i> ภาพรวมคะแนนความพึงพอใจ
+      </h3>
+      <p class="text-slate-500 font-medium mb-8">คะแนนเฉลี่ยจากผู้ประเมินตามหลักสูตรที่เลือก (คะแนนเต็ม 5)</p>
+
+      <div id="satisfactionContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+    </div>
+
+    <!-- ข้อเสนอแนะ -->
+    <div class="glass-card p-6 md:p-8 mb-8 no-print">
+       <div class="flex justify-between items-center mb-6">
+           <h3 class="text-lg font-black text-slate-800 flex items-center gap-3">
+              <i class="fi fi-sr-comment-alt text-blue-500 text-2xl"></i> ข้อเสนอแนะเพิ่มเติม
+           </h3>
+           <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm font-bold border border-blue-100"><span id="totalSuggestions">0</span> ข้อความ</span>
+       </div>
+       
+       <div id="suggestionList" class="space-y-3 mb-6"></div>
+
+       <div class="flex justify-between items-center border-t border-slate-100 pt-4" id="paginationControls">
+          <button id="btnPrev" onclick="changePage(-1)" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition">ก่อนหน้า</button>
+          <span class="text-sm font-bold text-slate-500">หน้าที่ <span id="lblPageNum" class="text-blue-600">1</span> จาก <span id="lblTotalPages">1</span></span>
+          <button id="btnNext" onclick="changePage(1)" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-bold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition">ถัดไป</button>
+       </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ⚠️ นำ URL จาก Google Apps Script (ที่ Deploy ล่าสุด) มาใส่ที่นี่
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec'; 
+
+    let ALL_DATA = [];
+    let FILTERED_DATA = [];
+    let suggestionsArray = [];
+    let currentPage = 1;
+    const itemsPerPage = 10; 
+
+    // รายการคำถามเรียงตาม Database (คอลัมน์)
+    const questionsDef = [
+        { id: "q_overall", label: "ภาพรวมของกิจกรรม CRA The Tutor : Portfolio Level Up", icon: "fi-sr-star", color: "from-amber-400 to-orange-500", txtColor: "text-amber-500" },
+        { id: "q_study", label: "รู้สึกอยากศึกษาต่อที่ราชวิทยาลัยจุฬาภรณ์มากขึ้น", icon: "fi-sr-graduation-cap", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_reg", label: "ความสะดวกในการลงทะเบียนเข้าร่วม", icon: "fi-sr-laptop", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_time", label: "ช่วงเวลาในการจัดกิจกรรม", icon: "fi-sr-clock", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_location", label: "สถานที่จัดงาน", icon: "fi-sr-marker", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_courseInt", label: "สนใจหลักสูตรมากขึ้น", icon: "fi-sr-heart", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_tcas", label: "กิจกรรมบรรยายพิเศษ 'เจาะลึก TCAS 70' (พี่ลาเต้)", icon: "fi-sr-presentation", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_base", label: "ฐานกิจกรรมประจำหลักสูตร", icon: "fi-sr-flask", color: "from-emerald-400 to-teal-500", txtColor: "text-emerald-500" },
+        { id: "q_future", label: "กิจกรรมบรรยาย 'มุมมองการศึกษาและอนาคต' (พี่ท็อป)", icon: "fi-sr-rocket", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" },
+        { id: "q_qa", label: "กิจกรรม Q&A เทคนิคการทำพอร์ตและเตรียมตัวสัมภาษณ์", icon: "fi-sr-comments", color: "from-blue-400 to-indigo-500", txtColor: "text-blue-500" }
+    ];
+
+    window.onload = () => fetchData();
+
+    async function fetchData() {
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('loading').classList.remove('opacity-0');
+      document.getElementById('mainApp').classList.add('hidden');
+
+      try {
+        const res = await fetch(SCRIPT_URL + '?action=getEvaluationData');
+        const json = await res.json();
+
+        if(json.status === 'error') throw new Error(json.message);
+
+        ALL_DATA = [];
+        const rows = json.data;
+        if(rows && rows.length > 1) { 
+            for(let i=1; i<rows.length; i++) {
+                const r = rows[i];
+                if(!r[0]) continue; // ข้ามแถวว่าง
+                ALL_DATA.push({
+                    id: String(r[0]),
+                    name: r[1],
+                    course: r[3] || 'ไม่ระบุ',
+                    round: r[4] || '-',
+                    knewBefore: r[5] || '-',
+                    channels: r[6] || '-',
+                    q_study: parseFloat(r[7])||0,
+                    q_reg: parseFloat(r[8])||0,
+                    q_time: parseFloat(r[9])||0,
+                    q_location: parseFloat(r[10])||0,
+                    q_courseInt: parseFloat(r[11])||0,
+                    q_tcas: parseFloat(r[12])||0,
+                    q_base: parseFloat(r[13])||0,
+                    q_future: parseFloat(r[14])||0,
+                    q_qa: parseFloat(r[15])||0,
+                    q_overall: parseFloat(r[16])||0,
+                    recommend: r[17] || '-',
+                    openhouse: r[18] || '-',
+                    feedback: r[19] || '-'
+                });
+            }
+        }
+
+        processAndRenderData();
+
+        document.getElementById('loading').classList.add('opacity-0');
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            setTimeout(()=>document.getElementById('mainApp').classList.remove('opacity-0'), 50);
+        }, 500);
+
+      } catch (error) {
+        document.getElementById('loading').innerHTML = `<div class="text-rose-500 font-bold text-center p-6 bg-white rounded-3xl shadow-xl border border-rose-100"><i class="fi fi-sr-triangle-warning text-5xl mb-4 text-rose-400"></i><br>ไม่สามารถดึงข้อมูลได้<br><span class="text-sm text-slate-500 font-normal mt-2 block">${error.message}</span><button onclick="fetchData()" class="mt-4 bg-rose-50 text-rose-600 px-4 py-2 rounded-xl border border-rose-200 hover:bg-rose-100">ลองใหม่</button></div>`;
+      }
+    }
+
+    function countFreq(dataArray, key, isMulti = false) {
+        let counts = {};
+        dataArray.forEach(item => {
+            let val = String(item[key] || "").trim();
+            if (val && val !== "-" && val !== "") {
+                if (isMulti) {
+                   val.split(/,\s*/).forEach(v => {
+                       let cleanV = v.trim();
+                       if(cleanV) counts[cleanV] = (counts[cleanV] || 0) + 1;
+                   });
+                } else {
+                   counts[val] = (counts[val] || 0) + 1;
+                }
+            }
+        });
+        return Object.entries(counts).sort((a,b) => b[1] - a[1]);
+    }
+
+    function processAndRenderData() {
+      const courseFilter = document.getElementById('courseFilter').value;
+      
+      // ฟิลเตอร์ข้อมูลตามที่เลือก (หา ID ที่ขึ้นต้นด้วยตัวย่อ หรือ ตรงกับชื่อหลักสูตร)
+      if (courseFilter === 'all') {
+          FILTERED_DATA = ALL_DATA;
+      } else {
+          FILTERED_DATA = ALL_DATA.filter(d => d.id.startsWith(courseFilter) || d.course.includes(courseFilter));
+      }
+
+      const total = FILTERED_DATA.length;
+      document.getElementById('kpiTotal').innerText = total.toLocaleString();
+
+      if (total === 0) {
+          // เคลียร์ UI ให้หมดถ้าไม่มีข้อมูล
+          document.getElementById('kpiRecommend').innerText = "0%";
+          document.getElementById('kpiOpenhouse').innerText = "0%";
+          document.getElementById('kpiOverall').innerText = "0.00";
+          ['roundTableBody', 'knewBeforeTableBody', 'channelsTableBody'].forEach(id => {
+              document.getElementById(id).innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400 font-bold border-b border-slate-50">ไม่มีข้อมูล</td></tr>`;
+          });
+          document.getElementById('satisfactionContainer').innerHTML = '<div class="col-span-2 text-center text-slate-400 font-bold py-10">ไม่มีข้อมูล</div>';
+          suggestionsArray = [];
+          renderSuggestions();
+          return;
+      }
+
+      // 1. คำนวณ KPI (%)
+      let recommendCount = FILTERED_DATA.filter(d => d.recommend === 'แนะนำ' || d.recommend === 'แนะนำแน่นอน').length;
+      let openhouseCount = FILTERED_DATA.filter(d => d.openhouse === 'สนใจ' || d.openhouse === 'สนใจเข้าร่วม').length;
+      
+      document.getElementById('kpiRecommend').innerText = Math.round((recommendCount / total) * 100) + "%";
+      document.getElementById('kpiOpenhouse').innerText = Math.round((openhouseCount / total) * 100) + "%";
+
+      // 2. คำนวณค่าเฉลี่ยแบบประเมิน
+      let sumRatings = {};
+      let validRatings = {};
+      questionsDef.forEach(q => { sumRatings[q.id] = 0; validRatings[q.id] = 0; });
+
+      suggestionsArray = [];
+
+      FILTERED_DATA.forEach(d => {
+          // รวมคะแนน
+          questionsDef.forEach(q => {
+             let v = d[q.id];
+             if (v > 0) { sumRatings[q.id] += v; validRatings[q.id]++; }
+          });
+
+          // เก็บข้อเสนอแนะ
+          let fb = String(d.feedback).trim();
+          if (fb !== "" && fb !== "-" && fb !== "ไม่มี" && fb.toLowerCase() !== "none") {
+              suggestionsArray.push({text: fb, course: d.course});
+          }
+      });
+
+      // ภาพรวม
+      let overallAvg = validRatings["q_overall"] > 0 ? (sumRatings["q_overall"] / validRatings["q_overall"]).toFixed(2) : "0.00";
+      document.getElementById('kpiOverall').innerText = overallAvg;
+
+      // 3. Render ตารางประชากรศาสตร์
+      renderDataTable('roundTableBody', countFreq(FILTERED_DATA, 'round'), total);
+      renderDataTable('knewBeforeTableBody', countFreq(FILTERED_DATA, 'knewBefore'), total);
+      renderDataTable('channelsTableBody', countFreq(FILTERED_DATA, 'channels', true), total);
+
+      // 4. Render กราฟแท่ง
+      renderSatisfactionBars(sumRatings, validRatings);
+
+      // 5. Render ข้อเสนอแนะ
+      currentPage = 1;
+      document.getElementById('totalSuggestions').innerText = suggestionsArray.length;
+      renderSuggestions();
+    }
+
+    function renderDataTable(containerId, data, total) {
+       if(data.length === 0 || total === 0) { document.getElementById(containerId).innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400 font-bold border-b border-slate-50">ไม่มีข้อมูล</td></tr>`; return; }
+       document.getElementById(containerId).innerHTML = data.map((it) => {
+          let p = (it[1]*100/total).toFixed(2); 
+          return `<tr class="hover:bg-slate-50 transition-colors border-b border-slate-50"> 
+              <td class="p-3 font-bold text-slate-700">${it[0]}</td> 
+              <td class="p-3 text-right font-black text-blue-600 text-lg w-24">${it[1]}</td> 
+              <td class="p-3 text-right text-slate-500 font-bold w-24">${p}%</td> 
+          </tr>`;
+       }).join('');
+    }
+
+    function renderSatisfactionBars(sumObj, countObj) {
+      document.getElementById('satisfactionContainer').innerHTML = questionsDef.map(item => {
+        let validC = countObj[item.id] || 0;
+        let sum = sumObj[item.id] || 0;
+        let avg = validC ? (sum/validC).toFixed(2) : "0.00";
+        let pct = (parseFloat(avg)/5)*100;
+
+        return `<div class="bg-white p-5 rounded-2xl border border-slate-100 flex flex-col shadow-sm hover:shadow-md transition">
+                  <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
+                    <span class="text-sm font-bold text-slate-700 flex items-start gap-2 leading-relaxed flex-1">
+                      <i class="fi ${item.icon} ${item.txtColor} mt-0.5 flex-shrink-0 text-base"></i> <span>${item.label}</span>
+                    </span>
+                    <div class="flex flex-col items-end flex-shrink-0 bg-slate-50 px-3 py-1 rounded-xl border border-slate-100">
+                      <span class="text-xl md:text-2xl font-black text-slate-800">${avg}<span class="text-xs text-slate-400 font-bold ml-1">/5</span></span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mt-auto">
+                    <div class="bg-gradient-to-r ${item.color} h-full rounded-full transition-all duration-1000" style="width:${pct}%"></div>
+                  </div>
+                </div>`;
+      }).join('');
+    }
+
+    function renderSuggestions() {
+       const totalPages = Math.ceil(suggestionsArray.length / itemsPerPage) || 1;
+       document.getElementById('lblTotalPages').innerText = totalPages;
+
+       if (suggestionsArray.length === 0) {
+           document.getElementById('suggestionList').innerHTML = '<div class="p-8 text-center text-slate-400 font-bold border border-dashed border-slate-200 rounded-xl">ไม่มีข้อความเพิ่มเติม</div>';
+           document.getElementById('paginationControls').style.display = 'none';
+           return;
+       }
+
+       document.getElementById('paginationControls').style.display = 'flex';
+       const start = (currentPage - 1) * itemsPerPage;
+       const end = start + itemsPerPage;
+       const currentItems = suggestionsArray.slice(start, end);
+
+       document.getElementById('suggestionList').innerHTML = currentItems.map((item, index) => {
+           let actualIndex = start + index + 1;
+           return `<div class="p-4 bg-white rounded-xl border border-slate-200 flex items-start gap-4 shadow-sm">
+               <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black flex-shrink-0 text-sm border border-blue-100">${actualIndex}</div>
+               <div>
+                   <div class="text-slate-700 text-sm leading-relaxed pt-1 font-medium mb-1">"${item.text}"</div>
+                   <div class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded inline-block">${item.course}</div>
+               </div>
+           </div>`;
+       }).join('');
+
+       document.getElementById('lblPageNum').innerText = currentPage;
+       document.getElementById('btnPrev').disabled = currentPage === 1;
+       document.getElementById('btnNext').disabled = currentPage === totalPages;
+    }
+
+    function changePage(direction) {
+       const totalPages = Math.ceil(suggestionsArray.length / itemsPerPage);
+       currentPage += direction;
+       if (currentPage < 1) currentPage = 1;
+       if (currentPage > totalPages) currentPage = totalPages;
+       renderSuggestions();
+    }
+  </script>
+</body>
+</html>
