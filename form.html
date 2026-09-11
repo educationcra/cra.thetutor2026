@@ -811,23 +811,35 @@
     }
 
     function sendCertToEmail() {
-       const btn = document.getElementById('emailCertBtn');
-       const originalText = btn.innerHTML;
-       btn.disabled = true; 
-       btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ส่ง...';
+       if(!currentData || !currentData.email) {
+           return Swal.fire('ข้อมูลไม่ครบ', 'ไม่พบอีเมลของคุณในระบบ กรุณาใช้วิธีดาวน์โหลดโดยตรง', 'warning');
+       }
 
-       fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'sendCertEmail', email: currentData.email, name: currentData.name, certUrl: currentData.certUrl })
-       })
-       .then(r=>r.json()).then(res => {
-          if(res.status === 'success') Swal.fire({toast: true, position: 'top', icon: 'success', title: 'ส่งเข้าอีเมลสำเร็จ!', showConfirmButton: false, timer: 2500, customClass: {popup: 'rounded-2xl'}});
-          else Swal.fire('ผิดพลาด', 'ส่งอีเมลไม่สำเร็จ', 'error');
-          btn.disabled = false; btn.innerHTML = originalText;
-       })
-       .catch(err => {
-          Swal.fire('การเชื่อมต่อขัดข้อง', 'ไม่สามารถส่งอีเมลได้', 'error');
-          btn.disabled = false; btn.innerHTML = originalText;
+       // สร้างข้อความอีเมล
+       const toEmail = currentData.email;
+       const subject = encodeURIComponent("เกียรติบัตรเข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up");
+       let bodyText = `สวัสดีครับ ${currentData.name}\n\n`;
+       bodyText += `ขอขอบคุณที่เข้าร่วมกิจกรรม CRA The Tutor : Portfolio Level Up โครงการพี่ติวน้องสู่ความเป็นเลิศ ปี 2\n\n`;
+       bodyText += `ท่านสามารถดาวน์โหลดและเก็บลิงก์เกียรติบัตรของท่านไว้ได้ที่ลิงก์ด้านล่างนี้:\n${currentData.certUrl}\n\n`;
+       bodyText += `ขอบคุณครับ\nทีมงาน CRA Education`;
+       
+       const body = encodeURIComponent(bodyText);
+
+       // สร้างลิงก์ mailto: เพื่อเปิดแอปอีเมลในเครื่อง
+       const mailtoLink = `mailto:${toEmail}?subject=${subject}&body=${body}`;
+
+       // สั่งเปลี่ยนหน้าต่างไปยังแอพ Mail ทันที
+       window.location.href = mailtoLink;
+
+       // แสดงแจ้งเตือนน่ารักๆ ว่าเปิดแอพแล้ว
+       Swal.fire({
+           toast: true, 
+           position: 'top', 
+           icon: 'success', 
+           title: 'เปิดแอปอีเมลแล้ว!', 
+           showConfirmButton: false, 
+           timer: 2500, 
+           customClass: {popup: 'rounded-2xl'}
        });
     }
   </script>
