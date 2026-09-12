@@ -154,8 +154,8 @@
             <div>
                <p class="text-rose-800 font-bold text-sm mb-1">พบปัญหาชื่อ-สกุลผิดพลาด?</p>
                <p class="text-rose-600 text-xs leading-relaxed">หากข้อมูลบนเกียรติบัตรไม่ถูกต้อง กรุณาแจ้งเพื่อแก้ไขข้อมูล</p>
-               <a href="mailto:craopenhouse@gmail.com?subject=แจ้งปัญหาเกียรติบัตรผิดพลาด" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
-                  แจ้งปัญหาทางอีเมล
+               <a id="reportIssueBtn" href="#" class="inline-flex items-center gap-1.5 mt-3 bg-white border border-rose-200 text-rose-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-rose-100 transition no-underline">
+                  แจ้งปัญหา
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" /><path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" /></svg>
                </a>
             </div>
@@ -168,14 +168,15 @@
   </div>
 
   <script>
-    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุด)
+    // ⚠️ ลิงก์ Web App (ใช้ลิงก์ล่าสุดที่ Deploy)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTpTOTqdytjmsEoBX8a88y3toayWDXBR6G6KzgGka6YhbnvmLNLOF1MuUtlGJnmv9/exec";
     
     let allAttendees = [];
     let currentUser = null; 
 
     window.onload = () => {
-       fetch(SCRIPT_URL + "?action=getRegisteredList")
+       // ดึงรายชื่อจากผู้ที่ทำแบบประเมินแล้ว (getEvaluatedList)
+       fetch(SCRIPT_URL + "?action=getEvaluatedList")
          .then(r => r.json())
          .then(data => {
              allAttendees = data;
@@ -207,7 +208,7 @@
              e.stopPropagation();
              const val = opt.getAttribute('data-value');
              hiddenInput.value = val; 
-             displayText.innerText = val; 
+             displayText.innerText = val; // แสดงผลเป็นตัวย่อเมื่อเลือกเสร็จ
              
              options.forEach(o => o.classList.remove('selected'));
              opt.classList.add('selected');
@@ -236,7 +237,13 @@
        if(found) {
            confirmUser(found);
        } else {
-           Swal.fire('ไม่พบข้อมูล', `ไม่มีรหัส ${fullId} ในระบบ`, 'error');
+           // แจ้งเตือนใหม่ให้ชัดเจนว่าต้องทำแบบประเมินก่อน
+           Swal.fire({
+             title: 'ไม่พบข้อมูล', 
+             html: `ไม่พบข้อมูลเกียรติบัตรของรหัส <strong class="text-rose-500">${fullId}</strong><br><br><span class="text-sm text-slate-500 font-medium">ท่านทำแบบประเมินความพึงพอใจแล้วหรือยัง?<br>หากยัง กรุณาทำแบบประเมินก่อนระบบจึงจะออกเกียรติบัตรให้ครับ</span>`, 
+             icon: 'warning',
+             customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl shadow-md' }
+           });
        }
     }
 
@@ -294,6 +301,7 @@
        const certFallback = document.getElementById('certFallback');
        const downloadBtn = document.getElementById('downloadCertBtn');
        const emailBtn = document.getElementById('emailCertBtn');
+       const reportBtn = document.getElementById('reportIssueBtn');
 
        if(certUrl) {
            currentUser.certUrl = certUrl; 
@@ -322,6 +330,12 @@
            } else {
                certFallback.style.display = 'block';
            }
+           
+           // อัปเดตปุ่มรายงานปัญหาให้ดึง ID ผู้ใช้งานได้อัตโนมัติ
+           const mailSubject = encodeURIComponent(`แจ้งปัญหาเกียรติบัตรผิดพลาด - ID: ${currentUser.id}`);
+           const mailBody = encodeURIComponent(`สวัสดีครับ/ค่ะ ทีมงาน CRA Education\n\nพบปัญหาบนเกียรติบัตรครับ/ค่ะ\nรหัสประจำตัว (ID): ${currentUser.id}\nชื่อ-นามสกุล: ${currentUser.name}\n\nรายละเอียดปัญหา:\n(โปรดระบุปัญหาที่พบ...)\n`);
+           reportBtn.href = `mailto:craopenhouse@gmail.com?subject=${mailSubject}&body=${mailBody}`;
+
        } else {
            certFallback.innerHTML = `
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-14 h-14 text-amber-500 mx-auto mb-3 drop-shadow"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
